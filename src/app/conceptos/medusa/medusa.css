@@ -1,0 +1,696 @@
+/* ─────────────────────────────────────────────────────────────
+   01 · MEDUSA — Dark Horror Editorial
+   ───────────────────────────────────────────────────────────── */
+
+.theme-medusa {
+  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+}
+
+/* ── Intro: el escudo emerge de la oscuridad ── */
+
+.md-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: calc(100svh - 4rem);
+  padding: 0 var(--mf-gutter) clamp(2rem, 5vw, 3.5rem);
+  grid-template-rows: auto auto auto;
+  align-content: end;
+  gap: 1.5rem;
+  overflow: clip;
+}
+.md-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(60% 45% at 50% 36%, #390b14 0%, #08080a 72%);
+}
+.md-hero__shield {
+  position: relative;
+  z-index: -1;
+  justify-self: center;
+  /* Nunca más ancho que la columna: si no, empuja el título contra el borde */
+  width: min(100vw - 2 * var(--mf-gutter), 62svh, 46rem);
+  margin-top: clamp(0.5rem, 3vw, 2rem);
+  filter: drop-shadow(0 30px 50px rgb(0 0 0 / 0.75));
+}
+.md-hero__shield img {
+  display: block;
+  width: 100%;
+  height: auto;
+  clip-path: ellipse(49.3% 49.3% at 50% 50%);
+}
+/* Volumen sin coste: brillo de barniz arriba a la izquierda y borde en sombra */
+.md-hero__shield::after {
+  content: "";
+  position: absolute;
+  inset: 0.7%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 26%, rgb(255 240 220 / 0.16), transparent 38%),
+    radial-gradient(circle, transparent 60%, rgb(0 0 0 / 0.5));
+  box-shadow: inset 0 0 0 1px rgb(255 230 190 / 0.1);
+  pointer-events: none;
+}
+.md-hero__copy {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(-7rem, -12vw, -3rem);
+}
+.md-title {
+  margin: 0;
+  font-family: var(--font-gloock), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(3rem, 1.4rem + 8.6vw, 9.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.015em;
+  text-shadow: 0 6px 40px rgb(8 8 10 / 0.9);
+}
+.md-title span {
+  display: block;
+}
+.md-title span + span {
+  padding-left: 0.6em;
+  color: var(--c-accent);
+}
+.md-warning {
+  margin: 0;
+  font-size: clamp(1.1rem, 1rem + 0.6vw, 1.5rem);
+  color: var(--c-muted);
+}
+.md-cta {
+  justify-self: start;
+}
+.md-hero__label {
+  justify-self: start;
+}
+
+@media (min-width: 64rem) {
+  .md-hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 1fr auto;
+    align-items: end;
+  }
+  .md-hero__shield {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    align-self: center;
+    width: min(58svh, 40rem);
+  }
+  .md-hero__copy {
+    grid-row: 2;
+    margin-top: -9rem;
+  }
+  .md-hero__label {
+    grid-row: 2;
+    justify-self: end;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .md-hero__shield {
+    animation: md-emerge 3.2s cubic-bezier(0.3, 0.6, 0.2, 1) both;
+  }
+  .md-title span {
+    animation: md-rise 1.2s var(--ease-cine) both;
+  }
+  .md-title span + span {
+    animation-delay: 0.15s;
+  }
+  .md-cta {
+    animation: md-fade 1s ease 1.6s both;
+  }
+}
+@keyframes md-emerge {
+  0% {
+    transform: scale(0.92);
+    filter: brightness(0) drop-shadow(0 30px 50px rgb(0 0 0 / 0.75));
+  }
+  45% {
+    filter: brightness(0.35) drop-shadow(0 30px 50px rgb(0 0 0 / 0.75));
+  }
+  100% {
+    transform: none;
+    filter: brightness(1) drop-shadow(0 30px 50px rgb(0 0 0 / 0.75));
+  }
+}
+@keyframes md-rise {
+  from {
+    transform: translateY(0.4em);
+    opacity: 0;
+  }
+}
+@keyframes md-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ── Secciones ── */
+
+.md-section {
+  padding: clamp(4rem, 10vw, 8rem) var(--mf-gutter);
+}
+.md-section__head {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+.md-section__head p {
+  margin: 0;
+  max-width: var(--mf-measure);
+  color: var(--c-muted);
+}
+@media (min-width: 48rem) {
+  .md-section__head {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    align-items: end;
+    column-gap: 3rem;
+  }
+}
+.md-h2 {
+  margin: 0;
+  font-family: var(--font-gloock), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 1.4rem + 4.4vw, 5.5rem);
+  line-height: 0.92;
+}
+
+/* ── Escudo interactivo: un objeto, no una imagen ── */
+
+.md-explore {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+@media (min-width: 64rem) {
+  .md-explore {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 25rem);
+    align-items: start;
+  }
+  .md-stage-wrap {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.md-stage {
+  --lx: -0.35;
+  --ly: -0.45;
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 2400 / 2350;
+  width: min(100%, 78svh);
+  margin-inline: auto;
+  perspective: 1100px;
+  /* El arrastre horizontal inclina; el vertical sigue desplazando la página */
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Atmósfera: un resplandor de sangre detrás del escudo que se enfría con la piedra */
+.md-stage::before,
+.md-stage::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  z-index: -2;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: opacity 2.2s ease;
+}
+.md-stage::before {
+  background: radial-gradient(closest-side, rgb(132 16 32 / 0.42), rgb(57 11 20 / 0.18) 55%, transparent);
+}
+.md-stage::after {
+  background: radial-gradient(closest-side, rgb(118 132 148 / 0.26), rgb(40 46 54 / 0.14) 55%, transparent);
+  opacity: 0;
+}
+.md-stage:is([data-estado="petrificando"], [data-estado="piedra"])::before {
+  opacity: 0.25;
+}
+.md-stage:is([data-estado="petrificando"], [data-estado="piedra"])::after {
+  opacity: 1;
+}
+
+/* Sombra sobre la pared: opuesta a la luz, más densa cuando el escudo es de piedra */
+.md-cast {
+  position: absolute;
+  inset: 6%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0.5) 70%, transparent);
+  transform: translate(calc(var(--lx) * -5%), calc(var(--ly) * -5% + 6%)) scale(1.04);
+  transition: opacity 1.2s ease;
+  opacity: 0.8;
+  pointer-events: none;
+}
+.md-stage[data-estado="piedra"] .md-cast {
+  opacity: 1;
+}
+
+.md-tilt {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: absolute;
+  inset: 4%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: scale 1.2s var(--ease-cine);
+}
+/* La piedra pesa: el escudo se hunde un poco */
+.md-stage[data-estado="piedra"] .md-tilt {
+  scale: 0.985;
+}
+
+/* Canto: capas de madera y bronce detrás de la cara; se ven al inclinar */
+.md-rim {
+  position: absolute;
+  inset: 0.7%;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #5a3c26, #2a1a10 45%, #0d0907 80%);
+  transform: translateZ(calc(var(--i) * -2.2px));
+}
+/* El canto también se vuelve piedra: sin madera a la vista en un escudo petrificado */
+.md-rim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(155deg, #8d9399, #4a4f55 45%, #1b1d20 80%);
+  opacity: 0;
+  transition: opacity 1.6s ease 0.8s;
+}
+.md-stage:is([data-estado="petrificando"], [data-estado="piedra"]) .md-rim::after {
+  opacity: 1;
+}
+.md-rim:nth-child(7) {
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.6);
+}
+
+.md-face {
+  --s: 1;
+  --tx: 0%;
+  --ty: 0%;
+  position: absolute;
+  inset: 0;
+  clip-path: ellipse(49.3% 49.3% at 50% 50%);
+}
+/* Cara convexa: borde en sombra y un filo de luz en el lado iluminado */
+.md-face::after {
+  content: "";
+  position: absolute;
+  inset: 0.7%;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 230 190 / 0.12),
+    inset calc(var(--lx) * -10px) calc(var(--ly) * -10px) 26px -8px rgb(255 228 190 / 0.22),
+    inset 0 0 50px 6px rgb(0 0 0 / 0.5);
+  pointer-events: none;
+}
+.md-canvas {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  transform: translate(var(--tx), var(--ty)) scale(var(--s));
+}
+.md-shield,
+.md-stone {
+  position: absolute;
+  inset: 0;
+}
+.md-shield img,
+.md-stone img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.md-gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+.md-stage.has-gl .md-gl {
+  opacity: 1;
+}
+/* Con WebGL, la imagen y las capas CSS se apartan cuando el material ya está pintado */
+.md-stage.has-gl :is(.md-canvas:not(.md-canvas--hot), .md-glare) {
+  visibility: hidden;
+  transition: visibility 0s 0.6s;
+}
+
+/* Versión sin WebGL: la piedra se propaga desde los ojos con un recorte */
+.md-stone {
+  clip-path: circle(0% at 54% 41%);
+  transition: clip-path 2.6s cubic-bezier(0.6, 0, 0.2, 1);
+  pointer-events: none;
+}
+.md-stage:is([data-estado="petrificando"], [data-estado="piedra"]) .md-stone {
+  clip-path: circle(150% at 54% 41%);
+}
+.md-stone img {
+  filter: grayscale(1) contrast(1.35) brightness(0.92) sepia(0.12);
+}
+.md-stone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  opacity: 0.6;
+}
+.md-glare {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at calc(50% + var(--lx) * 40%) calc(50% + var(--ly) * 40%), rgb(255 248 235 / 0.3), transparent 42%),
+    radial-gradient(circle, transparent 58%, rgb(0 0 0 / 0.35));
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+/* Golpe sordo al terminar de petrificarse */
+@media (prefers-reduced-motion: no-preference) {
+  .md-stage.is-golpe .md-tilt {
+    animation: md-golpe 0.5s cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+}
+@keyframes md-golpe {
+  18% {
+    translate: 0 1.2%;
+  }
+  42% {
+    translate: 0 -0.4%;
+  }
+  70% {
+    translate: 0 0.15%;
+  }
+}
+
+/* Detalles: numerales grabados sobre la obra, no puntos de interfaz */
+.md-hotspot {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transform: scale(calc(1 / var(--s)));
+  transition: opacity 0.4s;
+}
+.md-hotspot__ring {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgb(240 226 200 / 0.8);
+  border-radius: 50%;
+  background: rgb(8 8 10 / 0.42);
+  box-shadow:
+    0 0 0 4px rgb(8 8 10 / 0.18),
+    0 2px 10px rgb(0 0 0 / 0.5);
+  color: #f3e6cf;
+  font-family: var(--font-gloock), Georgia, serif;
+  font-size: 0.75rem;
+  line-height: 1;
+  transition:
+    transform 0.35s var(--ease-cine),
+    background-color 0.35s,
+    border-color 0.35s;
+}
+.md-hotspot[aria-pressed="true"] .md-hotspot__ring {
+  transform: scale(1.15);
+  border-color: #f3e6cf;
+  background: var(--c-accent);
+}
+.md-hotspot__name {
+  position: absolute;
+  left: calc(50% + 24px);
+  top: 50%;
+  translate: 0 -50%;
+  padding: 0.15rem 0.45rem;
+  background: rgb(8 8 10 / 0.8);
+  color: #f3e6cf;
+  font-variation-settings: "wdth" 80;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.md-hotspot[data-lado="izquierda"] .md-hotspot__name {
+  left: auto;
+  right: calc(50% + 24px);
+}
+.md-hotspot:focus-visible .md-hotspot__name,
+.md-hotspot[aria-pressed="true"] .md-hotspot__name {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .md-hotspot:hover .md-hotspot__ring {
+    transform: scale(1.12);
+  }
+  .md-hotspot:hover .md-hotspot__name {
+    opacity: 1;
+  }
+}
+.md-stage.is-focus .md-hotspot:not([aria-pressed="true"]) {
+  opacity: 0.25;
+}
+/* En piedra, los numerales también se enfrían */
+.md-stage[data-estado="piedra"] .md-hotspot__ring {
+  border-color: rgb(205 214 222 / 0.85);
+  color: #dfe5ea;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .md-stage:not(.is-focus) .md-hotspot__ring {
+    animation: md-respira 3.6s ease-in-out infinite;
+  }
+  .md-hotspot:nth-child(2) .md-hotspot__ring {
+    animation-delay: -0.7s;
+  }
+  .md-hotspot:nth-child(3) .md-hotspot__ring {
+    animation-delay: -1.4s;
+  }
+  .md-hotspot:nth-child(4) .md-hotspot__ring {
+    animation-delay: -2.1s;
+  }
+  .md-hotspot:nth-child(5) .md-hotspot__ring {
+    animation-delay: -2.8s;
+  }
+}
+@keyframes md-respira {
+  50% {
+    box-shadow:
+      0 0 0 7px rgb(240 226 200 / 0.1),
+      0 2px 10px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* Qué se está viendo: siempre explícito */
+.md-estado {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  font-variation-settings: "wdth" 80;
+  font-size: 0.875rem;
+  color: var(--c-muted);
+  text-align: center;
+}
+.md-estado span {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-ink);
+}
+.md-estado:not([data-estado="obra"]) {
+  color: #d5dde4;
+}
+.md-estado:not([data-estado="obra"]) span {
+  background: #9fb2c4;
+  box-shadow: 0 0 0 3px rgb(159 178 196 / 0.25);
+}
+
+.md-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+.md-controls .mf-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.md-petrify[aria-pressed="false"] {
+  background: var(--c-ink);
+  color: var(--c-bg);
+  border-color: var(--c-ink);
+}
+.md-hint {
+  margin: 0.75rem auto 0;
+  max-width: 30rem;
+  text-align: center;
+  font-variation-settings: "wdth" 75;
+  font-size: 0.875rem;
+  color: var(--c-muted);
+}
+
+/* ── Panel de expedientes ── */
+
+.md-panel {
+  display: grid;
+  gap: 1.75rem;
+  align-content: start;
+}
+.md-index ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.md-index button {
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--c-line);
+  color: var(--c-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background-color 0.2s;
+}
+/* Rojo aclarado de verdad (no con filter): el contraste debe pasar AA sobre el fondo */
+.md-index button span {
+  font-family: var(--font-gloock), Georgia, serif;
+  color: #e8646e;
+}
+.md-index button[aria-pressed="true"] {
+  color: var(--c-ink);
+  border-color: var(--c-accent);
+  background: rgb(182 38 50 / 0.18);
+}
+@media (hover: hover) {
+  .md-index button:hover {
+    color: var(--c-ink);
+  }
+}
+
+.md-files {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html.js .md-file:not(.is-active) {
+  display: none;
+}
+.md-file {
+  border-top: 2px solid var(--c-accent);
+  padding-top: 1rem;
+}
+.md-files > .md-file + .md-file {
+  margin-top: 2rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html.js .md-file.is-active {
+    animation: md-file-in 0.6s var(--ease-cine) both;
+  }
+}
+@keyframes md-file-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+}
+.md-file__kicker {
+  margin: 0;
+  font-variation-settings: "wdth" 75;
+  font-size: 0.875rem;
+  color: #e8646e;
+}
+.md-file__title {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-gloock), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.8rem, 1.4rem + 1.4vw, 2.4rem);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.md-file__text {
+  margin: 0.9rem 0 0;
+  color: var(--c-muted);
+}
+.md-file__block {
+  margin-top: 1.25rem;
+}
+.md-file__block p {
+  margin: 0.4rem 0 0;
+}
+.md-file__block--read p {
+  color: var(--c-muted);
+}
+
+/* ── Expediente (contexto) ── */
+
+.md-dossier {
+  background: linear-gradient(to bottom, var(--c-bg), #12070a 40%, var(--c-bg));
+}
+.md-dossier__grid {
+  columns: 1;
+  column-gap: clamp(2rem, 4vw, 3.5rem);
+}
+@media (min-width: 48rem) {
+  .md-dossier__grid {
+    columns: 2;
+  }
+}
+@media (min-width: 80rem) {
+  .md-dossier__grid {
+    columns: 3;
+  }
+}
+.md-case {
+  break-inside: avoid;
+  margin-bottom: clamp(2rem, 5vw, 3rem);
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-line);
+}
+.md-case__title {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-gloock), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem);
+  line-height: 1.05;
+}
+.md-case__block {
+  margin-top: 1rem;
+}
+.md-case__block p {
+  margin: 0.35rem 0 0;
+  max-width: var(--mf-measure);
+}
+
+/* Capa de alta resolución para el zoom (se descarga al primer enfoque) */
+.md-shield .md-detail {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.md-shield .md-detail.is-ready {
+  opacity: 1;
+}

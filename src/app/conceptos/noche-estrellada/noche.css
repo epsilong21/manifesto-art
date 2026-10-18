@@ -1,0 +1,561 @@
+/* ─────────────────────────────────────────────────────────────
+   02 · NOCHE ESTRELLADA — Immersive Cosmic Editorial
+   ───────────────────────────────────────────────────────────── */
+
+.nc-top {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 10;
+}
+
+/* ── Intro: oscuridad, estrellas, corrientes y por fin la obra ── */
+
+.nc-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: grid;
+  align-content: end;
+  overflow: clip;
+  touch-action: pan-y;
+}
+.nc-hero__art {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+}
+.nc-hero__art img {
+  object-fit: cover;
+  object-position: 50% 40%;
+}
+.nc-field {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+.nc-field.is-hidden {
+  opacity: 0;
+}
+.nc-hero__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, rgb(8 13 30 / 0.92) 0%, rgb(8 13 30 / 0.45) 38%, transparent 62%),
+    linear-gradient(to bottom, rgb(8 13 30 / 0.7), transparent 22%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* La obra amanece desde la oscuridad mientras las corrientes ya se mueven */
+  .nc-hero__art {
+    animation: nc-dawn 3.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+  }
+  .nc-title {
+    animation: nc-rise 1.4s var(--ease-cine) 0.9s both;
+  }
+  .nc-controls {
+    animation: nc-fade 1s ease 1.8s both;
+  }
+}
+@keyframes nc-dawn {
+  from {
+    filter: brightness(0.05) saturate(0.4) blur(6px);
+    transform: scale(1.06);
+  }
+  to {
+    filter: none;
+    transform: none;
+  }
+}
+@keyframes nc-rise {
+  from {
+    transform: translateY(0.3em);
+    opacity: 0;
+  }
+}
+@keyframes nc-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.nc-hero__copy {
+  display: grid;
+  gap: 1.1rem;
+  padding: 6rem var(--mf-gutter) max(2rem, env(safe-area-inset-bottom));
+}
+.nc-title {
+  margin: 0;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(3rem, 1.4rem + 8vw, 9.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+  text-shadow: 0 4px 40px rgb(8 13 30 / 0.85);
+  max-width: 11ch;
+}
+.nc-title em {
+  display: block;
+  color: var(--c-accent);
+}
+.nc-lede {
+  margin: 0;
+  max-width: 30rem;
+  color: var(--c-ink);
+  text-shadow: 0 2px 16px rgb(8 13 30 / 0.9);
+}
+.nc-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.nc-controls .mf-btn:not(.mf-btn--solid) {
+  background: rgb(8 13 30 / 0.55);
+  backdrop-filter: blur(6px);
+}
+/* Móvil apaisado: título, texto y controles caben en la primera pantalla */
+@media (orientation: landscape) and (max-height: 30rem) {
+  .nc-hero__copy {
+    gap: 0.75rem;
+    padding-top: 4.5rem;
+  }
+  .nc-title {
+    font-size: clamp(2.4rem, 12svh, 4rem);
+    max-width: none;
+  }
+  .nc-title em {
+    display: inline;
+  }
+}
+.nc-note {
+  margin: 0;
+  align-self: center;
+  font-size: 0.875rem;
+  color: var(--c-muted);
+}
+
+/* ── Ver solo la obra: la reproducción completa, sin capas ni texto ── */
+.theme-noche:has(.nc-hero.is-contemplating) .nc-top {
+  visibility: hidden;
+}
+.nc-hero.is-contemplating {
+  --nc-banda: calc(5.5rem + env(safe-area-inset-bottom));
+  background: rgb(8 13 30);
+}
+.nc-hero.is-contemplating .nc-hero__art {
+  /* Encajada, no recortada: proporción y colores originales */
+  inset: max(var(--mf-gutter), env(safe-area-inset-top)) var(--mf-gutter) var(--nc-banda);
+  animation: none;
+}
+.nc-hero.is-contemplating .nc-hero__art img {
+  object-fit: contain;
+}
+.nc-hero.is-contemplating .nc-field,
+.nc-hero.is-contemplating .nc-hero__veil {
+  display: none;
+}
+.nc-hero.is-contemplating .nc-hero__copy {
+  min-height: var(--nc-banda);
+  padding-top: 0;
+  align-content: center;
+  justify-items: center;
+}
+.nc-hero.is-contemplating .nc-controls {
+  animation: none;
+}
+.nc-hero.is-contemplating .nc-lede,
+.nc-hero.is-contemplating .nc-controls > :not(.nc-contemplar) {
+  display: none;
+}
+/* El título sigue en el árbol accesible: solo deja de verse */
+.nc-hero.is-contemplating .nc-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── Secciones ── */
+
+.nc-section {
+  padding: clamp(4rem, 10vw, 8rem) var(--mf-gutter);
+}
+.nc-section__head {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: clamp(1.5rem, 4vw, 3rem);
+}
+.nc-section__head p {
+  margin: 0;
+  max-width: var(--mf-measure);
+  color: var(--c-muted);
+}
+@media (min-width: 48rem) {
+  .nc-section__head {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    align-items: end;
+    column-gap: 3rem;
+  }
+}
+.nc-h2 {
+  margin: 0;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.5rem, 1.4rem + 4.6vw, 6rem);
+  line-height: 0.95;
+}
+.nc-h2 em {
+  color: var(--c-accent);
+}
+
+/* ── Capas ── */
+
+.nc-layers {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  border: 1px solid var(--c-line);
+}
+.nc-layer {
+  position: relative;
+  cursor: pointer;
+}
+.nc-layer input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+.nc-layer span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  color: var(--c-muted);
+  transition:
+    background-color 0.25s,
+    color 0.25s;
+}
+.nc-layer input:checked + span {
+  background: var(--c-ink);
+  color: var(--c-bg);
+}
+.nc-layer input:focus-visible + span {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+.nc-layer-desc {
+  margin: 0 0 clamp(1.25rem, 3vw, 2rem);
+  max-width: var(--mf-measure);
+  color: var(--c-muted);
+  min-height: 3em;
+}
+
+.nc-explore__grid {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+@media (min-width: 64rem) {
+  .nc-explore__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(19rem, 24rem);
+    align-items: start;
+  }
+  .nc-figure {
+    position: sticky;
+    top: 1rem;
+  }
+}
+.nc-figure {
+  margin: 0;
+}
+.nc-stage {
+  position: relative;
+  aspect-ratio: 3000 / 2376;
+  overflow: clip;
+  box-shadow:
+    0 0 0 1px var(--c-line),
+    0 40px 90px -40px rgb(0 0 0 / 0.9);
+}
+.nc-canvas {
+  --s: 1;
+  --tx: 0%;
+  --ty: 0%;
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  transform: translate(var(--tx), var(--ty)) scale(var(--s));
+  transition: transform 1.1s var(--ease-cine);
+}
+.nc-canvas img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nc-zones {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.nc-zones ellipse,
+.nc-zones path {
+  fill: none;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.nc-zones [data-capa="observacion"] {
+  stroke: var(--c-accent);
+}
+.nc-zones [data-capa="imaginacion"] {
+  stroke: var(--c-ink);
+  stroke-dasharray: 6 5;
+}
+.nc-zones path[data-capa="observacion"] {
+  stroke-width: 2.5;
+}
+.nc-explore[data-filtro="observacion"] .nc-zones [data-capa="observacion"],
+.nc-explore[data-filtro="imaginacion"] .nc-zones [data-capa="imaginacion"] {
+  opacity: 1;
+}
+.nc-explore[data-filtro="observacion"] .nc-hotspot[data-capa="imaginacion"],
+.nc-explore[data-filtro="imaginacion"] .nc-hotspot[data-capa="observacion"] {
+  opacity: 0.25;
+}
+
+.nc-hotspot {
+  /* Área táctil de 44 px; la estrella visible sigue midiendo 16 px */
+  --size: 44px;
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transform: scale(calc(1 / var(--s)));
+  transition:
+    transform 1.1s var(--ease-cine),
+    opacity 0.4s;
+}
+.nc-hotspot__star {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: transform 0.3s var(--ease-cine);
+}
+.nc-hotspot[data-capa="observacion"] .nc-hotspot__star {
+  background: var(--c-accent);
+  box-shadow:
+    0 0 0 3px rgb(8 13 30 / 0.6),
+    0 0 16px 5px rgb(224 170 69 / 0.7);
+}
+.nc-hotspot[data-capa="imaginacion"] .nc-hotspot__star {
+  border: 2px dashed var(--c-ink);
+  background: rgb(8 13 30 / 0.55);
+  box-shadow: 0 0 14px 4px rgb(244 233 207 / 0.4);
+}
+.nc-hotspot[aria-pressed="true"] .nc-hotspot__star {
+  transform: scale(1.35);
+}
+.nc-stage.is-focus .nc-hotspot:not([aria-pressed="true"]) {
+  opacity: 0.25;
+}
+@media (hover: hover) {
+  .nc-hotspot:hover .nc-hotspot__star {
+    transform: scale(1.25);
+  }
+}
+/* Etiquetas siempre visibles: en táctil no hay «hover» que las descubra */
+.nc-hotspot__label {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 0.1rem 0.4rem;
+  white-space: nowrap;
+  background: rgb(8 13 30 / 0.78);
+  color: var(--c-ink);
+  font-variation-settings: "wdth" 75;
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+.nc-stage.is-focus .nc-hotspot__label {
+  opacity: 0;
+}
+@media (max-width: 29.99rem) {
+  .nc-hotspot__label {
+    display: none;
+  }
+}
+.nc-back {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  background: rgb(8 13 30 / 0.85);
+  color: var(--c-ink);
+  font-variation-settings: "wdth" 85;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.nc-caption {
+  margin-top: 0.75rem;
+  font-variation-settings: "wdth" 75;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+.nc-caption cite {
+  font-style: italic;
+}
+
+/* ── Fichas ── */
+
+.nc-cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html.js .nc-card:not(.is-active) {
+  display: none;
+}
+.nc-cards > .nc-card + .nc-card {
+  margin-top: 2rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html.js .nc-card.is-active {
+    animation: nc-card-in 0.6s var(--ease-cine) both;
+  }
+}
+@keyframes nc-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+}
+.nc-card__title {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.9rem, 1.5rem + 1.4vw, 2.6rem);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.nc-card__text {
+  margin: 0.9rem 0 0;
+}
+.nc-card__read {
+  margin-top: 1.25rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--c-accent);
+}
+.nc-card__read p {
+  margin: 0.35rem 0 0;
+  color: var(--c-muted);
+}
+.nc-legend {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  font-size: 0.9375rem;
+  color: var(--c-muted);
+}
+.nc-legend li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+}
+.nc-legend li::before {
+  content: "";
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  translate: 0 0.1rem;
+}
+.nc-legend [data-capa="observacion"]::before {
+  background: var(--c-accent);
+}
+.nc-legend [data-capa="imaginacion"]::before {
+  border: 2px dashed var(--c-ink);
+}
+
+/* ── Contexto ── */
+
+.nc-context {
+  background: linear-gradient(to bottom, var(--c-bg), var(--c-deep) 60%, var(--c-bg));
+}
+.nc-timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2rem;
+}
+@media (min-width: 64rem) {
+  .nc-timeline {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2.5rem;
+  }
+}
+.nc-timeline li {
+  position: relative;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--c-line);
+}
+.nc-timeline li::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  box-shadow: 0 0 12px 3px rgb(224 170 69 / 0.6);
+}
+.nc-timeline h3 {
+  margin: 0;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.75rem;
+  line-height: 1.05;
+}
+.nc-timeline p {
+  margin: 0.6rem 0 0;
+  color: var(--c-muted);
+}
+/* Etiquetas junto al borde derecho: se anclan hacia dentro */
+.nc-hotspot[data-edge="end"] .nc-hotspot__label {
+  left: auto;
+  right: 0;
+  translate: 0 0;
+}
+
+/* Capa de alta resolución para el zoom (se descarga al primer enfoque) */
+.nc-canvas .nc-detail {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.nc-canvas .nc-detail.is-ready {
+  opacity: 1;
+}

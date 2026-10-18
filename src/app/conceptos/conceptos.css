@@ -1,0 +1,810 @@
+/* ─────────────────────────────────────────────────────────────
+   MANIFESTO / Experimental Art Journal — identidad madre
+   Cada universo redefine sus colores; la estructura es común.
+   ───────────────────────────────────────────────────────────── */
+
+.mf-theme {
+  --mf-gutter: clamp(1rem, 4vw, 3.5rem);
+  --mf-measure: 36rem;
+  min-height: 100svh;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  overflow-x: clip;
+}
+
+.theme-selector {
+  --c-bg: #0c0b0d;
+  --c-ink: #efe8dc;
+  --c-muted: #a9a198;
+  --c-accent: #c98a4e;
+  --c-line: rgb(239 232 220 / 0.16);
+}
+.theme-medusa {
+  --c-bg: #08080a;
+  --c-deep: #390b14;
+  --c-accent: #b62632;
+  --c-muted: #bbb5ad;
+  --c-ink: #e6d8c2;
+  --c-line: rgb(230 216 194 / 0.14);
+}
+.theme-noche {
+  --c-bg: #080d1e;
+  --c-deep: #172b54;
+  --c-mid: #285b8c;
+  --c-accent: #e0aa45;
+  --c-ink: #f4e9cf;
+  --c-muted: #b8c2d6;
+  --c-line: rgb(244 233 207 / 0.16);
+}
+.theme-elefantes {
+  --c-bg: #121016;
+  --c-deep: #502b38;
+  --c-mid: #ba6248;
+  --c-accent: #dc9b65;
+  --c-ink: #efe1c9;
+  --c-muted: #c8b5a2;
+  --c-line: rgb(239 225 201 / 0.16);
+}
+
+/* El fondo del documento acompaña al universo (sin franjas al hacer overscroll) */
+html:has(.theme-selector) { background: #0c0b0d; }
+html:has(.theme-medusa) { background: #08080a; }
+html:has(.theme-noche) { background: #080d1e; }
+html:has(.theme-elefantes) { background: #121016; }
+body:has(.mf-theme) { background: transparent; }
+
+.mf-theme :focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+}
+
+/* ── Logotipo y cabecera ── */
+
+.mf-header {
+  position: relative;
+  /* Por encima del contenido de cada obra solo para que el menú abierto no quede debajo */
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: max(1rem, env(safe-area-inset-top)) var(--mf-gutter) 0;
+}
+.mf-mark {
+  display: inline-grid;
+  gap: 0.1rem;
+  color: var(--c-ink);
+  text-decoration: none;
+  min-height: 44px;
+  align-content: center;
+}
+.mf-mark__word {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-variation-settings: "wdth" 125;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+.mf-mark__sub {
+  font-variation-settings: "wdth" 75;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+}
+/* ── Selector de obras (cabecera) ── */
+
+.mf-obras {
+  position: relative;
+  flex: none;
+}
+.mf-obras__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0 0.35rem 0 1rem;
+  border: 1px solid color-mix(in srgb, var(--c-ink) 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c-bg) 78%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--c-ink);
+  font-variation-settings: "wdth" 85;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  transition: border-color 0.25s;
+}
+.mf-obras__btn::-webkit-details-marker {
+  display: none;
+}
+.mf-obras__n {
+  font-variation-settings: "wdth" 75;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-muted);
+}
+.mf-obras__ico {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--c-ink) 10%, transparent);
+}
+.mf-obras__ico::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-top: -3px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.3s var(--ease-cine);
+}
+.mf-obras[open] .mf-obras__ico::before {
+  margin-top: 3px;
+  transform: rotate(-135deg);
+}
+.mf-obras[open] .mf-obras__btn,
+.mf-obras__btn:focus-visible {
+  border-color: var(--c-ink);
+}
+@media (hover: hover) {
+  .mf-obras__btn:hover {
+    border-color: color-mix(in srgb, var(--c-ink) 60%, transparent);
+  }
+}
+/* Móvil estrecho: solo el número; el nombre sigue en el nombre accesible */
+@media (max-width: 26rem) {
+  .mf-obras__n + .mf-obras__t {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.mf-obras__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 40;
+  width: min(22rem, calc(100vw - 2 * var(--mf-gutter)));
+  padding: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--c-ink) 18%, transparent);
+  background: color-mix(in srgb, var(--c-bg) 94%, #efe8dc);
+  box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.85);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mf-obras[open] .mf-obras__panel {
+    animation: mf-drop 0.24s var(--ease-cine) both;
+  }
+}
+@keyframes mf-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+.mf-obras__lista,
+.mf-obras__extra {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mf-obras__obra {
+  --o-accent: #c98a4e;
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 0.25rem;
+  padding: 0.7rem 0.75rem;
+  border-left: 2px solid transparent;
+  color: var(--c-ink);
+  text-decoration: none;
+}
+.mf-obras__obra[data-obra="medusa"] { --o-accent: #e5636d; }
+.mf-obras__obra[data-obra="noche-estrellada"] { --o-accent: #e0aa45; }
+.mf-obras__obra[data-obra="los-elefantes"] { --o-accent: #dc9b65; }
+.mf-obras__num {
+  grid-row: span 2;
+  font-variation-settings: "wdth" 75;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--o-accent);
+}
+.mf-obras__titulo {
+  font-variation-settings: "wdth" 110;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.2;
+}
+.mf-obras__meta {
+  font-variation-settings: "wdth" 80;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+.mf-obras__obra[aria-current="page"] {
+  border-left-color: var(--o-accent);
+  background: color-mix(in srgb, var(--c-ink) 6%, transparent);
+}
+@media (hover: hover) {
+  .mf-obras__obra:hover {
+    background: color-mix(in srgb, var(--c-ink) 9%, transparent);
+  }
+}
+.mf-obras__extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+  margin-top: 0.3rem;
+  padding: 0.1rem 0.75rem 0;
+  border-top: 1px solid var(--c-line);
+}
+.mf-obras__extra a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-ink);
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 0.25em;
+}
+
+/* Pie breve: portada y catálogo */
+.mf-sitefoot {
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(2.5rem, 6vw, 4rem) var(--mf-gutter) max(2rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--c-line);
+  color: var(--c-muted);
+  font-size: 0.875rem;
+}
+.mf-sitefoot p {
+  margin: 0;
+  max-width: 44rem;
+}
+.mf-sitefoot .mf-mark__word {
+  margin-right: 0.6rem;
+  color: var(--c-ink);
+  font-size: 0.9375rem;
+}
+@media (min-width: 48rem) {
+  .mf-sitefoot {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 3rem;
+  }
+}
+
+/* ── Etiqueta de obra (cartela + etiqueta de prenda) ── */
+
+.mf-label {
+  margin: 0;
+  display: grid;
+  width: min(100%, 21rem);
+  border: 1px solid var(--c-line);
+  font-variation-settings: "wdth" 75;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  background: color-mix(in srgb, var(--c-bg) 70%, transparent);
+  backdrop-filter: blur(6px);
+}
+.mf-label > div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.75rem;
+  padding: 0.45rem 0.75rem;
+}
+.mf-label > div + div {
+  border-top: 1px dashed var(--c-line);
+}
+.mf-label dt {
+  color: var(--c-muted);
+}
+.mf-label dd {
+  margin: 0;
+}
+
+/* ── Hecho / interpretación ── */
+
+.mf-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-variation-settings: "wdth" 75;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+.mf-kind::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: none;
+}
+.mf-kind[data-kind="hecho"]::before,
+.mf-kind[data-kind="observacion"]::before {
+  background: var(--c-ink);
+}
+.mf-kind[data-kind="lectura"]::before,
+.mf-kind[data-kind="imaginacion"]::before {
+  border: 1px solid var(--c-accent);
+  border-radius: 50%;
+}
+
+/* ── Botones comunes ── */
+
+.mf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--c-ink) 40%, transparent);
+  background: transparent;
+  color: var(--c-ink);
+  font: inherit;
+  font-variation-settings: "wdth" 85;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    border-color 0.25s;
+}
+.mf-btn[aria-pressed="true"],
+.mf-btn--solid {
+  background: var(--c-ink);
+  color: var(--c-bg);
+  border-color: var(--c-ink);
+}
+@media (hover: hover) {
+  .mf-btn:hover {
+    border-color: var(--c-ink);
+  }
+}
+
+/* ── Pie ── */
+
+.mf-footer {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 4rem);
+  padding: clamp(3rem, 8vw, 6rem) var(--mf-gutter) max(2.5rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--c-line);
+}
+.mf-footer__next {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--c-ink);
+  text-decoration: none;
+  justify-self: start;
+}
+.mf-footer__label,
+.mf-footer__meta {
+  font-variation-settings: "wdth" 75;
+  font-size: 0.875rem;
+  color: var(--c-muted);
+}
+.mf-footer__title {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-variation-settings: "wdth" 125;
+  font-weight: 800;
+  font-size: clamp(2rem, 1.2rem + 4vw, 4.5rem);
+  line-height: 0.95;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+  text-decoration-color: var(--c-accent);
+}
+.mf-footer__cols {
+  display: grid;
+  gap: 2rem;
+  font-size: 0.9375rem;
+}
+@media (min-width: 48rem) {
+  .mf-footer__cols {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.mf-footer__h {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--c-ink);
+}
+.mf-footer ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+}
+.mf-footer a:not(.mf-footer__next) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.35rem 0;
+  color: var(--c-muted);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 0.25em;
+}
+@media (hover: hover) {
+  .mf-footer a:not(.mf-footer__next):hover {
+    color: var(--c-ink);
+  }
+}
+.mf-footer__rights,
+.mf-footer__note {
+  color: var(--c-muted);
+  font-size: 0.875rem;
+  max-width: 34rem;
+}
+.mf-footer__rights p {
+  margin: 0 0 0.5rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Selector /conceptos
+   ───────────────────────────────────────────────────────────── */
+
+.sel-intro {
+  padding: clamp(2.5rem, 8vw, 6rem) var(--mf-gutter) clamp(2rem, 5vw, 3.5rem);
+  display: grid;
+  gap: 1.25rem;
+}
+.sel-title {
+  margin: 0;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.6rem, 0.9rem + 8.4vw, min(9.5rem, 11svh));
+  line-height: 0.86;
+  letter-spacing: -0.02em;
+}
+/* Las dos frases del título se separan por anchura: lo «estrecho» y lo «ancho» */
+.sel-title span {
+  display: block;
+}
+.sel-title span:first-child {
+  font-variation-settings: "wdth" 62;
+}
+.sel-title span:last-child {
+  font-variation-settings: "wdth" 125;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--c-ink);
+}
+/* Escritorio: título y entradilla en una fila, las láminas suben a la primera pantalla */
+@media (min-width: 64rem) {
+  .sel-intro {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 26rem);
+    align-items: end;
+    column-gap: clamp(2rem, 5vw, 5rem);
+    padding-top: 1.5rem;
+    padding-bottom: 1.75rem;
+  }
+  .sel-sub {
+    padding-bottom: 0.4rem;
+  }
+  /* «Tres universos.» en anchura 125 mide unas 9,5 veces el cuerpo: cabe en su columna */
+  .sel-title {
+    container-type: inline-size;
+  }
+  .sel-title span {
+    font-size: min(9.5rem, 11svh, 10.2cqi);
+  }
+}
+.sel-sub {
+  margin: 0;
+  max-width: 30rem;
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.35rem);
+  color: var(--c-muted);
+}
+
+/* Cada entrada es una lámina: arte arriba, cartela abajo. Todo el texto es
+   visible siempre; el hover solo añade movimiento. */
+.sel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+@media (min-width: 64rem) {
+  .sel-list {
+    display: flex;
+    padding: 0 var(--mf-gutter) clamp(2.5rem, 5vw, 4rem);
+    gap: 0.75rem;
+  }
+}
+
+.sel-item {
+  --px: 0;
+  --py: 0;
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  color: var(--u-ink);
+  background: var(--u-bg);
+  border-top: 1px solid var(--c-line);
+}
+@media (min-width: 64rem) {
+  .sel-item {
+    flex: 1 1 0;
+    min-width: 0;
+    border: 1px solid var(--c-line);
+  }
+}
+/* Solo con espacio de sobra: la lámina elegida se ensancha un poco */
+@media (min-width: 80rem) and (hover: hover) {
+  .sel-item {
+    transition: flex-grow 0.8s var(--ease-cine);
+  }
+  .sel-list:has(.sel-item:hover) .sel-item:hover,
+  .sel-list:has(.sel-item:focus-within) .sel-item:focus-within {
+    flex-grow: 1.35;
+  }
+}
+
+.sel-item--medusa {
+  --u-bg: #08080a;
+  --u-ink: #e6d8c2;
+  --u-muted: #bbb5ad;
+  --u-accent: #b62632;
+  --u-num: #e5636d;
+}
+.sel-item--noche {
+  --u-bg: #080d1e;
+  --u-ink: #f4e9cf;
+  --u-muted: #b8c2d6;
+  --u-accent: #e0aa45;
+  --u-num: #e0aa45;
+}
+.sel-item--elefantes {
+  --u-bg: #121016;
+  --u-ink: #efe1c9;
+  --u-muted: #c8b5a2;
+  --u-accent: #dc9b65;
+  --u-num: #dc9b65;
+}
+
+.sel-plate {
+  position: relative;
+  overflow: clip;
+  height: clamp(15rem, 44svh, 24rem);
+}
+@media (min-width: 64rem) {
+  .sel-plate {
+    height: clamp(12rem, 30svh, 20rem);
+  }
+}
+/* Capa de arte: se desplaza con el puntero (o con el scroll en táctil) */
+.sel-art {
+  position: absolute;
+  inset: -6%;
+  z-index: -2;
+  transform: translate3d(calc(var(--px) * -2.5%), calc(var(--py) * -2.5%), 0);
+  transition: transform 0.6s var(--ease-cine);
+}
+.sel-art img {
+  object-fit: cover;
+}
+.sel-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, var(--u-bg) 0%, color-mix(in srgb, var(--u-bg) 40%, transparent) 30%, transparent 60%);
+}
+
+.sel-item--medusa .sel-art img {
+  object-position: 52% 45%;
+  /* Recorte hacia el interior del escudo: sin el fondo de la fotografía */
+  transform: scale(1.45);
+  transform-origin: 53% 45%;
+  filter: saturate(0.85) contrast(1.05);
+}
+.sel-item--medusa .sel-art {
+  background: radial-gradient(70% 55% at 50% 40%, #390b14, #08080a 70%);
+}
+.sel-item--noche .sel-art img {
+  object-position: 55% 30%;
+}
+/* Su luz está en el horizonte, abajo: la sombra de la lámina solo roza el borde */
+.sel-item--elefantes .sel-shade {
+  background: linear-gradient(to top, var(--u-bg) 0%, transparent 22%);
+}
+.sel-grafico {
+  position: absolute;
+  inset: 6%;
+  width: 88%;
+  height: 88%;
+}
+/* Las marcas de los cinco capítulos responden al gesto de entrar */
+.sel-grafico .eg-marcas circle {
+  transition: fill-opacity 0.4s;
+}
+@media (hover: hover) {
+  .sel-item--elefantes:hover .eg-marcas circle {
+    fill-opacity: 0.9;
+  }
+}
+
+/* En columna: el enlace baja al pie y las tres láminas quedan alineadas */
+.sel-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 1.25rem var(--mf-gutter) 2rem;
+}
+@media (min-width: 64rem) {
+  .sel-body {
+    padding: 1.25rem 1.5rem 1.75rem;
+  }
+}
+.sel-num {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.6rem;
+  margin: 0;
+  font-variation-settings: "wdth" 75;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  color: var(--u-ink);
+}
+.sel-num__n {
+  font-weight: 800;
+  font-size: 1.75rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--u-num);
+}
+.sel-num__de {
+  margin-left: -0.35rem;
+  color: var(--u-muted);
+}
+.sel-num__idea {
+  flex-basis: 100%;
+  color: var(--u-muted);
+}
+.sel-name {
+  margin: 0.2rem 0 0;
+  font-size: clamp(2.5rem, 1.7rem + 3.4vw, 4.5rem);
+  line-height: 0.92;
+  font-weight: 400;
+  text-wrap: balance;
+}
+@media (min-width: 64rem) {
+  .sel-name {
+    font-size: clamp(2.4rem, 0.9rem + 2.6vw, 4.25rem);
+  }
+}
+.sel-item--medusa .sel-name {
+  font-family: var(--font-gloock), Georgia, serif;
+}
+.sel-item--noche .sel-name {
+  font-family: var(--font-instrument), Georgia, serif;
+  font-style: italic;
+}
+.sel-item--elefantes .sel-name {
+  font-family: var(--font-shoulders), sans-serif;
+  font-weight: 200;
+  font-variation-settings: "opsz" 72;
+  letter-spacing: 0.01em;
+  transform: scaleY(1.25);
+  transform-origin: bottom left;
+  /* compensa el estiramiento para no pisar la línea superior */
+  margin-top: 0.45em;
+}
+.sel-meta {
+  margin: 0;
+  font-variation-settings: "wdth" 75;
+  font-size: 0.9375rem;
+  color: var(--u-muted);
+}
+.sel-quote {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.125rem, 1.05rem + 0.3vw, 1.3rem);
+  line-height: 1.3;
+  color: var(--u-ink);
+  text-wrap: balance;
+}
+.sel-desc {
+  margin: 0;
+  max-width: 32rem;
+  color: var(--u-muted);
+  text-wrap: pretty;
+}
+/* Mecánica: la acción que propone la obra, marcada con el color del universo */
+.sel-gesto {
+  margin: 0.15rem 0 0;
+  padding-left: 0.8rem;
+  border-left: 2px solid var(--u-num);
+  font-weight: 600;
+  color: var(--u-ink);
+}
+/* Enlace extendido: toda la entrada es clicable */
+.sel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  margin-top: auto;
+  color: var(--u-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--u-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.3em;
+}
+.sel-link svg {
+  transition: transform 0.4s var(--ease-cine);
+}
+@media (hover: hover) {
+  .sel-item:hover .sel-link svg {
+    transform: translateX(4px);
+  }
+}
+.sel-link::after {
+  content: "";
+  position: absolute;
+  inset: -100vmax;
+}
+.sel-item:has(.sel-link:focus-visible) {
+  outline: 2px solid var(--u-num);
+  outline-offset: -4px;
+}
+.sel-link:focus-visible {
+  outline: none;
+}
+.sel-nota {
+  margin: 0;
+  font-variation-settings: "wdth" 75;
+  font-size: 0.8125rem;
+  color: var(--u-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sel-item {
+    animation: sel-in 0.9s var(--ease-cine) both;
+  }
+  .sel-item:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .sel-item:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  /* En táctil, el arte se desliza con el scroll (sin JS) */
+  @supports (animation-timeline: view()) {
+    @media (hover: none) {
+      .sel-art {
+        animation: sel-drift linear both;
+        animation-timeline: view();
+      }
+    }
+  }
+}
+@keyframes sel-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+}
+@keyframes sel-drift {
+  from {
+    transform: translate3d(0, -4%, 0);
+  }
+  to {
+    transform: translate3d(0, 4%, 0);
+  }
+}

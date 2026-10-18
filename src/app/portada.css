@@ -1,0 +1,358 @@
+/* ─────────────────────────────────────────────────────────────
+   Portada MANIFESTO
+   Una sola idea visual: tres mirillas abiertas en la oscuridad, cada una
+   con un fragmento de su obra, sobre una misma línea de horizonte. El
+   resto, tipografía de la identidad madre (Archivo, contraste de anchuras).
+   ───────────────────────────────────────────────────────────── */
+
+.hm-hero {
+  --hm-alto: clamp(13rem, 32svh, 16rem);
+  display: grid;
+  gap: clamp(2.25rem, 6vw, 3.5rem);
+  padding: clamp(1.75rem, 6vw, 3rem) var(--mf-gutter) clamp(3rem, 8vw, 5rem);
+}
+@media (min-width: 64rem) {
+  .hm-hero {
+    --hm-alto: clamp(18rem, 52svh, 34rem);
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-rows: 1fr auto;
+    align-items: end;
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+    row-gap: 1.5rem;
+    min-height: calc(100svh - 4.5rem);
+    padding-top: 1.5rem;
+  }
+}
+
+.hm-copy {
+  /* El titular se mide contra su columna: la palabra ancha nunca la desborda */
+  container-type: inline-size;
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 1.75rem);
+  min-width: 0;
+}
+.hm-t {
+  margin: 0;
+  font-weight: 900;
+  /* «solamente.» en anchura 125 mide unas 7,2 veces el cuerpo */
+  font-size: clamp(2rem, min(13.4cqi, 13.5svh), 8rem);
+  line-height: 0.86;
+  letter-spacing: -0.02em;
+}
+.hm-t span {
+  display: block;
+}
+/* Tres anchuras para tres tiempos: lo que se espera, la duda, la invitación */
+.hm-t__a {
+  font-variation-settings: "wdth" 62;
+  text-wrap: balance;
+}
+.hm-t__b {
+  font-variation-settings: "wdth" 125;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--c-ink);
+}
+.hm-t__c {
+  font-variation-settings: "wdth" 125;
+}
+.hm-intro {
+  margin: 0;
+  max-width: 34rem;
+  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+.hm-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+.hm-cta {
+  min-height: 52px;
+  padding-inline: 1.5rem 1.35rem;
+  gap: 0.9rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+.hm-cta svg {
+  transition: transform 0.4s var(--ease-cine);
+}
+@media (hover: hover) {
+  .hm-cta:hover {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+  .hm-cta:hover svg {
+    transform: translateX(4px);
+  }
+}
+.hm-cuenta {
+  margin: 0;
+  max-width: 20rem;
+  font-variation-settings: "wdth" 80;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: var(--c-muted);
+}
+
+/* Móvil apaisado: texto y mirillas lado a lado, el CTA dentro de la primera pantalla */
+@media (orientation: landscape) and (max-height: 32rem) and (max-width: 63.99rem) {
+  .hm-hero {
+    --hm-alto: 52svh;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    /* Arriba: el CTA no debe quedar pegado al borde inferior */
+    align-items: start;
+    column-gap: 1.75rem;
+    row-gap: 1rem;
+    padding-top: 1rem;
+  }
+  .hm-copy {
+    gap: 0.85rem;
+  }
+  .hm-t {
+    font-size: clamp(2rem, min(10cqi, 10svh), 8rem);
+  }
+  .hm-intro {
+    font-size: 0.9375rem;
+  }
+  .hm-cuenta {
+    display: none;
+  }
+  .hm-nota {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── Mirillas ── */
+
+.hm-mirillas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.6rem, 2.4vw, 1.5rem);
+  /* La línea de horizonte: todas las mirillas se apoyan en ella */
+  background: linear-gradient(var(--c-line), var(--c-line)) no-repeat 0 var(--hm-alto) / 100% 1px;
+}
+.hm-mirilla {
+  --h: 1;
+  min-width: 0;
+}
+/* Medusa, la más intensa, no es la más alta: el peso visual se reparte */
+.hm-mirilla[data-obra="medusa"] { --h: 0.84; --acento: #e5636d; }
+.hm-mirilla[data-obra="noche-estrellada"] { --h: 1; --acento: #e0aa45; }
+.hm-mirilla[data-obra="los-elefantes"] { --h: 0.72; --acento: #dc9b65; }
+
+.hm-mirilla__link {
+  display: grid;
+  gap: 0.75rem;
+  color: var(--c-ink);
+  text-decoration: none;
+}
+.hm-mirilla__ventana {
+  position: relative;
+  display: block;
+  overflow: clip;
+  height: calc(var(--hm-alto) * var(--h));
+  margin-top: calc(var(--hm-alto) * (1 - var(--h)));
+  /* Arco de hornacina: la ventana por la que se asoma cada obra */
+  border-radius: 999px 999px 0 0;
+  background: #050406;
+}
+.hm-mirilla__ventana img,
+.hm-grafico {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hm-mirilla__ventana img {
+  object-fit: cover;
+  transition: scale 1.2s var(--ease-cine);
+}
+/* Encuadre abierto: el rostro con sus serpientes y el verde del escudo, no solo el grito.
+   Mismo tratamiento de color que en el catálogo */
+.hm-mirilla[data-obra="medusa"] img {
+  object-position: 52% 40%;
+  transform: scale(1.4);
+  transform-origin: 52% 38%;
+  filter: saturate(0.85) contrast(1.05) brightness(0.92);
+}
+.hm-mirilla[data-obra="noche-estrellada"] img {
+  object-position: 48% 40%;
+  transform: scale(1.5);
+  transform-origin: 48% 40%;
+}
+.hm-mirilla__pie {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+  font-variation-settings: "wdth" 80;
+  line-height: 1.25;
+}
+.hm-mirilla__n {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--acento);
+}
+.hm-mirilla__t {
+  font-variation-settings: "wdth" 100;
+  font-weight: 700;
+  font-size: clamp(0.9375rem, 0.85rem + 0.4vw, 1.125rem);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color 0.3s;
+}
+.hm-mirilla__a {
+  font-size: 0.875rem;
+  color: var(--c-muted);
+}
+.hm-mirilla__link:focus-visible {
+  outline: none;
+}
+.hm-mirilla__link:focus-visible .hm-mirilla__ventana {
+  outline: 2px solid var(--acento);
+  outline-offset: 3px;
+}
+.hm-mirilla__link:focus-visible .hm-mirilla__t {
+  text-decoration-color: var(--acento);
+}
+@media (hover: hover) {
+  .hm-mirilla__link:hover .hm-mirilla__t {
+    text-decoration-color: var(--acento);
+  }
+  .hm-mirilla__link:hover img {
+    scale: 1.06;
+  }
+}
+.hm-nota {
+  margin: 0;
+  max-width: 34rem;
+  font-variation-settings: "wdth" 80;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--c-muted);
+}
+@media (min-width: 64rem) {
+  .hm-mirillas {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+  .hm-nota {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+/* ── Cómo se recorre ── */
+
+.hm-metodo {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 2.75rem);
+  padding: clamp(3rem, 8vw, 6rem) var(--mf-gutter);
+  border-top: 1px solid var(--c-line);
+}
+.hm-h2 {
+  margin: 0;
+  max-width: 14ch;
+  font-variation-settings: "wdth" 62;
+  font-weight: 900;
+  font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.015em;
+}
+.hm-pasos {
+  counter-reset: paso;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2rem;
+}
+.hm-pasos li {
+  counter-increment: paso;
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-line);
+}
+.hm-pasos li::before {
+  content: counter(paso);
+  font-variation-settings: "wdth" 125;
+  font-weight: 900;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--c-ink);
+}
+.hm-pasos h3 {
+  margin: 0;
+  font-variation-settings: "wdth" 100;
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+.hm-pasos p {
+  margin: 0;
+  max-width: 30rem;
+  color: var(--c-muted);
+}
+@media (min-width: 48rem) {
+  .hm-pasos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+  }
+}
+.hm-volver {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--c-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.3em;
+}
+
+/* ── Movimiento: una apertura breve y una deriva ambiental casi imperceptible ── */
+
+@media (prefers-reduced-motion: no-preference) {
+  .hm-mirilla__ventana {
+    animation: hm-abre 1s var(--ease-cine) both;
+    animation-delay: calc(0.15s + var(--i, 0) * 0.12s);
+  }
+  .hm-mirilla__ventana img,
+  .hm-grafico {
+    animation: hm-deriva 22s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i, 0) * -7s);
+  }
+}
+@keyframes hm-abre {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes hm-deriva {
+  from {
+    translate: -2% 1.5%;
+  }
+  to {
+    translate: 2% -1.5%;
+  }
+}
+/* Margen para que la deriva no descubra los bordes de la composición */
+.hm-grafico {
+  transform: scale(1.08);
+}
