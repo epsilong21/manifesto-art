@@ -1,11 +1,14 @@
 // Exportación estática de MANIFESTO para GitHub Pages.
 // Uso: npm run build:pages   (genera out/ y lo verifica)
 //
-// - Fuerza MANIFESTO_ELEFANTES_IMAGEN=off: la reproducción de Dalí nunca entra en el sitio.
+// - Los elefantes muestra la pintura (V6.1 completa) solo si su archivo está en
+//   public/obras al exportar y no se pide MANIFESTO_ELEFANTES_IMAGEN=off; si no,
+//   la página usa su alternativa sin imagen. El archivo no está en Git: en una
+//   instalación limpia (p. ej. GitHub Actions) la exportación sale sin pintura.
 // - Genera las variantes WebP de las obras que usa src/lib/imagenEstatica.ts.
-// - Quita de out/ todo /obras (originales, Dante y, si existiera en local, la referencia de Dalí).
+// - Quita de out/ todo /obras (originales y Dante): solo se publican variantes.
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 
@@ -13,18 +16,21 @@ const raiz = process.cwd();
 const out = join(raiz, "out");
 // Destino por defecto: https://epsilong21.github.io/manifesto-art/
 const base = process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art";
+/** Archivo de la pintura de Dalí (ver OBRA_ELEFANTES.imagen en src/content/elefantes.ts). */
+const ELEFANTES = "los-elefantes-referencia.jpg";
+const conElefantes = process.env.MANIFESTO_ELEFANTES_IMAGEN !== "off" && existsSync(join(raiz, "public/obras", ELEFANTES));
+console.log(`Los elefantes: ${conElefantes ? "con la pintura (V6.1 completa)" : "sin la pintura (alternativa)"}`);
 const env = {
   ...process.env,
   MANIFESTO_DESTINO: "pages",
   MANIFESTO_BASE_PATH: base,
-  MANIFESTO_ELEFANTES_IMAGEN: "off",
+  MANIFESTO_ELEFANTES_IMAGEN: conElefantes ? "on" : "off",
   // La entrada es el selector de tres obras (publicación simplificada)
   MANIFESTO_ENTRADA: process.env.MANIFESTO_ENTRADA ?? "selector",
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? `https://epsilong21.github.io${base}`,
 };
 
-/** Solo las obras que el sitio público puede mostrar. */
-const OBRAS = ["medusa.jpg", "noche-estrellada.jpg"];
+const OBRAS = ["medusa.jpg", "noche-estrellada.jpg", ...(conElefantes ? [ELEFANTES] : [])];
 const ANCHOS = JSON.parse(readFileSync(join(raiz, "src/lib/imagenAnchos.json"), "utf8"));
 
 rmSync(out, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
@@ -84,5 +90,5 @@ aplana(out);
 // Sin Jekyll: GitHub Pages ignoraría las carpetas que empiezan por «_» (_next)
 writeFileSync(join(out, ".nojekyll"), "");
 
-const verificacion = spawnSync(process.execPath, [join(raiz, "scripts/pages/verificar.mjs"), out, base], { stdio: "inherit" });
+const verificacion = spawnSync(process.execPath, [join(raiz, "scripts/pages/verificar.mjs"), out, base, ...(conElefantes ? ["--con-elefantes"] : [])], { stdio: "inherit" });
 process.exit(verificacion.status ?? 1);

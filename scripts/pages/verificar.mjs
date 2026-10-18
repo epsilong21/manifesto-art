@@ -1,9 +1,13 @@
 // Verifica una exportación estática antes de publicarla.
-// Uso: node scripts/pages/verificar.mjs <out> [basePath]
+// Uso: node scripts/pages/verificar.mjs <out> [basePath] [--con-elefantes]
+// Con --con-elefantes, la exportación debe incluir las variantes de la pintura
+// de Dalí; sin él, no puede quedar ningún rastro de ella.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const [out = "out", base = "/manifesto-art"] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const conElefantes = args.includes("--con-elefantes");
+const [out = "out", base = "/manifesto-art"] = args.filter((a) => !a.startsWith("--"));
 const errores = [];
 const archivos = [];
 const recorre = (dir) => {
@@ -20,21 +24,26 @@ const RUTAS = ["", "conceptos/", "conceptos/medusa/", "conceptos/noche-estrellad
 for (const r of RUTAS) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
 if (!existsSync(join(out, "404.html"))) errores.push("Falta 404.html");
 
-// 2. Nada no autorizado ni ajeno al sitio
-const PROHIBIDO = /(elefantes-referencia|barca-de-dante|prototipos|presentation-review|assets-source|qa-reports|\.map$|^obras\/)/;
+// 2. Nada ajeno al sitio: ni originales (/obras), ni Dante, ni carpetas internas
+const PROHIBIDO = /(barca-de-dante|prototipos|presentation-review|assets-source|qa-reports|\.map$|^obras\/)/;
 for (const a of archivos) if (PROHIBIDO.test(a)) errores.push(`Archivo no permitido: ${a}`);
 
-// 2b. Ningún archivo (HTML, JS, datos) menciona la reproducción de Dalí ni su procedencia
-for (const a of archivos.filter((a) => /\.(html|js|txt|json|css)$/.test(a))) {
-  const t = readFileSync(join(out, a), "utf8");
-  if (/elefantes-referencia|historia-arte\.com\/_\//.test(t)) errores.push(`${a} contiene datos de la reproducción de Dalí`);
+// 2b. La pintura de Dalí: variantes presentes si se pidió, ningún rastro si no
+if (conElefantes) {
+  if (!archivos.some((a) => /^img\/los-elefantes-referencia-\d+\.webp$/.test(a))) errores.push("Faltan las variantes de la pintura de Los elefantes");
+} else {
+  for (const a of archivos) if (/elefantes-referencia/.test(a)) errores.push(`Archivo no permitido: ${a}`);
+  for (const a of archivos.filter((a) => /\.(html|js|txt|json|css)$/.test(a))) {
+    const t = readFileSync(join(out, a), "utf8");
+    if (/elefantes-referencia|historia-arte\.com\/_\//.test(t)) errores.push(`${a} contiene datos de la reproducción de Dalí`);
+  }
 }
 
 // 3. Ninguna página enlaza la reproducción de Dalí ni a Dante
 const html = archivos.filter((a) => a.endsWith(".html"));
 for (const a of html) {
   const t = readFileSync(join(out, a), "utf8");
-  if (/elefantes-referencia/.test(t)) errores.push(`${a} referencia la reproducción de Dalí`);
+  if (!conElefantes && /elefantes-referencia/.test(t)) errores.push(`${a} referencia la reproducción de Dalí`);
   if (/barca-de-dante/i.test(t)) errores.push(`${a} referencia a La barca de Dante`);
   if (t.includes(`${base}${base}/`)) errores.push(`${a} contiene el prefijo ${base} duplicado`);
   // 4. Cada recurso local enlazado existe

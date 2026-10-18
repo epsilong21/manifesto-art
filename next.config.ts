@@ -56,8 +56,12 @@ const nextConfig: NextConfig = {
         },
       }),
   turbopack: {
-    // En Pages, el visor de la reproducción de Dalí no se usa nunca: fuera del paquete
-    ...(pages ? { resolveAlias: { "@/components/elefantes/ObraLectura": "./src/components/elefantes/ObraLecturaExcluida.tsx" } } : {}),
+    // Exportación sin la pintura de Dalí: el visor ObraLectura no se usa y se sustituye
+    // por un componente vacío, para que el sitio no lleve su código ni los datos del archivo.
+    // Con la pintura (MANIFESTO_ELEFANTES_IMAGEN=on, ver scripts/pages/exportar.mjs) se incluye completo.
+    ...(pages && process.env.MANIFESTO_ELEFANTES_IMAGEN !== "on"
+      ? { resolveAlias: { "@/components/elefantes/ObraLectura": "./src/components/elefantes/ObraLecturaExcluida.tsx" } }
+      : {}),
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],

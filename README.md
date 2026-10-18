@@ -33,7 +33,7 @@ npm run preview:pages  # http://localhost:4010/manifesto-art/
 - la entrada directa al selector de las tres obras;
 - variantes WebP de las imágenes (hasta 2048 px);
 - páginas con `noindex`;
-- **siempre** sin la reproducción de *Los elefantes*.
+- *Los elefantes* completo (pintura, cinco capítulos y guías) solo si su reproducción está en `public/obras/` al exportar y tiene derechos de reutilización; este repositorio no la incluye, así que la publicación usa la alternativa informativa.
 
 El workflow `.github/workflows/pages.yml` ejecuta lint, typecheck y esta exportación, y publica solo `out/`.
 
