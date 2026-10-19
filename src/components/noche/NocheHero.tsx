@@ -3,22 +3,15 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { NOCHE } from "@/content/noche";
+import { alternarCielo, useCieloPausado, useMovimientoReducido } from "./cielo";
 import { SkyField } from "./SkyField";
 
 export function NocheHero() {
   const ref = useRef<HTMLElement>(null);
-  const [paused, setPaused] = useState(false);
+  const paused = useCieloPausado();
   // Contemplación: solo la reproducción completa, sin capas ni texto editorial
   const [contemplar, setContemplar] = useState(false);
-  const [reduced, setReduced] = useState(false);
-
-  useEffect(() => {
-    const mq = matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReduced(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+  const reduced = useMovimientoReducido();
 
   useEffect(() => {
     if (!contemplar) return;
@@ -63,7 +56,7 @@ export function NocheHero() {
           {reduced ? (
             <p className="nc-note">Animación desactivada por tu preferencia de movimiento reducido.</p>
           ) : (
-            <button type="button" className="mf-btn" aria-pressed={paused} onClick={() => setPaused((p) => !p)}>
+            <button type="button" className="mf-btn" aria-pressed={paused} onClick={alternarCielo}>
               {paused ? "Reanudar el cielo" : "Pausar el cielo"}
             </button>
           )}

@@ -46,16 +46,8 @@ export default function NochePage() {
       <main>
         <NocheHero />
 
-        <section id="observar" className="nc-section" aria-labelledby="nc-obs-t">
-          <header className="nc-section__head">
-            <h2 id="nc-obs-t" className="nc-h2">
-              Observación <em>e</em> imaginación
-            </h2>
-            <p>
-              El MoMA lo resume así: el cuadro es a la vez un ejercicio de observación y un claro
-              alejamiento de ella. Aquí puedes separar las dos capas.
-            </p>
-          </header>
+        {/* El encabezado vive junto a la obra (en NocheExplorer): la noche sigue sin un nuevo comienzo */}
+        <section id="observar" className="nc-section nc-explora" aria-labelledby="nc-obs-t">
           <NocheExplorer />
         </section>
 

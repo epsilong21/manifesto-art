@@ -18,6 +18,7 @@
   align-content: end;
   overflow: clip;
   touch-action: pan-y;
+  scroll-margin-top: 0.5rem;
 }
 .nc-hero__art {
   position: absolute;
@@ -214,58 +215,144 @@
   color: var(--c-accent);
 }
 
-/* ── Capas ── */
+/* ── Del hero al explorador: la noche no se corta ──
+   Al salir del hero la obra se vela un poco (sin desaparecer: las corrientes
+   siguen encima) y la misma obra aparece enseguida en el explorador, sin
+   encabezado de por medio. Solo con animaciones ligadas al scroll; sin ellas,
+   todo queda en su estado final. */
 
-.nc-layers {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0;
-  margin: 0 0 0.75rem;
-  padding: 0;
-  border: 1px solid var(--c-line);
-}
-.nc-layer {
+.nc-explora {
   position: relative;
-  cursor: pointer;
+  isolation: isolate;
+  padding-top: clamp(1rem, 3vw, 2rem);
 }
-.nc-layer input {
+/* Polvo de estrellas fijo y el resplandor azul del cielo que queda arriba */
+/* Sube 2rem sobre el final del hero (por debajo de sus botones) para borrar la costura */
+.nc-explora::before {
+  content: "";
   position: absolute;
-  opacity: 0;
-  inset: 0;
-  cursor: pointer;
+  inset: -2rem 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(transparent, var(--c-bg) 2rem, transparent 16rem),
+    radial-gradient(120% 50% at 60% 22rem, rgb(23 43 84 / 0.5), transparent 70%),
+    radial-gradient(1px 1px at 12% 18%, rgb(244 233 207 / 0.55), transparent),
+    radial-gradient(1px 1px at 47% 62%, rgb(244 233 207 / 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 78% 34%, rgb(224 170 69 / 0.5), transparent),
+    radial-gradient(1px 1px at 88% 81%, rgb(160 196 232 / 0.5), transparent),
+    radial-gradient(1px 1px at 30% 90%, rgb(160 196 232 / 0.35), transparent);
+  background-size:
+    100% 100%,
+    100% 100%,
+    230px 190px,
+    230px 190px,
+    310px 260px,
+    270px 210px,
+    190px 240px;
+  mask-image: linear-gradient(to bottom, #000 40%, transparent);
 }
-.nc-layer span {
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .nc-hero {
+      view-timeline: --nc-hero block;
+    }
+    .nc-hero__art::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--c-bg);
+      opacity: 0;
+      pointer-events: none;
+      animation: nc-ocaso linear both;
+      animation-timeline: --nc-hero;
+      animation-range: exit 10% exit 100%;
+    }
+    .nc-hero.is-contemplating .nc-hero__art::after {
+      animation: none;
+    }
+    .nc-stage {
+      animation: nc-amanece linear both;
+      animation-timeline: view();
+      /* Termina pronto: al llegar con «Descifrar el cuadro» la obra ya está entera */
+      animation-range: entry 0% entry 90%;
+    }
+  }
+}
+@keyframes nc-ocaso {
+  to {
+    opacity: 0.38;
+  }
+}
+/* Mismo tono que el final del hero: la obra se aclara, no «empieza» de nuevo */
+@keyframes nc-amanece {
+  from {
+    opacity: 0.7;
+    transform: scale(0.97);
+    filter: brightness(0.62) saturate(0.85);
+  }
+}
+
+/* ── Herramientas bajo la obra: discretas, junto a la cartela ── */
+
+.nc-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.1rem;
+}
+.nc-tool {
   display: inline-flex;
   align-items: center;
+  gap: 0.5rem;
   min-height: 44px;
-  padding: 0.5rem 1rem;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--c-muted);
-  transition:
-    background-color 0.25s,
-    color 0.25s;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: color 0.25s;
 }
-.nc-layer input:checked + span {
-  background: var(--c-ink);
-  color: var(--c-bg);
-}
-.nc-layer input:focus-visible + span {
+.nc-tool:focus-visible {
   outline: 2px solid var(--c-accent);
   outline-offset: 2px;
 }
-.nc-layer-desc {
-  margin: 0 0 clamp(1.25rem, 3vw, 2rem);
-  max-width: var(--mf-measure);
-  color: var(--c-muted);
-  min-height: 3em;
+/* «Capas de luz» es un interruptor: el punto se enciende con las capas */
+.nc-tool:first-child::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--c-muted);
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
 }
+.nc-tool:first-child[aria-pressed="true"]::before {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  box-shadow: 0 0 10px 2px rgb(224 170 69 / 0.6);
+}
+.nc-tool[aria-pressed="true"] {
+  color: var(--c-ink);
+}
+@media (hover: hover) {
+  .nc-tool:hover {
+    color: var(--c-ink);
+  }
+}
+
+/* ── Escenario ── */
 
 .nc-explore__grid {
   display: grid;
-  gap: clamp(1.5rem, 4vw, 3rem);
+  gap: clamp(1.25rem, 3.5vw, 2.5rem);
 }
 @media (min-width: 64rem) {
   .nc-explore__grid {
-    grid-template-columns: minmax(0, 1fr) minmax(19rem, 24rem);
+    /* Columna de texto estrecha: la obra domina (a 1024 px conserva ~640 px) */
+    grid-template-columns: minmax(0, 1fr) clamp(16rem, 24vw, 22rem);
     align-items: start;
   }
   .nc-figure {
@@ -273,15 +360,83 @@
     top: 1rem;
   }
 }
+/* La cartela y las herramientas comparten la línea bajo la obra */
 .nc-figure {
   margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1.5rem;
+  align-items: start;
 }
 .nc-stage {
+  grid-column: 1 / -1;
+}
+.nc-tools {
+  grid-column: 2;
+  grid-row: 2;
+}
+.nc-caption {
+  grid-column: 1;
+  grid-row: 2;
+}
+@media (max-width: 47.99rem) {
+  .nc-tools,
+  .nc-caption {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .nc-figure .nc-caption {
+    margin-top: 0;
+  }
+}
+/* Móvil: la obra a sangre, de borde a borde */
+@media (max-width: 47.99rem) {
+  .nc-figure {
+    margin-inline: calc(var(--mf-gutter) * -1);
+  }
+  .nc-caption,
+  .nc-tools {
+    padding-inline: var(--mf-gutter);
+  }
+}
+/* Móvil apaisado: la obra entera a la vista y el texto al lado */
+@media (orientation: landscape) and (max-height: 30rem) {
+  .nc-explore__grid {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+  .nc-figure {
+    position: sticky;
+    top: 0.5rem;
+    margin-inline: 0;
+    /* Obra, herramientas y cartela caben juntas en alto */
+    width: min(58vw, calc((100svh - 6.5rem) * 3000 / 2376));
+  }
+  .nc-caption,
+  .nc-tools {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    padding-inline: 0;
+  }
+  .nc-figure .nc-caption {
+    margin-top: 0;
+  }
+}
+
+.nc-stage {
   position: relative;
+  isolation: isolate;
+  container-type: inline-size;
   aspect-ratio: 3000 / 2376;
+  /* Con la línea de herramientas debajo, la obra entera cabe en alto */
+  max-width: calc((100svh - 5rem) * 3000 / 2376);
+  width: 100%;
+  margin-inline: auto;
   overflow: clip;
+  touch-action: pan-y;
+  /* Sin marco de visor: un resplandor del mismo azul del cielo */
   box-shadow:
-    0 0 0 1px var(--c-line),
+    0 0 90px -20px rgb(23 43 84 / 0.75),
     0 40px 90px -40px rgb(0 0 0 / 0.9);
 }
 .nc-canvas {
@@ -299,7 +454,25 @@
   width: 100%;
   height: 100%;
 }
+/* Capa de alta resolución para el zoom (se descarga al primer enfoque) */
+.nc-canvas .nc-detail {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.nc-canvas .nc-detail.is-ready {
+  opacity: 1;
+}
 
+/* Corrientes del explorador: encima de la obra y de la penumbra, sin capturar el puntero */
+.nc-field--stage {
+  z-index: 1;
+}
+
+/* ── Capas de MANIFESTO (reversibles: «Capas de luz» las quita todas) ── */
+
+.nc-veils,
 .nc-zones {
   position: absolute;
   inset: 0;
@@ -307,6 +480,140 @@
   height: 100%;
   pointer-events: none;
 }
+.nc-veil {
+  fill: rgb(8 13 30 / 0.62);
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-cine);
+}
+.nc-explore[data-efecto="silueta"] .nc-veil--silueta {
+  opacity: 1;
+}
+.nc-explore[data-capas="si"]:not([data-efecto])[data-filtro="observacion"] .nc-veil--observacion,
+.nc-explore[data-capas="si"]:not([data-efecto])[data-filtro="imaginacion"] .nc-veil--imaginacion {
+  opacity: 0.8;
+}
+
+/* Linterna: penumbra alrededor del punto enfocado (centro y radio de src/lib/focus.ts) */
+.nc-lantern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle calc(var(--sr) * 1cqw) at var(--sx) var(--sy),
+    transparent 40%,
+    rgb(8 13 30 / 0.6)
+  );
+  transition: opacity 0.9s var(--ease-cine);
+}
+.nc-explore[data-efecto="halo"] .nc-lantern,
+.nc-explore[data-efecto="anillos"] .nc-lantern {
+  opacity: 1;
+}
+/* El pueblo: la penumbra cae sobre el cielo, que sigue moviéndose por encima */
+.nc-explore[data-efecto="calma"] .nc-lantern {
+  opacity: 0.75;
+}
+
+.nc-halo,
+.nc-rings {
+  position: absolute;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s var(--ease-cine) 0.35s;
+}
+.nc-halo {
+  width: 26%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(255 226 150 / 0.45) 0%,
+    rgb(255 210 120 / 0.38) 30%,
+    rgb(224 170 69 / 0.22) 48%,
+    rgb(224 170 69 / 0.07) 62%,
+    transparent 72%
+  );
+  mix-blend-mode: screen;
+}
+.nc-rings {
+  width: 11%;
+}
+.nc-rings i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgb(255 232 170 / 0.85);
+  box-shadow:
+    0 0 14px 2px rgb(255 214 130 / 0.45),
+    inset 0 0 14px 2px rgb(255 214 130 / 0.3);
+}
+/* Sin animación, tres anillos quietos y concéntricos */
+.nc-rings i:nth-child(1) {
+  scale: 0.6;
+}
+.nc-rings i:nth-child(2) {
+  scale: 1.05;
+  opacity: 0.6;
+}
+.nc-rings i:nth-child(3) {
+  scale: 1.5;
+  opacity: 0.3;
+}
+.nc-explore[data-efecto="halo"] .nc-halo,
+.nc-explore[data-efecto="anillos"] .nc-rings {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .nc-explore[data-efecto="halo"] .nc-halo {
+    animation: nc-respira 4.8s ease-in-out infinite alternate;
+  }
+  .nc-explore[data-efecto="anillos"] .nc-rings i {
+    animation: nc-onda 4.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite both;
+  }
+  .nc-explore[data-efecto="anillos"] .nc-rings i:nth-child(2) {
+    animation-delay: 1.4s;
+  }
+  .nc-explore[data-efecto="anillos"] .nc-rings i:nth-child(3) {
+    animation-delay: 2.8s;
+  }
+}
+@keyframes nc-respira {
+  from {
+    scale: 0.9;
+  }
+  to {
+    scale: 1.12;
+  }
+}
+@keyframes nc-onda {
+  from {
+    scale: 0.3;
+    opacity: 0.95;
+  }
+  to {
+    scale: 2;
+    opacity: 0;
+  }
+}
+
+/* Contorno del ciprés: se dibuja de la raíz a la copa */
+.nc-silueta {
+  fill: none;
+  stroke: rgb(244 233 207 / 0.32);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: url(#nc-suave);
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-cine);
+}
+.nc-explore[data-efecto="silueta"] .nc-silueta {
+  opacity: 1;
+}
+
+/* Zonas de la composición (observación / imaginación) */
 .nc-zones ellipse,
 .nc-zones path {
   fill: none;
@@ -325,8 +632,8 @@
 .nc-zones path[data-capa="observacion"] {
   stroke-width: 2.5;
 }
-.nc-explore[data-filtro="observacion"] .nc-zones [data-capa="observacion"],
-.nc-explore[data-filtro="imaginacion"] .nc-zones [data-capa="imaginacion"] {
+.nc-explore:not([data-efecto])[data-filtro="observacion"] .nc-zones [data-capa="observacion"],
+.nc-explore:not([data-efecto])[data-filtro="imaginacion"] .nc-zones [data-capa="imaginacion"] {
   opacity: 1;
 }
 .nc-explore[data-filtro="observacion"] .nc-hotspot[data-capa="imaginacion"],
@@ -334,8 +641,19 @@
   opacity: 0.25;
 }
 
+/* Sin capas de luz: solo la obra (el zoom y los textos siguen) */
+.nc-explore[data-capas="no"] .nc-veils,
+.nc-explore[data-capas="no"] .nc-zones,
+.nc-explore[data-capas="no"] .nc-lantern,
+.nc-explore[data-capas="no"] .nc-halo,
+.nc-explore[data-capas="no"] .nc-rings {
+  visibility: hidden;
+}
+
+/* ── Puntos de luz ── */
+
 .nc-hotspot {
-  /* Área táctil de 44 px; la estrella visible sigue midiendo 16 px */
+  /* Área táctil de 44 px; la luz visible mide 10-14 px */
   --size: 44px;
   position: absolute;
   width: var(--size);
@@ -343,6 +661,9 @@
   margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
   display: grid;
   place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
   border-radius: 50%;
   cursor: pointer;
   transform: scale(calc(1 / var(--s)));
@@ -351,46 +672,68 @@
     opacity 0.4s;
 }
 .nc-hotspot__star {
-  width: 16px;
-  height: 16px;
   border-radius: 50%;
   transition: transform 0.3s var(--ease-cine);
 }
 .nc-hotspot[data-capa="observacion"] .nc-hotspot__star {
-  background: var(--c-accent);
+  width: 10px;
+  height: 10px;
+  background: #ffe6aa;
   box-shadow:
-    0 0 0 3px rgb(8 13 30 / 0.6),
-    0 0 16px 5px rgb(224 170 69 / 0.7);
+    0 0 0 2px rgb(224 170 69 / 0.55),
+    0 0 18px 7px rgb(224 170 69 / 0.55);
 }
 .nc-hotspot[data-capa="imaginacion"] .nc-hotspot__star {
-  border: 2px dashed var(--c-ink);
-  background: rgb(8 13 30 / 0.55);
-  box-shadow: 0 0 14px 4px rgb(244 233 207 / 0.4);
+  width: 14px;
+  height: 14px;
+  border: 1.5px dashed var(--c-ink);
+  background: rgb(8 13 30 / 0.35);
+  box-shadow: 0 0 16px 4px rgb(160 196 232 / 0.5);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .nc-hotspot__star {
+    animation: nc-titila 3.4s ease-in-out calc(var(--i, 0) * -0.7s) infinite alternate;
+  }
+}
+@keyframes nc-titila {
+  to {
+    scale: 1.3;
+    opacity: 0.75;
+  }
 }
 .nc-hotspot[aria-pressed="true"] .nc-hotspot__star {
   transform: scale(1.35);
+}
+/* En foco, la capa visual hace de marca: el punto propio se retira y los demás se apagan */
+.nc-stage.is-focus .nc-hotspot[aria-pressed="true"] {
+  opacity: 0;
 }
 .nc-stage.is-focus .nc-hotspot:not([aria-pressed="true"]) {
   opacity: 0.25;
 }
 @media (hover: hover) {
   .nc-hotspot:hover .nc-hotspot__star {
-    transform: scale(1.25);
+    transform: scale(1.3);
   }
 }
 /* Etiquetas siempre visibles: en táctil no hay «hover» que las descubra */
 .nc-hotspot__label {
   position: absolute;
-  top: calc(100% - 4px);
+  top: calc(100% - 6px);
   left: 50%;
   translate: -50% 0;
   padding: 0.1rem 0.4rem;
   white-space: nowrap;
-  background: rgb(8 13 30 / 0.78);
+  background: rgb(8 13 30 / 0.72);
   color: var(--c-ink);
   font-variation-settings: "wdth" 75;
   font-size: 0.75rem;
   pointer-events: none;
+}
+.nc-hotspot[data-edge="end"] .nc-hotspot__label {
+  left: auto;
+  right: 0;
+  translate: 0 0;
 }
 .nc-stage.is-focus .nc-hotspot__label {
   opacity: 0;
@@ -400,20 +743,58 @@
     display: none;
   }
 }
+
 .nc-back {
   position: absolute;
+  z-index: 2;
   left: 0.5rem;
   top: 0.5rem;
   min-height: 44px;
   padding: 0 0.9rem;
+  border: 0;
   background: rgb(8 13 30 / 0.85);
   color: var(--c-ink);
   font-variation-settings: "wdth" 85;
   font-size: 0.875rem;
   cursor: pointer;
 }
+.nc-back:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+/* Qué capa se está viendo: siempre declarada sobre la obra */
+.nc-fxnote {
+  position: absolute;
+  z-index: 2;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  max-width: calc(100% - 1rem);
+  margin: 0;
+  padding: 0.3rem 0.6rem;
+  background: rgb(8 13 30 / 0.78);
+  color: var(--c-ink);
+  font-variation-settings: "wdth" 80;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  pointer-events: none;
+}
+.nc-fxnote span {
+  margin-right: 0.35rem;
+  color: var(--c-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .nc-fxnote {
+    animation: nc-fade 0.7s ease 0.6s both;
+  }
+}
+.nc-tools {
+  margin-top: 0.25rem;
+}
 .nc-caption {
   margin-top: 0.75rem;
+  max-width: var(--mf-measure);
   font-variation-settings: "wdth" 75;
   font-size: 0.8125rem;
   color: var(--c-muted);
@@ -422,7 +803,149 @@
   font-style: italic;
 }
 
-/* ── Fichas ── */
+/* ── Índice de descubrimientos ── */
+
+.nc-side {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 1.75rem);
+  align-content: start;
+}
+/* Encabezado de acompañamiento: pequeño, al lado de la obra (debajo en móvil) */
+.nc-intro {
+  display: grid;
+  gap: 0.5rem;
+}
+.nc-intro__title {
+  margin: 0;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 1.35rem + 1.3vw, 2.4rem);
+  line-height: 1;
+}
+.nc-intro__title em {
+  color: var(--c-accent);
+}
+.nc-intro p {
+  margin: 0;
+  max-width: var(--mf-measure);
+  color: var(--c-muted);
+  font-size: 0.9375rem;
+}
+.nc-index {
+  display: grid;
+  gap: 0.6rem;
+}
+.nc-group {
+  display: grid;
+  gap: 0.15rem;
+}
+/* El nombre del grupo es la capa de lectura: un interruptor como «Capas de luz» */
+.nc-group__filter {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.25s;
+}
+.nc-group__filter::after {
+  content: "";
+  width: 1.9rem;
+  height: 1rem;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  background: radial-gradient(circle 0.3rem at 0.5rem 50%, var(--c-muted) 98%, transparent);
+  transition:
+    background-position 0.3s var(--ease-cine),
+    border-color 0.3s;
+}
+.nc-group__filter[aria-pressed="true"] {
+  color: var(--c-ink);
+}
+.nc-group__filter[aria-pressed="true"]::after {
+  border-color: var(--c-accent);
+  background: radial-gradient(circle 0.3rem at calc(100% - 0.5rem) 50%, var(--c-accent) 98%, transparent);
+}
+.nc-group__filter:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .nc-group__filter:hover {
+    color: var(--c-ink);
+  }
+}
+.nc-index ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0 0.95rem;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  background: rgb(8 13 30 / 0.45);
+  color: var(--c-ink);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition:
+    border-color 0.3s,
+    background-color 0.3s,
+    color 0.3s;
+}
+.nc-chip__star {
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+}
+.nc-chip[data-capa="observacion"] .nc-chip__star {
+  background: var(--c-accent);
+  box-shadow: 0 0 8px 2px rgb(224 170 69 / 0.5);
+}
+.nc-chip[data-capa="imaginacion"] .nc-chip__star {
+  border: 1.5px dashed var(--c-ink);
+}
+.nc-chip[data-visto]:not([aria-pressed="true"]) {
+  color: var(--c-muted);
+}
+.nc-chip[aria-pressed="true"] {
+  border-color: var(--c-accent);
+  background: rgb(224 170 69 / 0.14);
+}
+.nc-chip:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .nc-chip:hover {
+    border-color: rgb(244 233 207 / 0.5);
+  }
+}
+.nc-count {
+  margin: 0.25rem 0 0;
+  /* Dos líneas reservadas: cambiar de capa no mueve la ficha */
+  min-height: 2.8em;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+
+/* ── Fichas: primero la mirada, después el dato ── */
 
 .nc-cards {
   margin: 0;
@@ -432,12 +955,22 @@
 html.js .nc-card:not(.is-active) {
   display: none;
 }
-.nc-cards > .nc-card + .nc-card {
+/* Sin JS se leen todas seguidas; con JS solo hay una a la vista y no lleva margen */
+html:not(.js) .nc-cards > .nc-card + .nc-card {
   margin-top: 2rem;
 }
 @media (prefers-reduced-motion: no-preference) {
   html.js .nc-card.is-active {
     animation: nc-card-in 0.6s var(--ease-cine) both;
+  }
+  /* La ficha llega cuando la capa visual ya se ha posado sobre la obra */
+  html.js .nc-cards .nc-card.is-active {
+    animation-duration: 0.7s;
+    animation-delay: 0.25s;
+  }
+  html.js .nc-cards .nc-card.is-active .nc-card__text,
+  html.js .nc-cards .nc-card.is-active .nc-more {
+    animation: nc-card-in 0.7s var(--ease-cine) 0.4s both;
   }
 }
 @keyframes nc-card-in {
@@ -451,7 +984,7 @@ html.js .nc-card:not(.is-active) {
   font-family: var(--font-instrument), Georgia, serif;
   font-weight: 400;
   font-style: italic;
-  font-size: clamp(1.9rem, 1.5rem + 1.4vw, 2.6rem);
+  font-size: clamp(1.7rem, 1.35rem + 1.1vw, 2.3rem);
   line-height: 1.02;
   text-wrap: balance;
 }
@@ -459,7 +992,7 @@ html.js .nc-card:not(.is-active) {
   margin: 0.9rem 0 0;
 }
 .nc-card__read {
-  margin-top: 1.25rem;
+  margin-top: 0.75rem;
   padding-left: 1rem;
   border-left: 1px solid var(--c-accent);
 }
@@ -467,33 +1000,63 @@ html.js .nc-card:not(.is-active) {
   margin: 0.35rem 0 0;
   color: var(--c-muted);
 }
-.nc-legend {
-  margin: 1.25rem 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
+.nc-more {
+  margin-top: 1.1rem;
+  border-top: 1px solid var(--c-line);
+}
+.nc-more summary {
+  display: flex;
+  align-items: center;
   gap: 0.6rem;
+  min-height: 44px;
+  color: var(--c-ink);
   font-size: 0.9375rem;
+  list-style: none;
+  cursor: pointer;
+}
+.nc-more summary::-webkit-details-marker {
+  display: none;
+}
+.nc-more summary::before {
+  content: "+";
+  width: 1rem;
+  color: var(--c-accent);
+  font-size: 1.15rem;
+  text-align: center;
+}
+.nc-more[open] summary::before {
+  content: "−";
+}
+.nc-more summary:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+.nc-more__fx {
+  margin: 0.9rem 0 0.25rem;
+  font-size: 0.875rem;
   color: var(--c-muted);
 }
-.nc-legend li {
+.nc-next {
   display: flex;
-  gap: 0.6rem;
-  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  margin: 1rem 0 0;
 }
-.nc-legend li::before {
-  content: "";
-  flex: none;
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 50%;
-  translate: 0 0.1rem;
+.nc-next button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-accent);
+  font: inherit;
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
 }
-.nc-legend [data-capa="observacion"]::before {
-  background: var(--c-accent);
-}
-.nc-legend [data-capa="imaginacion"]::before {
-  border: 2px dashed var(--c-ink);
+.nc-next button:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
 }
 
 /* ── Contexto ── */
@@ -541,21 +1104,4 @@ html.js .nc-card:not(.is-active) {
 .nc-timeline p {
   margin: 0.6rem 0 0;
   color: var(--c-muted);
-}
-/* Etiquetas junto al borde derecho: se anclan hacia dentro */
-.nc-hotspot[data-edge="end"] .nc-hotspot__label {
-  left: auto;
-  right: 0;
-  translate: 0 0;
-}
-
-/* Capa de alta resolución para el zoom (se descarga al primer enfoque) */
-.nc-canvas .nc-detail {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 0.6s;
-}
-.nc-canvas .nc-detail.is-ready {
-  opacity: 1;
 }

@@ -43,24 +43,48 @@ function enCielo(u: number, v: number) {
 /** z: profundidad (0 lejos, 1 cerca). vis: visibilidad suavizada sobre el cielo. */
 type P = { x: number; y: number; px: number; py: number; life: number; max: number; c: string; w: number; z: number; vis: number };
 
+/** Encuadre de la obra cuando el contenedor la amplía (ver src/lib/focus.ts). */
+export type SkyView = { scale: number; tx: number; ty: number };
+
 type Props = {
   /** Contenedor que recibe el puntero (normalmente la sección entera). */
   targetRef: React.RefObject<HTMLElement | null>;
   paused: boolean;
   hidden: boolean;
+  /** Encuadre ampliado de la obra (explorador); sin él, la obra cubre el contenedor. */
+  view?: SkyView;
+  /** Brillo de las estelas (1 = hero). */
+  intensity?: number;
+  /** Fuerza de los remolinos (1 = hero). */
+  swirl?: number;
+  /** Partículas por superficie (1 = hero). */
+  density?: number;
+  className?: string;
+};
+
+/**
+ * Relevo entre lienzos: si dos están a la vista (el final del hero y el
+ * explorador), solo anima el que más se ve. Nunca hay dos bucles a la vez.
+ */
+const visibles = new Map<symbol, number>();
+const esPrincipal = (id: symbol) => {
+  const mio = visibles.get(id) ?? 0;
+  if (mio <= 0) return false;
+  for (const [otro, r] of visibles) if (otro !== id && r > mio) return false;
+  return true;
 };
 
 /**
  * Corrientes de luz sobre la pintura (Canvas 2D). La obra queda debajo, intacta:
  * el lienzo es transparente y las estelas se desvanecen con «destination-out».
  */
-export function SkyField({ targetRef, paused, hidden }: Props) {
+export function SkyField({ targetRef, paused, hidden, view, intensity = 1, swirl = 1, density = 1, className = "nc-field" }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [supported, setSupported] = useState(true);
-  const state = useRef({ paused, hidden });
+  const state = useRef({ paused, hidden, view, intensity, swirl });
   useEffect(() => {
-    state.current = { paused, hidden };
-  }, [paused, hidden]);
+    state.current = { paused, hidden, view, intensity, swirl };
+  }, [paused, hidden, view, intensity, swirl]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -72,6 +96,7 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
       return;
     }
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    const id = Symbol("cielo");
 
     let W = 0;
     let H = 0;
@@ -85,11 +110,12 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
     const pointer = { x: -1, y: -1, dx: 0, dy: 0, strength: 0 };
     // Transformación «object-fit: cover» de la obra al lienzo (s = ancho de la obra en px)
     let map = { s: 1, ox: 0, oy: 0 };
+    let mappedView = state.current.view;
 
     const budget = () => {
       const small = W < 768;
       const lowEnd = (navigator.hardwareConcurrency ?? 8) <= 4;
-      let n = Math.round((W * H) / (small ? 1500 : 1900));
+      let n = Math.round(((W * H) / (small ? 1500 : 1900)) * density);
       n = Math.min(n, small ? 320 : 900);
       return lowEnd ? Math.round(n / 2) : n;
     };
@@ -127,6 +153,12 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
       const iw = ih * IMG_ASPECT;
       // Igual que el CSS de la obra (object-position: 50% 40%)
       map = { s: iw, ox: (W - iw) * 0.5, oy: (H - ih) * 0.4 };
+      // Encuadre ampliado: translate(tx%, ty%) scale(s) con origen arriba a la izquierda
+      mappedView = state.current.view;
+      if (mappedView) {
+        const { scale, tx, ty } = mappedView;
+        map = { s: map.s * scale, ox: (tx / 100) * W + map.ox * scale, oy: (ty / 100) * H + map.oy * scale };
+      }
       const n = budget();
       parts = Array.from({ length: n }, () => spawn());
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -145,7 +177,7 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
         const dy = y - cy;
         const d2 = dx * dx + dy * dy;
         const R = map.s * 0.12;
-        const f = (v.k * R * 1.6) / (d2 / R + R);
+        const f = (v.k * state.current.swirl * R * 1.6) / (d2 / R + R);
         vx += -dy * f * 0.02;
         vy += dx * f * 0.02;
       }
@@ -164,7 +196,9 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
 
     const frame = (now: number) => {
       raf = 0;
-      if (!visible || state.current.paused || state.current.hidden || reduce.matches) return;
+      if (!visible || state.current.paused || state.current.hidden || reduce.matches || !esPrincipal(id)) return;
+      // Nuevo encuadre: se recoloca todo (el lienzo está oculto mientras cambia)
+      if (state.current.view !== mappedView) resize();
       const dt = Math.min(48, now - last);
       last = now;
       // Si el dispositivo no llega, se reduce la carga
@@ -194,7 +228,7 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
         }
         p.vis += ((cielo(p.x, p.y) ? 1 : 0) - p.vis) * Math.min(1, 0.12 * step);
         // Fundido al nacer y al morir: sin destellos que aparecen de golpe
-        const a = Math.min(1, (p.max - p.life) / 18) * Math.min(1, p.life / 60) * (0.45 + 0.55 * p.z) * p.vis * 0.75;
+        const a = Math.min(1, (p.max - p.life) / 18) * Math.min(1, p.life / 60) * (0.45 + 0.55 * p.z) * p.vis * 0.75 * state.current.intensity;
         if (a < 0.01) continue;
         ctx.strokeStyle = `rgba(${p.c},${a})`;
         ctx.lineWidth = p.w / dpr;
@@ -208,7 +242,7 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
     };
 
     const start = () => {
-      if (!raf && visible && !state.current.paused && !state.current.hidden && !reduce.matches) {
+      if (!raf && visible && !state.current.paused && !state.current.hidden && !reduce.matches && esPrincipal(id)) {
         last = performance.now();
         raf = requestAnimationFrame(frame);
       }
@@ -244,11 +278,15 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
       resize();
     });
     ro.observe(host);
-    const io = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      if (visible) start();
-      else stop();
-    });
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        visibles.set(id, visible ? entry.intersectionRatio || 0.001 : 0);
+        if (visible) start();
+        else stop();
+      },
+      { threshold: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1] },
+    );
     io.observe(host);
     const onVis = () => (document.hidden ? stop() : start());
     document.addEventListener("visibilitychange", onVis);
@@ -261,6 +299,7 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
 
     return () => {
       stop();
+      visibles.delete(id);
       ro.disconnect();
       io.disconnect();
       document.removeEventListener("visibilitychange", onVis);
@@ -269,8 +308,8 @@ export function SkyField({ targetRef, paused, hidden }: Props) {
       reduce.removeEventListener("change", onReduce);
       window.clearInterval(poll);
     };
-  }, [targetRef]);
+  }, [targetRef, density]);
 
   if (!supported) return null;
-  return <canvas ref={canvasRef} className={`nc-field ${hidden ? "is-hidden" : ""}`} aria-hidden="true" />;
+  return <canvas ref={canvasRef} className={`${className} ${hidden ? "is-hidden" : ""}`} aria-hidden="true" />;
 }

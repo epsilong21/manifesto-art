@@ -33,6 +33,8 @@ export type DetalleNoche = {
   x: number;
   y: number;
   zoom: number;
+  /** Centro del encuadre, si no coincide con el punto (en % de la obra). */
+  foco?: { x: number; y: number };
   texto: string;
   lectura?: string;
 };
@@ -45,7 +47,7 @@ export const DETALLES_NOCHE: DetalleNoche[] = [
     capa: "observacion",
     x: 91.5,
     y: 17,
-    zoom: 2.4,
+    zoom: 2.1,
     texto:
       "Según el MoMA, el cielo está dominado por la luna brillante de la derecha. Algunos rasgos del cielo se reconstruyeron tal como se observaron.",
     lectura:
@@ -58,7 +60,7 @@ export const DETALLES_NOCHE: DetalleNoche[] = [
     capa: "observacion",
     x: 35,
     y: 52,
-    zoom: 2.6,
+    zoom: 2.2,
     texto:
       "El MoMA identifica la estrella grande a la izquierda del centro como Venus, visible desde la ventana del asilo de Saint-Paul-de-Mausole.",
   },
@@ -69,7 +71,7 @@ export const DETALLES_NOCHE: DetalleNoche[] = [
     capa: "imaginacion",
     x: 57,
     y: 38,
-    zoom: 2.2,
+    zoom: 1.7,
     texto:
       "Azules y amarillos intensos aplicados con un gesto rápido y visible. El cielo en espiral no describe ningún fenómeno: es pintura que se muestra como pintura.",
     lectura:
@@ -82,7 +84,9 @@ export const DETALLES_NOCHE: DetalleNoche[] = [
     capa: "imaginacion",
     x: 22,
     y: 62,
-    zoom: 2,
+    // Encuadre más abierto y algo más alto: la silueta entera, de la tierra a la copa
+    zoom: 1.2,
+    foco: { x: 24, y: 45 },
     texto:
       "Según el MoMA, el ciprés de la izquierda aparece mucho más cerca de lo que estaba en realidad.",
     lectura:
@@ -95,7 +99,7 @@ export const DETALLES_NOCHE: DetalleNoche[] = [
     capa: "imaginacion",
     x: 62,
     y: 86,
-    zoom: 2.4,
+    zoom: 2,
     texto:
       "El pueblo bajo las colinas se basó en otras vistas: desde su ventana no podía verse. Además, la escena es nocturna, pero el cuadro se pintó en varias sesiones durante el día.",
     lectura:
