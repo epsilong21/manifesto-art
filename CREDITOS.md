@@ -16,11 +16,16 @@ MANIFESTO es una plataforma cultural y educativa sin ánimo de lucro. No vende p
 - **Reproducción:** [«Van Gogh - Starry Night - Google Art Project.jpg»](https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg) (Wikimedia Commons; fuente: Google Arts & Culture). Commons la describe como reproducción fiel de una obra bidimensional en dominio público, con Public Domain Mark 1.0.
 - **Archivo:** `public/obras/noche-estrellada.jpg`. Las partículas son una capa visual de MANIFESTO y no modifican la imagen.
 
-## Obra no reproducida
+## Obra protegida reproducida sin licencia
 
 ### Los elefantes · Salvador Dalí, 1948
 
-Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fundació Gala-Salvador Dalí a través de VEGAP. **Su reproducción no está incluida en este repositorio ni en el sitio publicado.** La página muestra en su lugar una composición gráfica original de MANIFESTO, rotulada como tal, que no reproduce ni imita la pintura.
+Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fundació Gala-Salvador Dalí a través de VEGAP.
+
+- **Reproducción:** escaneo publicado en historia-arte.com (ficha «Los elefantes»), sin licencia para la imagen.
+- **Archivo en el repositorio:** `public/obras/los-elefantes-referencia.jpg` (1596 × 1270 px), sin retoques. El sitio sirve variantes WebP.
+- **Sin licencia:** **no hay autorización de la Fundació Gala-Salvador Dalí ni de VEGAP.** Se muestra por decisión del titular del sitio, que asume el riesgo, y así se indica en la página. Se retirará si lo pide el titular de los derechos, o se sustituirá por un archivo con licencia si se obtiene.
+- **Capas de MANIFESTO:** las guías de los cinco capítulos se dibujan encima y no alteran la imagen.
 
 ## Creaciones de MANIFESTO
 

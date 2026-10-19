@@ -1,36 +1,58 @@
 // Exportación estática de MANIFESTO para GitHub Pages.
 // Uso: npm run build:pages   (genera out/ y lo verifica)
 //
-// - Los elefantes muestra la pintura (V6.1 completa) solo si su archivo está en
-//   public/obras al exportar y no se pide MANIFESTO_ELEFANTES_IMAGEN=off; si no,
-//   la página usa su alternativa sin imagen. El archivo no está en Git: en una
-//   instalación limpia (p. ej. GitHub Actions) la exportación sale sin pintura.
+// - Los elefantes muestra la pintura (V6.1 completa) solo con una reproducción
+//   válida (scripts/elefantes/reproduccion.mjs): la autorizada o, si no, la de referencia
+//   (sin licencia). Si no hay ninguna, la página usa su alternativa sin imagen.
+//   Al publicar (GitHub Actions o MANIFESTO_PUBLICACION=1) la referencia solo entra si
+//   su entrada dice `publicable: true` (decisión del titular del sitio, 19/10/2026).
 // - Genera las variantes WebP de las obras que usa src/lib/imagenEstatica.ts.
 // - Quita de out/ todo /obras (originales y Dante): solo se publican variantes.
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
+import { elegirReproduccion, esPublicacion, REPRODUCCIONES } from "../elefantes/reproduccion.mjs";
 
 const raiz = process.cwd();
 const out = join(raiz, "out");
 // Destino por defecto: https://epsilong21.github.io/manifesto-art/
 const base = process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art";
-/** Archivo de la pintura de Dalí (ver OBRA_ELEFANTES.imagen en src/content/elefantes.ts). */
-const ELEFANTES = "los-elefantes-referencia.jpg";
-const conElefantes = process.env.MANIFESTO_ELEFANTES_IMAGEN !== "off" && existsSync(join(raiz, "public/obras", ELEFANTES));
-console.log(`Los elefantes: ${conElefantes ? "con la pintura (V6.1 completa)" : "sin la pintura (alternativa)"}`);
+const publicacion = esPublicacion();
+
+// Los elefantes: la misma elección que hará next.config.ts dentro del build
+const { elegida, descartes, publicaRechazada } = elegirReproduccion();
+for (const d of descartes) console.log(`  · ${d}`);
+// Un archivo autorizado presente pero inválido es un error de configuración, no una ausencia
+if (publicaRechazada) {
+  console.error("✗ La reproducción autorizada de Los elefantes está en public/obras pero no es válida (ver arriba).");
+  process.exit(1);
+}
+if (elegida) {
+  // Las guías de V6.1 están calibradas para una proporción y un encuadre concretos
+  const { width, height } = await sharp(join(raiz, "public/obras", elegida.archivo)).metadata();
+  const cal = REPRODUCCIONES.calibracion;
+  const desvio = Math.abs(width / height / (cal.width / cal.height) - 1);
+  if (width !== elegida.width || height !== elegida.height) {
+    console.error(`✗ ${elegida.archivo} mide ${width} × ${height}, no ${elegida.width} × ${elegida.height} como declara elefantes-reproducciones.json.`);
+    process.exit(1);
+  }
+  if (desvio > 0.005) {
+    console.error(`✗ ${elegida.archivo} tiene otra proporción que el lienzo calibrado (${cal.width} × ${cal.height}): hay que recalibrar las guías antes de usarlo.`);
+    process.exit(1);
+  }
+}
+console.log(`Los elefantes: ${elegida ? `con la pintura (V6.1 completa), reproducción «${elegida.clave}»` : "sin la pintura (alternativa)"}`);
 const env = {
   ...process.env,
   MANIFESTO_DESTINO: "pages",
   MANIFESTO_BASE_PATH: base,
-  MANIFESTO_ELEFANTES_IMAGEN: conElefantes ? "on" : "off",
   // La entrada es el selector de tres obras (publicación simplificada)
   MANIFESTO_ENTRADA: process.env.MANIFESTO_ENTRADA ?? "selector",
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? `https://epsilong21.github.io${base}`,
 };
 
-const OBRAS = ["medusa.jpg", "noche-estrellada.jpg", ...(conElefantes ? [ELEFANTES] : [])];
+const OBRAS = ["medusa.jpg", "noche-estrellada.jpg", ...(elegida ? [elegida.archivo] : [])];
 const ANCHOS = JSON.parse(readFileSync(join(raiz, "src/lib/imagenAnchos.json"), "utf8"));
 
 rmSync(out, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
@@ -90,5 +112,16 @@ aplana(out);
 // Sin Jekyll: GitHub Pages ignoraría las carpetas que empiezan por «_» (_next)
 writeFileSync(join(out, ".nojekyll"), "");
 
-const verificacion = spawnSync(process.execPath, [join(raiz, "scripts/pages/verificar.mjs"), out, base, ...(conElefantes ? ["--con-elefantes"] : [])], { stdio: "inherit" });
+const marcas = [
+  ...(elegida ? [`--elefantes=${elegida.archivo.replace(/\.\w+$/, "")}`] : []),
+  ...(publicacion ? ["--publicacion"] : []),
+];
+const verificacion = spawnSync(process.execPath, [join(raiz, "scripts/pages/verificar.mjs"), out, base, ...marcas], { stdio: "inherit" });
+if (elegida?.clave === "referencia") {
+  console.warn(
+    REPRODUCCIONES.referencia.publicable
+      ? "\n⚠ out/ contiene la reproducción de REFERENCIA de Los elefantes, SIN LICENCIA, publicable por decisión del titular del sitio (ver elefantes-reproducciones.json)."
+      : "\n⚠ out/ contiene la reproducción de REFERENCIA de Los elefantes (sin licencia): solo para revisión local. NO publicar.",
+  );
+}
 process.exit(verificacion.status ?? 1);

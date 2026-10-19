@@ -136,20 +136,29 @@ export const DESIERTO = {
   } as Record<string, { marca: string; rotulo: string }>,
 };
 
+type Reproduccion = { clave: string; archivo: string; width: number; height: number; imagen: string; autorizacion: string; pie: string };
+
 /**
- * La pintura auténtica (V4). Obra protegida: su reproducción no está incluida
- * en este repositorio y requiere autorización (Fundació Gala-Salvador Dalí /
- * VEGAP). Sin el archivo, la página usa ObraPendiente (src/lib/obraElefantes.ts).
+ * La reproducción elegida al compilar (scripts/elefantes/reproduccion.mjs, datos en
+ * elefantes-reproducciones.json): la autorizada si existe; si no, la de referencia,
+ * sin licencia, que se publica por decisión del titular del sitio (ver CREDITOS.md).
+ * null: no hay ninguna y la página usa ObraPendiente. Solo sus datos llegan al bundle.
  */
+export const REPRODUCCION_ELEFANTES: Reproduccion | null = process.env.MANIFESTO_ELEFANTES_REPRODUCCION
+  ? JSON.parse(process.env.MANIFESTO_ELEFANTES_REPRODUCCION)
+  : null;
+const r = REPRODUCCION_ELEFANTES;
+
+/** La pintura auténtica (V4). */
 export const OBRA_ELEFANTES = {
-  imagen: { src: "/obras/los-elefantes-referencia.jpg", width: 1596, height: 1270 },
+  imagen: { src: r ? `/obras/${r.archivo}` : "", width: r?.width ?? 1596, height: r?.height ?? 1270 },
   alt: "Los elefantes, de Salvador Dalí: dos elefantes de patas larguísimas y articuladas, con obeliscos sobre el lomo, se encuentran frente a frente bajo un cielo rojo que se vuelve amarillo en el horizonte. Abajo, en el desierto, un pequeño templo y dos figuras diminutas.",
   credito: {
     corto: "Salvador Dalí, Los elefantes, 1948. © Fundació Gala-Salvador Dalí, VEGAP.",
     obra: "Salvador Dalí, Los elefantes (Els elefants), 1948. Óleo sobre lienzo, 49 × 60 cm. Colección particular.",
     derechos: "© Salvador Dalí, Fundació Gala-Salvador Dalí, VEGAP.",
-    imagen: "Imagen: reproducción no incluida en este repositorio.",
-    autorizacion: "Autorización de reproducción: pendiente.",
+    imagen: r?.imagen ?? "",
+    autorizacion: r?.autorizacion ?? "",
   },
 };
 

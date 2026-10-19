@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { elegirReproduccion } from "./scripts/elefantes/reproduccion.mjs";
 
 /**
  * Dos destinos:
@@ -9,6 +10,8 @@ import type { NextConfig } from "next";
  */
 const pages = process.env.MANIFESTO_DESTINO === "pages";
 const basePath = pages ? (process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art") : "";
+// Reproducción de Los elefantes para este build (null: la página usa su alternativa)
+const { elegida: reproduccion } = elegirReproduccion();
 
 const nextConfig: NextConfig = {
   // Next 16 no admite Cache Components (PPR) en una exportación estática
@@ -24,6 +27,8 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BASE_PATH: basePath,
     // «selector»: la entrada es el selector de tres obras y la navegación no ofrece otra portada
     NEXT_PUBLIC_MANIFESTO_ENTRADA: process.env.MANIFESTO_ENTRADA ?? "portada",
+    // Solo los datos de la reproducción elegida (ver src/content/elefantes.ts); vacío si no hay
+    MANIFESTO_ELEFANTES_REPRODUCCION: reproduccion ? JSON.stringify(reproduccion) : "",
   },
   ...(pages
     ? {
@@ -58,8 +63,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     // Exportación sin la pintura de Dalí: el visor ObraLectura no se usa y se sustituye
     // por un componente vacío, para que el sitio no lleve su código ni los datos del archivo.
-    // Con la pintura (MANIFESTO_ELEFANTES_IMAGEN=on, ver scripts/pages/exportar.mjs) se incluye completo.
-    ...(pages && process.env.MANIFESTO_ELEFANTES_IMAGEN !== "on"
+    // Con una reproducción elegida (scripts/elefantes/reproduccion.mjs) se incluye completo.
+    ...(pages && !reproduccion
       ? { resolveAlias: { "@/components/elefantes/ObraLectura": "./src/components/elefantes/ObraLecturaExcluida.tsx" } }
       : {}),
     rules: {

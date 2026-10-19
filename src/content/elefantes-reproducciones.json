@@ -1,0 +1,29 @@
+{
+  "calibracion": {
+    "width": 1596,
+    "height": 1270,
+    "nota": "Lienzo de las guías de V6.1 (LIENZO en GuiasObra.tsx y aspect-ratio en elefantes.css). Toda reproducción debe tener esta proporción y este encuadre; si no, hay que recalibrar DESCUBRIMIENTOS y GuiasObra."
+  },
+  "publica": {
+    "nota": "Hueco para una futura reproducción con licencia de publicación. Hoy no existe ni el archivo ni la licencia: los campos vacíos impiden usarla. Completarlos solo con los datos de una licencia real.",
+    "archivo": "los-elefantes.jpg",
+    "publicable": true,
+    "width": 0,
+    "height": 0,
+    "sha256": "",
+    "imagen": "",
+    "autorizacion": "",
+    "pie": ""
+  },
+  "referencia": {
+    "nota": "Sin licencia de la Fundació Gala-Salvador Dalí / VEGAP. Se publica por decisión expresa del titular del sitio (19/10/2026), que asume el riesgo (ver CREDITOS.md). Si llega una reproducción con licencia, la entrada publica tiene prioridad.",
+    "archivo": "los-elefantes-referencia.jpg",
+    "publicable": true,
+    "width": 1596,
+    "height": 1270,
+    "sha256": "5726543523fb9d94b55b3f7607e8b7d2b0c511c730cece6f868be1e545667908",
+    "imagen": "Imagen: reproducción procedente de historia-arte.com.",
+    "autorizacion": "Sin licencia de reproducción de la Fundació Gala-Salvador Dalí / VEGAP.",
+    "pie": "La reproducción procede de historia-arte.com y se muestra sin licencia de reproducción."
+  }
+}

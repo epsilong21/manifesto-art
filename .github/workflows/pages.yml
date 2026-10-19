@@ -27,8 +27,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      # Sin la pintura en public/obras (no está en este repositorio), exporta la
-      # alternativa de Los elefantes; genera out/ y lo verifica
+      # Los elefantes: usa la reproducción registrada en elefantes-reproducciones.json
+      # (ver CREDITOS.md) o, sin ninguna válida, la alternativa; genera out/ y lo verifica
       # (rutas, recursos enlazados y exclusiones); falla si algo no cuadra
       - run: npm run build:pages
         env:

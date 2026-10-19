@@ -49,9 +49,8 @@ presentation-review/**/grabaciones/
 presentation-review/**/comparativa/
 presentation-review/**/lighthouse/
 
-# Reproducciones sin autorización de publicación (Dalí): nunca entran en Git
+# Originales de trabajo de la reproducción de Los elefantes (ver CREDITOS.md)
 assets-source/elefantes-referencia/*.png
-public/obras/los-elefantes-referencia.jpg
 
 # Capturas sueltas de QA: se conservan en local; en Git solo informes y herramientas
 presentation-review/**/*.jpg

@@ -1,12 +1,17 @@
 // Verifica una exportación estática antes de publicarla.
-// Uso: node scripts/pages/verificar.mjs <out> [basePath] [--con-elefantes]
-// Con --con-elefantes, la exportación debe incluir las variantes de la pintura
-// de Dalí; sin él, no puede quedar ningún rastro de ella.
+// Uso: node scripts/pages/verificar.mjs <out> [basePath] [--elefantes=<nombre>] [--publicacion]
+// Con --elefantes, la exportación debe incluir las variantes de esa reproducción
+// de la pintura de Dalí; sin él, no puede quedar ningún rastro de ninguna.
+// La reproducción de referencia (sin licencia) solo se admite sin --publicacion,
+// y con cualquier otra no puede quedar ningún rastro de ella.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import { REPRODUCCIONES } from "../elefantes/reproduccion.mjs";
 
 const args = process.argv.slice(2);
-const conElefantes = args.includes("--con-elefantes");
+const elefantes = args.find((a) => a.startsWith("--elefantes="))?.slice("--elefantes=".length);
+const publicacion = args.includes("--publicacion");
+const conReferencia = elefantes === "los-elefantes-referencia";
 const [out = "out", base = "/manifesto-art"] = args.filter((a) => !a.startsWith("--"));
 const errores = [];
 const archivos = [];
@@ -28,22 +33,25 @@ if (!existsSync(join(out, "404.html"))) errores.push("Falta 404.html");
 const PROHIBIDO = /(barca-de-dante|prototipos|presentation-review|assets-source|qa-reports|\.map$|^obras\/)/;
 for (const a of archivos) if (PROHIBIDO.test(a)) errores.push(`Archivo no permitido: ${a}`);
 
-// 2b. La pintura de Dalí: variantes presentes si se pidió, ningún rastro si no
-if (conElefantes) {
-  if (!archivos.some((a) => /^img\/los-elefantes-referencia-\d+\.webp$/.test(a))) errores.push("Faltan las variantes de la pintura de Los elefantes");
-} else {
+// 2b. La pintura de Dalí: variantes presentes si se pidió; la referencia, nunca al publicar
+if (publicacion && conReferencia && !REPRODUCCIONES.referencia.publicable) errores.push("La reproducción de referencia de Los elefantes no se puede publicar");
+if (elefantes && !archivos.some((a) => new RegExp(`^img/${elefantes}-\\d+\\.webp$`).test(a))) {
+  errores.push("Faltan las variantes de la pintura de Los elefantes");
+}
+const textos = archivos.filter((a) => /\.(html|js|txt|json|css)$/.test(a)).map((a) => [a, readFileSync(join(out, a), "utf8")]);
+if (!conReferencia) {
   for (const a of archivos) if (/elefantes-referencia/.test(a)) errores.push(`Archivo no permitido: ${a}`);
-  for (const a of archivos.filter((a) => /\.(html|js|txt|json|css)$/.test(a))) {
-    const t = readFileSync(join(out, a), "utf8");
-    if (/elefantes-referencia|historia-arte\.com\/_\//.test(t)) errores.push(`${a} contiene datos de la reproducción de Dalí`);
-  }
+  for (const [a, t] of textos) if (/elefantes-referencia|historia-arte\.com\/_\//.test(t)) errores.push(`${a} contiene datos de la reproducción de referencia`);
+}
+if (!elefantes) {
+  for (const a of archivos) if (/^img\/los-elefantes/.test(a)) errores.push(`Archivo no permitido: ${a}`);
+  for (const [a, t] of textos) if (/\/obras\/los-elefantes|img\/los-elefantes/.test(t)) errores.push(`${a} referencia una reproducción de Dalí`);
 }
 
 // 3. Ninguna página enlaza la reproducción de Dalí ni a Dante
 const html = archivos.filter((a) => a.endsWith(".html"));
 for (const a of html) {
   const t = readFileSync(join(out, a), "utf8");
-  if (!conElefantes && /elefantes-referencia/.test(t)) errores.push(`${a} referencia la reproducción de Dalí`);
   if (/barca-de-dante/i.test(t)) errores.push(`${a} referencia a La barca de Dante`);
   if (t.includes(`${base}${base}/`)) errores.push(`${a} contiene el prefijo ${base} duplicado`);
   // 4. Cada recurso local enlazado existe

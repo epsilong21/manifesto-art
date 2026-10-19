@@ -4,7 +4,7 @@ import { DesiertoImposible } from "@/components/elefantes/DesiertoImposible";
 import { LegLab } from "@/components/elefantes/LegLab";
 import { ObraLectura } from "@/components/elefantes/ObraLectura";
 import { ObraPendiente } from "@/components/elefantes/ObraPendiente";
-import { CONTEXTO_ELEFANTES, DERECHOS_DALI, DESIERTO, ELEFANTES } from "@/content/elefantes";
+import { CONTEXTO_ELEFANTES, DERECHOS_DALI, DESIERTO, ELEFANTES, REPRODUCCION_ELEFANTES } from "@/content/elefantes";
 import { shoulders } from "@/lib/fonts/shoulders";
 import { hayImagenElefantes } from "@/lib/obraElefantes";
 import "./elefantes.css";
@@ -134,8 +134,8 @@ export default function ElefantesPage() {
             <p>
               Los elefantes, de Salvador Dalí: obra protegida por derechos de autor hasta el{" "}
               {DERECHOS_DALI.hasta} ({DERECHOS_DALI.gestion}).{" "}
-              {conImagen
-                ? "La reproducción que se muestra requiere autorización y no forma parte de este repositorio."
+              {REPRODUCCION_ELEFANTES
+                ? REPRODUCCION_ELEFANTES.pie
                 : "La reproducción de la pintura está pendiente de autorización y no se muestra."}
             </p>
             <p>
