@@ -32,6 +32,71 @@ export type ParamsFlujo = { re: number; energia: number; activo: boolean };
 type Octava = { amp: number; k: number; c: number; s: number; fx: number; fy: number; w: number; sem: number; fija: boolean };
 type P = { x: number; y: number; px: number; py: number; life: number; max: number; c: string; w: number; z: number };
 
+/*
+ * Estelas sin poso. El rastro se funde cubriendo el lienzo con un velo casi
+ * transparente; con 8 bits por canal, cada velo redondea y, cuando el paso queda
+ * por debajo de medio nivel, el píxel se atasca en un gris que nunca llega al
+ * fondo (con velos del 1-3 %, hasta 42 niveles por encima). Dos remedios:
+ * 1) el velo se aplica en pasos de al menos PASO_FUNDIDO (acumulando el tiempo),
+ *    así el residuo queda por debajo de 0,5 / PASO_FUNDIDO niveles a cualquier Hz;
+ * 2) un filtro SVG (feComponentTransfer, al componer) lleva al fondo exacto todo
+ *    lo que quede cerca de él. En el lienzo opaco el propio color del velo también
+ *    se redondea (con alfa 0,06, el azul 38 pasa a valer 33), así que el residuo
+ *    puede quedar por encima o por debajo del fondo: la banda es simétrica y
+ *    suma los dos redondeos. En el transparente el velo solo resta alfa.
+ * Si el navegador no aplica filter: url() sobre un canvas, queda el paso 1: el
+ * residuo se queda en unos 12 niveles como mucho, sin errores ni lienzo vacío.
+ */
+const PASO_FUNDIDO = 0.06;
+const RESIDUO = Math.ceil(0.5 / PASO_FUNDIDO);
+/** Bandas que vuelven al fondo: opaco ±(redondeo del velo + del fundido); transparente, solo alfa. */
+const BANDA_OPACO = 2 * RESIDUO + 2;
+const BANDA_ALFA = RESIDUO + 2;
+let filtros = 0;
+
+/** Tabla de 256 valores (0-1) que lleva [fondo - banda, fondo + banda] al fondo y deja el resto igual. */
+const tablaUmbral = (fondo: number, banda: number) =>
+  Array.from({ length: 256 }, (_, v) => ((Math.abs(v - fondo) <= banda ? fondo : v) / 255).toFixed(5)).join(" ");
+
+/** Crea el filtro de umbral del lienzo y devuelve cómo quitarlo. */
+function filtroUmbral(canvas: HTMLCanvasElement, fondo?: string) {
+  const ns = "http://www.w3.org/2000/svg";
+  const id = `flujo-umbral-${++filtros}`;
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("width", "0");
+  svg.setAttribute("height", "0");
+  svg.style.position = "absolute";
+  const filtro = document.createElementNS(ns, "filter");
+  filtro.id = id;
+  filtro.setAttribute("color-interpolation-filters", "sRGB");
+  const ct = document.createElementNS(ns, "feComponentTransfer");
+  const canal = (nombre: string, tabla: string) => {
+    const f = document.createElementNS(ns, nombre);
+    f.setAttribute("type", "table");
+    f.setAttribute("tableValues", tabla);
+    ct.appendChild(f);
+  };
+  if (fondo) {
+    // Lienzo opaco: cada canal vuelve al color del fondo
+    const [r, g, b] = fondo.split(",").map(Number);
+    canal("feFuncR", tablaUmbral(r, BANDA_OPACO));
+    canal("feFuncG", tablaUmbral(g, BANDA_OPACO));
+    canal("feFuncB", tablaUmbral(b, BANDA_OPACO));
+  } else {
+    // Lienzo transparente: el alfa residual vuelve a 0
+    canal("feFuncA", tablaUmbral(0, BANDA_ALFA));
+  }
+  filtro.appendChild(ct);
+  svg.appendChild(filtro);
+  document.body.appendChild(svg);
+  canvas.style.filter = `url(#${id})`;
+  return () => {
+    canvas.style.filter = "";
+    svg.remove();
+  };
+}
+
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
@@ -89,6 +154,9 @@ export function montarFlujo(o: Opciones, inicial: ParamsFlujo) {
   let t = 0;
   let last = performance.now();
   let slowFrames = 0;
+  // Fracción del rastro que queda por fundir (se aplica en pasos de al menos PASO_FUNDIDO)
+  let pendiente = 1;
+  const quitaFiltro = filtroUmbral(o.canvas, o.fondo);
   // Hay que repintar el fotograma fijo (parámetros o tamaño nuevos)
   let sucio = true;
 
@@ -241,16 +309,20 @@ export function montarFlujo(o: Opciones, inicial: ParamsFlujo) {
     const step = dt / 16.7;
     t += step;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    // Rastro: el fondo cubre poco a poco las estelas anteriores
-    const fade = (1 - (1 - (o.rastro ?? 0.04)) ** step).toFixed(4);
-    if (o.fondo) {
-      ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = `rgba(${o.fondo},${fade})`;
-    } else {
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.fillStyle = `rgba(0,0,0,${fade})`;
+    // Rastro: el fondo cubre poco a poco las estelas anteriores, en pasos de al menos PASO_FUNDIDO
+    pendiente *= (1 - (o.rastro ?? 0.04)) ** step;
+    if (1 - pendiente >= PASO_FUNDIDO) {
+      const fade = (1 - pendiente).toFixed(4);
+      pendiente = 1;
+      if (o.fondo) {
+        ctx.globalCompositeOperation = "source-over";
+        ctx.fillStyle = `rgba(${o.fondo},${fade})`;
+      } else {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = `rgba(0,0,0,${fade})`;
+      }
+      ctx.fillRect(0, 0, W, H);
     }
-    ctx.fillRect(0, 0, W, H);
     ctx.globalCompositeOperation = "lighter";
     ctx.lineCap = "round";
     for (const p of parts) {
@@ -332,6 +404,7 @@ export function montarFlujo(o: Opciones, inicial: ParamsFlujo) {
     },
     destruir() {
       stop();
+      quitaFiltro();
       visibles.delete(id);
       ro.disconnect();
       io.disconnect();
