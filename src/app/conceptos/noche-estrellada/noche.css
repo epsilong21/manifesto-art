@@ -1133,23 +1133,37 @@ html:not(.js) .nc-cards > .nc-card + .nc-card {
 /* ── Laboratorio «Turbulencia» ── */
 
 .nc-lab-section {
+  --lab-hueco: clamp(2rem, 4vw, 3.5rem);
   border-top: 1px solid var(--c-line);
 }
+/* El encabezado ocupa el mismo ancho que el bloque canvas + mandos (como el aviso y la interpretación) */
+@media (min-width: 64rem) {
+  .nc-lab-section > .nc-section__head {
+    max-width: calc(900px + var(--lab-hueco) + 26rem);
+    margin-inline: auto;
+  }
+}
+/* Canvas con techo: 900 px de ancho y un alto de min(64svh, 600px) (proporción 16:10) */
 .nc-lab {
+  --lab-ancho: min(100%, 900px, calc(min(64svh, 600px) * 1.6));
   display: grid;
   gap: clamp(1.5rem, 4vw, 2.5rem);
 }
 @media (min-width: 64rem) {
+  /* Canvas y mandos, centrados como un solo bloque (como el laboratorio de Los elefantes) */
   .nc-lab {
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
-    align-items: start;
+    grid-template-columns: minmax(0, 900px) minmax(20rem, 26rem);
+    justify-content: center;
+    column-gap: var(--lab-hueco);
+    align-items: center;
   }
   .nc-lab__studies {
     grid-column: 1 / -1;
   }
 }
 .nc-lab__fig {
-  margin: 0;
+  width: var(--lab-ancho);
+  margin: 0 auto;
   min-width: 0;
 }
 .nc-lab__view {
@@ -1516,7 +1530,9 @@ html:not(.js) .nc-cards > .nc-card + .nc-card {
 /* Escritorio y móvil apaisado: el texto y la ventana, a la vez a la vista */
 @media (min-width: 64rem), (orientation: landscape) and (max-height: 30rem) {
   .vt {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    /* Texto y ventana como un bloque centrado: el texto no se estira en pantallas anchas */
+    grid-template-columns: minmax(0, 36rem) minmax(0, calc(min(72svh, 680px) * 0.8));
+    justify-content: center;
     /* Filas elásticas arriba y abajo: el texto queda centrado respecto a la ventana
        (si el panel abierto lo alarga, se reparten a cero y todo empieza arriba) */
     grid-template-areas:
@@ -1535,6 +1551,13 @@ html:not(.js) .nc-cards > .nc-card + .nc-card {
     grid-area: stage;
     position: sticky;
     top: 1rem;
+  }
+  /* El pie cuelga bajo el marco sin contar en el alto: el texto se centra respecto a la ventana */
+  .vt-nota {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
   }
   .vt-panel {
     grid-area: panel;
@@ -1604,7 +1627,8 @@ html:not(.js) .nc-cards > .nc-card + .nc-card {
   isolation: isolate;
   container: vt / inline-size;
   aspect-ratio: 4 / 5;
-  width: min(100%, calc((100svh - 6rem) * 0.8), 34rem);
+  /* Alto máximo min(72svh, 680px), con su proporción 4:5 */
+  width: min(100%, calc(min(72svh, 680px) * 0.8));
   margin-inline: auto;
   overflow: clip;
   background: linear-gradient(rgb(8 18 44), rgb(29 53 102) 70%);
