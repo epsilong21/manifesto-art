@@ -1105,3 +1105,845 @@ html:not(.js) .nc-cards > .nc-card + .nc-card {
   margin: 0.6rem 0 0;
   color: var(--c-muted);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   V4 · Laboratorio, escala e interpretación original
+   ───────────────────────────────────────────────────────────── */
+
+/* Mandos compartidos de la página (réplica del patrón de Los elefantes, con la voz de Noche) */
+.nc-range {
+  display: grid;
+  gap: 0.4rem;
+}
+.nc-range > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.nc-range output {
+  color: var(--c-accent);
+  font-variant-numeric: tabular-nums;
+}
+.nc-range input {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--c-accent);
+}
+
+/* ── Laboratorio «Turbulencia» ── */
+
+.nc-lab-section {
+  border-top: 1px solid var(--c-line);
+}
+.nc-lab {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+}
+@media (min-width: 64rem) {
+  .nc-lab {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+    align-items: start;
+  }
+  .nc-lab__studies {
+    grid-column: 1 / -1;
+  }
+}
+.nc-lab__fig {
+  margin: 0;
+  min-width: 0;
+}
+.nc-lab__view {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: clip;
+  background: rgb(9 16 38);
+  box-shadow:
+    0 0 80px -24px rgb(23 43 84 / 0.8),
+    inset 0 0 0 1px var(--c-line);
+}
+@media (min-width: 48rem) {
+  .nc-lab__view {
+    aspect-ratio: 16 / 10;
+  }
+}
+.nc-lab__view canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.nc-lab__tag {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  margin: 0;
+  padding: 0.2rem 0.6rem;
+  background: rgb(8 13 30 / 0.75);
+  color: var(--c-ink);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+/* Regla de escalas: qué tamaños de remolino sobreviven, frente al ancho de la pincelada */
+.nc-lab__rule {
+  position: relative;
+  height: 3.4rem;
+  margin: 0.9rem 0 0;
+}
+.nc-lab__rule::before {
+  content: "";
+  position: absolute;
+  inset: 0.55rem 0 auto;
+  height: 1px;
+  background: var(--c-line);
+}
+.nc-lab__band {
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--c-accent), rgb(160 196 232));
+  transition: width 0.45s var(--ease-cine);
+}
+.nc-lab__brush {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 1.15rem;
+  translate: -1px 0;
+  background: var(--c-ink);
+}
+.nc-lab__brush i,
+.nc-lab__end {
+  position: absolute;
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.nc-lab__brush i {
+  top: 1.3rem;
+  left: 50%;
+  translate: -50% 0;
+  color: var(--c-ink);
+}
+.nc-lab__end {
+  bottom: 0;
+}
+.nc-lab__end--a {
+  left: 0;
+}
+.nc-lab__end--b {
+  right: 0;
+}
+.nc-lab__fig figcaption {
+  margin-top: 0.5rem;
+  max-width: var(--mf-measure);
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+.nc-lab__controls {
+  display: grid;
+  gap: 1.1rem;
+}
+.nc-lab__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.nc-lab__result {
+  padding: 1rem;
+  border: 1px solid var(--c-line);
+  background: rgb(8 13 30 / 0.5);
+}
+.nc-lab__result p {
+  margin: 0.45rem 0 0;
+  color: var(--c-muted);
+}
+.nc-lab__verdict {
+  margin: 0 !important;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-style: italic;
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--c-accent) !important;
+}
+.nc-lab[data-estado="laminar"] .nc-lab__verdict {
+  color: rgb(160 196 232) !important;
+}
+.nc-lab[data-estado="ruido"] .nc-lab__verdict {
+  color: #f0a58c !important;
+}
+.nc-lab__data {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.nc-lab__pause {
+  justify-self: start;
+}
+.nc-lab__studies ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1.5rem;
+}
+@media (min-width: 48rem) {
+  .nc-lab__studies ol {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+.nc-lab__studies li {
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-line);
+}
+.nc-lab__studies h3 {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.45rem;
+  line-height: 1.05;
+}
+.nc-lab__studies p {
+  margin: 0.5rem 0 0;
+  color: var(--c-muted);
+  font-size: 0.9375rem;
+}
+.nc-lab__studies a {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding-block: 0.4rem;
+  color: var(--c-ink);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+  text-underline-offset: 0.2em;
+}
+.nc-lab__more {
+  margin-top: 1.25rem;
+}
+.nc-lab__more ol {
+  margin-block: 0.75rem 0.5rem;
+}
+.nc-lab__read {
+  padding-left: 1rem;
+  border-left: 1px solid var(--c-accent);
+  max-width: var(--mf-measure);
+}
+.nc-lab__read p {
+  margin: 0.4rem 0 0;
+}
+
+/* ── Escala «De la ventana a Venus» (dentro del punto «Distancia») ── */
+
+.nc-scale {
+  container: escala / inline-size;
+}
+.nc-scale__switch {
+  display: flex;
+  gap: 0 1.25rem;
+}
+/* Los dos modos llevan el punto de «Capas de luz»: encendido en el elegido */
+.nc-scale__switch .nc-tool::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--c-muted);
+}
+.nc-scale__switch .nc-tool[aria-pressed="true"]::before {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  box-shadow: 0 0 10px 2px rgb(224 170 69 / 0.6);
+}
+.nc-scale__rule {
+  position: relative;
+  height: 4.25rem;
+  margin: 1.25rem 0.9rem 0;
+}
+.nc-scale__rule::before {
+  content: "";
+  position: absolute;
+  inset: 1.6rem 0 auto;
+  height: 2px;
+  background: linear-gradient(to right, var(--c-ink), rgb(160 196 232 / 0.5));
+}
+.nc-scale__tick {
+  position: absolute;
+  top: 1.25rem;
+  width: 1px;
+  height: 0.75rem;
+  background: rgb(244 233 207 / 0.35);
+}
+.nc-scale__tick[data-label] {
+  height: 1rem;
+  background: var(--c-ink);
+}
+.nc-scale__tick i {
+  position: absolute;
+  top: 1.3rem;
+  left: 0;
+  translate: -50% 0;
+  font-style: normal;
+  font-size: 0.6875rem;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.nc-scale__tick[data-edge="start"] i {
+  translate: 0 0;
+}
+.nc-scale__tick[data-edge="end"] i {
+  translate: -100% 0;
+}
+.nc-scale__mark {
+  position: absolute;
+  top: 0;
+  translate: -50% 0;
+  transition: left 0.9s var(--ease-cine);
+}
+.nc-scale[data-modo="lineal"] .nc-scale__mark {
+  margin-left: calc(var(--i) * 0.35rem);
+}
+.nc-scale__mark b {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--c-bg);
+  border: 1.5px solid var(--c-accent);
+  color: var(--c-ink);
+  font-size: 0.6875rem;
+  font-weight: 400;
+}
+/* Regla estrecha: menos rótulos y las marcas vecinas en dos alturas, sin solaparse */
+@container escala (max-width: 26rem) {
+  .nc-scale__rule {
+    margin-top: 2.25rem;
+  }
+  .nc-scale__tick[data-secundaria] i {
+    display: none;
+  }
+  .nc-scale__mark[data-alt] {
+    top: -1.5rem;
+  }
+  .nc-scale__mark[data-alt]::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 1px;
+    height: 1.5rem;
+    background: var(--c-accent);
+  }
+}
+.nc-scale__mark[data-id="venus"] b {
+  background: var(--c-accent);
+  color: var(--c-bg);
+  box-shadow: 0 0 14px 3px rgb(224 170 69 / 0.55);
+}
+.nc-scale__note {
+  margin: 0.5rem 0 1rem;
+  min-height: 2.8em;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+.nc-scale__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.9rem;
+}
+.nc-scale__list li {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--c-line);
+}
+.nc-scale__list h4 {
+  margin: 0;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.3rem;
+  line-height: 1.1;
+}
+.nc-scale__val {
+  margin-left: 0.35rem;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-style: normal;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-accent);
+}
+.nc-scale__jump {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.3rem 0 0;
+  color: var(--c-muted);
+  font-size: 0.8125rem;
+}
+.nc-scale__txt {
+  margin: 0.35rem 0 0;
+  color: var(--c-muted);
+  font-size: 0.875rem;
+}
+
+/* ── Interpretación original «La ventana» ── */
+
+.vt {
+  --vt-pared: rgb(29 34 52);
+  position: relative;
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  padding: clamp(4rem, 10vw, 7rem) var(--mf-gutter) clamp(3rem, 8vw, 6rem);
+  /* La habitación: de día la luz de la ventana cae sobre la pared */
+  background:
+    radial-gradient(60% 50% at 70% 45%, rgb(243 201 140 / 0.14), transparent 70%),
+    var(--vt-pared);
+  transition: background-color 1.2s;
+  scroll-margin-top: 0.5rem;
+}
+.vt[data-estado="noche"] {
+  --vt-pared: var(--c-bg);
+  background:
+    radial-gradient(60% 50% at 70% 45%, rgb(40 91 140 / 0.22), transparent 70%),
+    var(--vt-pared);
+}
+/* Escritorio y móvil apaisado: el texto y la ventana, a la vez a la vista */
+@media (min-width: 64rem), (orientation: landscape) and (max-height: 30rem) {
+  .vt {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    /* Filas elásticas arriba y abajo: el texto queda centrado respecto a la ventana
+       (si el panel abierto lo alarga, se reparten a cero y todo empieza arriba) */
+    grid-template-areas:
+      ". stage"
+      "copy stage"
+      "panel stage"
+      ". stage";
+    grid-template-rows: 1fr auto auto 1fr;
+    gap: 0 clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  .vt-copy {
+    grid-area: copy;
+  }
+  .vt-stage {
+    grid-area: stage;
+    position: sticky;
+    top: 1rem;
+  }
+  .vt-panel {
+    grid-area: panel;
+    margin-top: 2rem;
+  }
+}
+.vt-copy {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+.vt-eyebrow {
+  margin: 0;
+  color: var(--c-accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.vt-lede,
+.vt-estado {
+  margin: 0;
+  max-width: var(--mf-measure);
+  color: var(--c-muted);
+}
+.vt-estado {
+  min-height: 4.5em;
+  font-size: 0.9375rem;
+}
+.vt-switch {
+  justify-self: start;
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  background: rgb(8 13 30 / 0.5);
+}
+.vt-switch button {
+  min-height: 44px;
+  min-width: 5.5rem;
+  padding: 0 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--c-muted);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.35s,
+    color 0.35s;
+}
+.vt-switch button[aria-pressed="true"] {
+  background: var(--c-accent);
+  color: var(--c-bg);
+}
+@media (hover: hover) {
+  .vt-switch button[aria-pressed="false"]:hover {
+    color: var(--c-ink);
+  }
+}
+
+/* La ventana: el hueco en la pared, con su derrame de piedra */
+.vt-stage {
+  min-width: 0;
+}
+.vt-ventana {
+  position: relative;
+  isolation: isolate;
+  container: vt / inline-size;
+  aspect-ratio: 4 / 5;
+  width: min(100%, calc((100svh - 6rem) * 0.8), 34rem);
+  margin-inline: auto;
+  overflow: clip;
+  background: linear-gradient(rgb(8 18 44), rgb(29 53 102) 70%);
+  box-shadow:
+    0 0 0 clamp(8px, 1.6vw, 14px) rgb(19 17 22),
+    0 0 0 calc(clamp(8px, 1.6vw, 14px) + 1px) rgb(244 233 207 / 0.12),
+    0 40px 90px -30px rgb(0 0 0 / 0.9);
+  touch-action: pan-y;
+}
+.vt-cielo,
+.vt-paisaje,
+.vt-reja {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.vt-cielo {
+  transition: opacity 1.2s;
+}
+.vt[data-estado="dia"] .vt-cielo {
+  opacity: 0;
+}
+.vt-paisaje *,
+.vt-paisaje {
+  transition:
+    fill 1.4s var(--ease-cine),
+    stroke 1.4s var(--ease-cine),
+    opacity 1.2s var(--ease-cine);
+}
+.vt-cielo-dia {
+  opacity: 1;
+}
+.vt[data-estado="noche"] .vt-cielo-dia {
+  opacity: 0;
+}
+.vt-sol circle:last-child {
+  fill: #fff1cf;
+}
+.vt[data-estado="noche"] .vt-sol {
+  opacity: 0;
+}
+.vt-venus circle:last-child {
+  fill: #fffaf0;
+}
+.vt[data-estado="dia"] .vt-venus {
+  opacity: 0;
+}
+.vt-colina--lejos {
+  fill: #a7b3c3;
+}
+.vt-colina--cerca {
+  fill: #8c9786;
+}
+.vt-tierra {
+  fill: #c8a75e;
+}
+/* El muro del campo cercado: piedra clara con juntas; de noche se retira */
+.vt-muro {
+  fill: #cdb48a;
+  transition: opacity 1s var(--ease-cine);
+}
+.vt-muro__juntas {
+  fill: none;
+  stroke: rgb(110 84 52 / 0.55);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.vt[data-estado="noche"] .vt-colina--lejos {
+  fill: #253a66;
+}
+.vt[data-estado="noche"] .vt-colina--cerca {
+  fill: #16274d;
+}
+.vt[data-estado="noche"] .vt-tierra {
+  fill: #0c1834;
+}
+.vt[data-estado="noche"] .vt-muro {
+  opacity: 0;
+}
+.vt-campo path {
+  fill: none;
+  stroke: rgb(115 84 34 / 0.55);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.vt-campo .vt-espigas {
+  stroke: rgb(140 104 40 / 0.75);
+}
+.vt[data-estado="noche"] .vt-campo {
+  opacity: 0.12;
+}
+/* El pueblo que no se veía: aparece al recomponer la noche */
+.vt-pueblo {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 1s var(--ease-cine) 0.35s,
+    transform 1.4s var(--ease-cine) 0.35s;
+}
+.vt-pueblo path {
+  fill: #0a1228;
+  stroke: rgb(160 196 232 / 0.55);
+  stroke-width: 0.8;
+}
+.vt-pueblo .vt-luz {
+  fill: #ffd27a;
+}
+.vt[data-estado="noche"] .vt-pueblo {
+  opacity: 1;
+  transform: none;
+}
+/* El ciprés: un huso rayado (no la llama del cuadro) que se acerca */
+.vt-cipres {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.vt-cipres > path:first-child {
+  fill: #3f4b37;
+}
+.vt-rayado {
+  fill: none;
+  stroke: #6f7f5d;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.vt[data-estado="noche"] .vt-cipres > path:first-child {
+  fill: #050b1c;
+}
+.vt[data-estado="noche"] .vt-rayado {
+  stroke: rgb(160 196 232 / 0.6);
+}
+.vt-cipres--fijo {
+  transform: translate(206px, 291px) scale(32);
+}
+.vt-cipres--movil {
+  transform: translate(150px, 293px) scale(46);
+  transition:
+    transform 1.8s var(--ease-cine),
+    opacity 1s;
+}
+.vt[data-estado="noche"] .vt-cipres--movil {
+  transform: translate(74px, 540px) scale(470);
+}
+.vt[data-estado="noche"] .vt-rayado {
+  stroke-width: 2;
+}
+/* La reja: hierro oscuro con un filo de luz */
+.vt-reja rect {
+  fill: #141016;
+  stroke: rgb(244 233 207 / 0.14);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Puntos: números, como en la escena de Los elefantes */
+.vt-hot {
+  --size: 44px;
+  position: absolute;
+  z-index: 2;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.vt-hot__ring {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-accent);
+  background: rgb(8 13 30 / 0.78);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 14px 2px rgb(224 170 69 / 0.35);
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    scale 0.3s var(--ease-cine);
+}
+.vt-hot[aria-expanded="true"] .vt-hot__ring {
+  background: var(--c-accent);
+  color: var(--c-bg);
+  scale: 1.12;
+}
+.vt-hot__label {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 0.1rem 0.4rem;
+  background: rgb(8 13 30 / 0.8);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+/* Ventana pequeña: solo los números a la vista; el nombre sigue en el botón para los lectores */
+@container vt (max-width: 300px) {
+  .vt-hot__label {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (hover: hover) {
+  .vt-hot:hover .vt-hot__ring {
+    scale: 1.12;
+  }
+}
+.vt-nota {
+  margin: 1.25rem auto 0;
+  max-width: 34rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+
+/* Panel del punto abierto */
+.vt-panel[hidden] {
+  display: none;
+}
+.vt-panel__inner {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.1rem 1.1rem 1.25rem;
+  border: 1px solid var(--c-line);
+  border-top: 2px solid var(--c-accent);
+  background: rgb(8 13 30 / 0.72);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vt-panel__inner {
+    animation: nc-card-in 0.5s var(--ease-cine) both;
+  }
+}
+.vt-panel__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.vt-panel__kicker {
+  margin: 0;
+  color: var(--c-accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.vt-panel__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -0.5rem -0.5rem -0.5rem 0;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+.vt-panel__t {
+  margin: 0;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.35rem, 1.15rem + 0.7vw, 1.75rem);
+  line-height: 1.1;
+}
+.vt-panel__t:focus {
+  outline: none;
+}
+.vt-panel__t:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+}
+.vt-panel__obra[hidden] {
+  display: none;
+}
+.vt-panel__obra p {
+  margin: 0.4rem 0 0;
+  color: var(--c-muted);
+  font-size: 0.9375rem;
+}
+.vt-panel__escala {
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--c-line);
+}
+.vt-panel__sub {
+  margin: 0.6rem 0 0.25rem;
+  color: var(--c-accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.vt-panel__more {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+.vt-panel__link {
+  margin: 0;
+}
+.vt-panel__link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-accent);
+  text-underline-offset: 0.25em;
+}
+.vt-panel__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Movimiento reducido: los cambios son instantáneos y el cielo, un fotograma fijo */
+@media (prefers-reduced-motion: reduce) {
+  .vt,
+  .vt *,
+  .nc-lab__band,
+  .nc-scale__mark {
+    transition: none !important;
+  }
+}

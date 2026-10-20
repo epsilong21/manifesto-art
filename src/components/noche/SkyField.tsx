@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { esPrincipal, visibles } from "./relevo";
 
 /** Remolinos de la pintura, en coordenadas de la obra (0–1). Signo: sentido de giro. */
 const VORTICES = [
@@ -60,18 +61,6 @@ type Props = {
   /** Partículas por superficie (1 = hero). */
   density?: number;
   className?: string;
-};
-
-/**
- * Relevo entre lienzos: si dos están a la vista (el final del hero y el
- * explorador), solo anima el que más se ve. Nunca hay dos bucles a la vez.
- */
-const visibles = new Map<symbol, number>();
-const esPrincipal = (id: symbol) => {
-  const mio = visibles.get(id) ?? 0;
-  if (mio <= 0) return false;
-  for (const [otro, r] of visibles) if (otro !== id && r > mio) return false;
-  return true;
 };
 
 /**

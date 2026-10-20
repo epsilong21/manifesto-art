@@ -31,6 +31,8 @@ Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fun
 
 El código, el diseño, los shaders, las composiciones gráficas (incluidos «El desierto imposible» y la composición de *Los elefantes*) y la textura mineral (generada por `scripts/textura-mineral.mjs`) son creaciones de MANIFESTO.
 
+En *La noche estrellada*, la escena «La ventana», el laboratorio «Turbulencia» y la escala «De la ventana a Venus» también son creaciones de MANIFESTO, generadas con código. «La ventana» evoca la recomposición del cuadro, pero no reproduce ni imita la pintura. El laboratorio es un modelo de juguete, no una simulación de fluidos.
+
 ## Tipografías
 
 Archivo, Gloock, Instrument Serif, Big Shoulders y Bodoni Moda, de Google Fonts, con licencia SIL Open Font License. Se autoalojan al compilar.
@@ -38,3 +40,15 @@ Archivo, Gloock, Instrument Serif, Big Shoulders y Bodoni Moda, de Google Fonts,
 ## Fuentes de los textos
 
 Gallerie degli Uffizi (ficha en Google Arts & Culture), The Museum of Modern Art, Fundació Gala-Salvador Dalí, Historia Arte y Wikipedia (fuente secundaria). Cada página las enlaza en su pie. Los textos distinguen los hechos documentados de las interpretaciones.
+
+Fuentes añadidas en *La noche estrellada*:
+
+- **Cartas de Van Gogh a Theo n.º 776 (hacia el 23 de mayo de 1889) y n.º 777 (principios de junio de 1889):** citadas a través de Wikipedia, *[The Starry Night](https://en.wikipedia.org/wiki/The_Starry_Night)* (fuente secundaria).
+- **Turbulencia:**
+  - J. L. Aragón, G. G. Naumis, M. Bai, M. Torres y P. K. Maini (2008), «Turbulent luminance in impassioned van Gogh paintings», *Journal of Mathematical Imaging and Vision* 30: 275–283, [doi:10.1007/s10851-007-0055-0](https://doi.org/10.1007/s10851-007-0055-0).
+  - Y. Ma, W. Cheng, S. Huang, F. G. Schmitt, X. Lin e Y. Huang (2024), «Hidden turbulence in van Gogh's *The Starry Night*», *Physics of Fluids* 36, 095140, [doi:10.1063/5.0213627](https://doi.org/10.1063/5.0213627).
+  - La réplica: Riley y Gad-el-Hak (2025), «Is there hidden turbulence in Vincent van Gogh's *The Starry Night*?», *Journal of Turbulence*, [doi:10.1080/14685248.2025.2477244](https://doi.org/10.1080/14685248.2025.2477244).
+- **Distancias:**
+  - Venus (junio de 1889): NASA [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/).
+  - Asilo de Saint-Paul-de-Mausole: coordenadas de Wikipedia en francés.
+  - Próxima Centauri: Wikipedia, *[Proxima Centauri](https://en.wikipedia.org/wiki/Proxima_Centauri)*.
