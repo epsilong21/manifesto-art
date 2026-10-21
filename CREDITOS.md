@@ -8,8 +8,15 @@ MANIFESTO es una plataforma cultural y educativa sin ánimo de lucro. No vende p
 
 - **Reproducción:** [«Caravaggio - Medusa - Google Art Project.jpg»](https://commons.wikimedia.org/wiki/File:Caravaggio_-_Medusa_-_Google_Art_Project.jpg) (Wikimedia Commons; fuente: Google Arts & Culture, asset `FAFPqU12CekL8Q`). Licencia en Commons: `PD-Art`, dominio público.
 - **Archivo en el repositorio:** `public/obras/medusa.jpg`, solo recortado y redimensionado (2400 × 2350 px). El sitio sirve variantes WebP de hasta 2048 px.
-- **Capas de MANIFESTO:** la petrificación, la luz, el relieve del escudo y los tratamientos de color son capas artísticas propias que no alteran el archivo. El laboratorio «La sombra que miente» muestra un recorte de esta misma reproducción con la zona de la sombra señalada encima. El espejo de «El reflejo» muestra esta misma reproducción invertida como un reflejo y con una ligera deformación de espejo convexo, aplicadas al mostrarla: el archivo no cambia.
+- **Capas de MANIFESTO:** la petrificación, la luz, el relieve del escudo y los tratamientos de color son capas artísticas propias que no alteran el archivo. El laboratorio «La sombra que miente» muestra un recorte de esta misma reproducción con la zona de la sombra señalada encima. El espejo de «El reflejo» muestra otra obra (ver la entrada siguiente).
 - **Patrimonio cultural italiano:** la difusión de imágenes de bienes culturales se acoge al art. 108, apartado 3-bis, del Codice dei beni culturali e del paesaggio (D.Lgs. 42/2004). Ese apartado solo ampara usos sin ánimo de lucro con fines de estudio, investigación, libre expresión o promoción del conocimiento del patrimonio. **No es una autorización de las Gallerie degli Uffizi** ni se ha solicitado ninguna. Cualquier reutilización con fines comerciales de estas imágenes requiere la concesión de la institución.
+
+### Cabeza de Medusa · Franz von Stuck, hacia 1892 · colección particular
+
+- **Reproducción:** [«Haupt der Medusa by Franz von Stuck.jpg»](https://commons.wikimedia.org/wiki/File:Haupt_der_Medusa_by_Franz_von_Stuck.jpg) (Wikimedia Commons; fuente: kunkelfineart.de). Licencia en Commons: `PD-art-two` (PD-old-auto, PD-US-expired; Stuck murió en 1928), dominio público.
+- **Archivo en el repositorio:** `public/obras/medusa-stuck.jpg`, sin modificar (1536 × 1154 px). El sitio sirve variantes WebP de hasta 1536 px: ninguna supera el original.
+- **Datos de la obra:** pastel sobre papel, 26,5 × 32,5 cm, colección particular, según Wikimedia Commons; pendiente de verificar.
+- **Uso en MANIFESTO:** solo en el espejo de «El reflejo» (*Medusa*), invertida como un reflejo y con una ligera deformación de espejo convexo, aplicadas al mostrarla: el archivo no cambia.
 
 ### La noche estrellada · Vincent van Gogh, 1889 · The Museum of Modern Art, Nueva York (472.1941)
 
@@ -33,7 +40,7 @@ El código, el diseño, los shaders, las composiciones gráficas (incluidos «El
 
 En *La noche estrellada*, la escena «La ventana», el laboratorio «Turbulencia» y la escala «De la ventana a Venus» también son creaciones de MANIFESTO, generadas con código. «La ventana» evoca la recomposición del cuadro, pero no reproduce ni imita la pintura. El laboratorio es un modelo de juguete, no una simulación de fluidos.
 
-En *Medusa*, el laboratorio «La sombra que miente» y la escena «El reflejo» también son creaciones de MANIFESTO, generadas con código. El laboratorio es un modelo didáctico que simplifica la óptica y no reproduce la del cuadro. En «El reflejo», la escena oscura y las serpientes se generan con código; dentro del espejo se ve la reproducción de dominio público de la obra, reflejada y deformada (ver arriba).
+En *Medusa*, el laboratorio «La sombra que miente» y la escena «El reflejo» también son creaciones de MANIFESTO, generadas con código. El laboratorio es un modelo didáctico que simplifica la óptica y no reproduce la del cuadro. En «El reflejo», la escena oscura y las serpientes se generan con código; dentro del espejo se ve la reproducción de dominio público de la *Cabeza de Medusa* de Franz von Stuck, reflejada y deformada (ver arriba).
 
 ## Tipografías
 
@@ -57,6 +64,7 @@ Fuentes añadidas en *La noche estrellada*:
 
 Fuentes añadidas en *Medusa*:
 
-- **Wikipedia, *[Medusa (Caravaggio)](https://en.wikipedia.org/wiki/Medusa_(Caravaggio))*** (fuente secundaria): las dos versiones (la primera, llamada Murtola, de 1596, y la de los Uffizi), el soporte y la lectura como autorretrato.
+- **Wikipedia, *[Medusa (Caravaggio)](https://en.wikipedia.org/wiki/Medusa_(Caravaggio))*** (fuente secundaria): el soporte del escudo.
+- **Neue Deutsche Biographie 25 (2013), pp. 612–614, [«Stuck, Franz von»](https://www.deutsche-biographie.de/sfz31093.html):** Franz von Stuck, miembro fundador de la Secesión de Múnich en 1892 («1892 gehörte S. zu den Gründungsmitgliedern der Ausstellungsgemeinschaft Münchner Secession»).
 - **Conceptual Fine Arts, [la sombra del escudo y el argumento de Taro Kimura](https://www.conceptualfinearts.com/cfa/?p=5166):** la sombra pintada como si el escudo fuera cóncavo y el escudo como argumento del *paragone* entre pintura y escultura.
 - **BeCulture, [*Medusa by Caravaggio*, la historia](https://www.beculture.it/en/medusa-by-caravaggio-story/):** la historia de la obra y el lienzo pegado sobre un escudo de madera de chopo.

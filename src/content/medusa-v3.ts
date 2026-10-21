@@ -13,6 +13,11 @@ export const FUENTES_MEDUSA_V3 = {
     href: "https://www.conceptualfinearts.com/cfa/?p=5166",
   },
   beculture: { label: "BeCulture: Medusa by Caravaggio, la historia", href: "https://www.beculture.it/en/medusa-by-caravaggio-story/" },
+  ndb: { label: "Neue Deutsche Biographie: Stuck, Franz von", href: "https://www.deutsche-biographie.de/sfz31093.html" },
+  stuck: {
+    label: "Wikimedia Commons: Haupt der Medusa, de Franz von Stuck",
+    href: "https://commons.wikimedia.org/wiki/File:Haupt_der_Medusa_by_Franz_von_Stuck.jpg",
+  },
 } satisfies Record<string, Fuente>;
 
 /** Zona de la sombra arrojada sobre el fondo verde, en fracciones de la reproducción (0-1). */
@@ -62,13 +67,21 @@ export type PuntoReflejo = {
 
 /**
  * «El reflejo»: interpretación original de MANIFESTO. Medusa está en la escena, pero
- * solo se ve en el espejo, como en el mito de Perseo: dentro del disco, la reproducción
- * de la obra invertida; fuera, una escena oscura generada con código.
+ * solo se ve en el espejo, como en el mito de Perseo: dentro del disco, otra Medusa de
+ * dominio público (la de Franz von Stuck) invertida; fuera, una escena oscura generada
+ * con código.
  */
 export const REFLEJO = {
   nombre: "El reflejo",
   entrada: "Medusa está aquí. Solo puedes verla en el espejo.",
-  nota: "Escena original de MANIFESTO. En el espejo, la Medusa de Caravaggio (dominio público), reflejada; el resto de la escena se genera con código.",
+  nota: "Escena original de MANIFESTO. En el espejo, Cabeza de Medusa de Franz von Stuck (dominio público), reflejada; el resto de la escena se genera con código.",
+  /** Reproducción de Wikimedia Commons sin modificar (ver CREDITOS.md). */
+  imagen: {
+    src: "/obras/medusa-stuck.jpg",
+    width: 1536,
+    height: 1154,
+    alt: "Reflejo de la Cabeza de Medusa de Franz von Stuck: un rostro pálido mira de frente con los ojos muy abiertos y la boca cerrada, enmarcado por serpientes oscuras.",
+  },
   pista: "Mueve el espejo",
   puntos: [
     {
@@ -92,17 +105,17 @@ export const REFLEJO = {
       id: "rostro",
       num: "03",
       nombre: "Rostro",
-      escena: "El rostro que buscas con el espejo podría ser el del propio pintor.",
+      escena: "En el espejo no está la Medusa de Caravaggio, sino la de Franz von Stuck: no grita, te mira.",
       hecho:
-        "Hay dos versiones. La primera, llamada Murtola (1596, 48 × 55 cm), está firmada y es de una colección privada; la de los Uffizi no está firmada ni fechada.",
+        "Franz von Stuck fue en 1892 uno de los fundadores de la Secesión de Múnich. Su Cabeza de Medusa se fecha hacia 1892: pastel sobre papel, 26,5 × 32,5 cm, en una colección particular (según Wikimedia Commons; pendiente de verificar).",
       lectura:
-        "Varias fuentes leen el rostro como un autorretrato. Si lo es, Caravaggio se pinta como el monstruo y, a la vez, queda a salvo: es él quien sostiene la imagen.",
+        "Caravaggio pinta el instante del grito, con la boca abierta y la sangre; Stuck, tres siglos después, una cara quieta que sostiene la mirada. En el mito, mirarla petrifica: aquí es ella quien no aparta los ojos.",
     },
     {
       id: "superficie",
       num: "04",
       nombre: "Superficie",
-      escena: "Lo que aparece en el espejo es luz y sombra pintadas, no relieve: no podría tallarse.",
+      escena: "Lo que hay en el escudo de Caravaggio es luz y sombra pintadas, no relieve: no podría tallarse.",
       hecho: "Caravaggio no pintó sobre la madera: pintó un lienzo y lo pegó sobre un escudo de chopo.",
       lectura:
         "Taro Kimura lo lee como un desafío a la escultura: la sombra arrojada y la sangre líquida solo puede mostrarlas la pintura.",

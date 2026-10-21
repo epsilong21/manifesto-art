@@ -52,7 +52,7 @@ const env = {
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? `https://epsilong21.github.io${base}`,
 };
 
-const OBRAS = ["medusa.jpg", "noche-estrellada.jpg", ...(elegida ? [elegida.archivo] : [])];
+const OBRAS = ["medusa.jpg", "medusa-stuck.jpg", "noche-estrellada.jpg", ...(elegida ? [elegida.archivo] : [])];
 const ANCHOS = JSON.parse(readFileSync(join(raiz, "src/lib/imagenAnchos.json"), "utf8"));
 
 rmSync(out, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });

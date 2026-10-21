@@ -174,8 +174,15 @@ export default function MedusaPage() {
             </p>
             <p>
               El laboratorio «La sombra que miente» y la escena «{REFLEJO.nombre}» son creaciones de MANIFESTO,
-              generadas con código. El laboratorio muestra además un recorte de la reproducción de la obra, y el
-              espejo de «{REFLEJO.nombre}», la misma reproducción invertida y con una ligera deformación de espejo
+              generadas con código. El laboratorio muestra además un recorte de la reproducción de la obra.
+            </p>
+            <p>
+              En el espejo de «{REFLEJO.nombre}»: Franz von Stuck, Cabeza de Medusa, hacia 1892. Obra en dominio
+              público. Reproducción: Wikimedia Commons (
+              <a href={FUENTES_MEDUSA_V3.stuck.href} target="_blank" rel="noopener noreferrer">
+                Haupt der Medusa by Franz von Stuck.jpg
+              </a>
+              , PD-Art), sin modificar el archivo; se muestra invertida y con una ligera deformación de espejo
               convexo.
             </p>
           </>

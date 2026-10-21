@@ -3,7 +3,6 @@
 import Image, { getImageProps } from "next/image";
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
 import { KindTag } from "@/components/concepts/ConceptChrome";
-import { MEDUSA } from "@/content/medusa";
 import { REFLEJO, type PuntoReflejo } from "@/content/medusa-v3";
 import { gsap } from "@/lib/gsap";
 
@@ -27,24 +26,38 @@ const ALTO = 500;
 const R = 92;
 
 /**
- * Ventana de la reproducción que ocupa la escena (fracciones de la imagen): la cara
- * es más grande que el espejo, así que hay que moverlo para verla entera.
+ * Mandos para afinar el zoom del espejo:
+ * - AUMENTO: ampliación en el centro del disco por la curvatura convexa.
+ * - ESCALA_CARA: tamaño de la obra respecto a la ventana base (el ancho central 0.2–0.8
+ *   llenando la escena). Por debajo de ~0,7 la cara deja de ser más grande que el
+ *   disco y se vería entera sin mover el espejo.
  */
-const VENTANA = { x0: 0.29, x1: 0.75, y0: 0.1764 };
+const AUMENTO = 1.15;
+const ESCALA_CARA = 0.92;
+
+/**
+ * Colocación de la reproducción en la escena, centrada en (cx, cy) de la obra. La cara
+ * es más grande que el espejo, así que hay que moverlo para ver ojos y boca. Con
+ * ESCALA_CARA < 1 la obra no llena el alto: arriba y abajo queda la oscuridad del fondo.
+ */
+const OBRA = REFLEJO.imagen;
+const VENTANA = { cx: 0.5, cy: 0.5, ancho: 0.6 };
 const IMG = (() => {
-  const w = ANCHO / (VENTANA.x1 - VENTANA.x0);
-  const h = (w * MEDUSA.imagen.height) / MEDUSA.imagen.width;
-  return { x: -VENTANA.x0 * w, y: -VENTANA.y0 * h, w, h };
+  const w = (ANCHO / VENTANA.ancho) * ESCALA_CARA;
+  const h = (w * OBRA.height) / OBRA.width;
+  return { x: ANCHO / 2 - VENTANA.cx * w, y: ALTO / 2 - VENTANA.cy * h, w, h };
 })();
+/** Fracción del alto de la obra que se funde con el fondo arriba y abajo. */
+const FUNDIDO = 0.07;
 /** Un punto de la obra (fracciones) en la escena, ya invertido como en un espejo. */
 const enEscena = (px: number, py: number) => ({ x: ANCHO - (IMG.x + px * IMG.w), y: IMG.y + py * IMG.h });
-const OJOS = [enEscena(0.484, 0.411), enEscena(0.599, 0.448)];
-const BOCA = enEscena(0.51, 0.579);
-const CUELLO = enEscena(0.4, 0.66);
-const CARA = enEscena(0.5, 0.5);
+// Pupilas medidas sobre la reproducción de 1536 × 1154
+const OJOS = [enEscena(0.383, 0.392), enEscena(0.61, 0.388)];
+const BOCA = enEscena(0.5, 0.685);
+const CARA = enEscena(0.5, 0.55);
 
-/** Variantes del optimizador: el reflejo comparte caché con las <Image> de la página. */
-const VARIANTES = (getImageProps({ src: MEDUSA.imagen.src, alt: "", width: MEDUSA.imagen.width, height: MEDUSA.imagen.height, sizes: "100vw", quality: 70 }).props.srcSet ?? "")
+/** Variantes del optimizador (en la exportación estática, las WebP de la obra). */
+const VARIANTES = (getImageProps({ src: OBRA.src, alt: "", width: OBRA.width, height: OBRA.height, sizes: "100vw", quality: 70 }).props.srcSet ?? "")
   .split(", ")
   .map((c) => {
     const [url, w] = c.split(" ");
@@ -56,9 +69,28 @@ const variante = (px: number) => VARIANTES.find((v) => v.w >= px) ?? VARIANTES.a
 
 /**
  * Espejo convexo: mapa de desplazamiento para feDisplacementMap. El centro se amplía
- * (hasta ×1,25) y el borde se comprime, como en un escudo pulido.
+ * (×AUMENTO) y el borde se comprime, como en un escudo pulido. «escala» solo fija la
+ * codificación del mapa: debe ser al menos el doble del desplazamiento máximo.
  */
-const CONVEXO = { centro: 0.2, borde: 0.1, escala: 24 };
+const CONVEXO = { centro: 1 - 1 / AUMENTO, borde: 0.1, escala: 24 };
+/**
+ * Desplazamiento máximo por eje, en unidades del disco: |g(r)| · r · R, con
+ * g(r) = −centro + (centro + borde) · r². Fuera del círculo (esquinas del mapa) g = borde.
+ */
+const DESPLAZAMIENTO_MAX = (() => {
+  let m = CONVEXO.borde;
+  for (let i = 0; i <= 200; i++) {
+    const r = i / 200;
+    m = Math.max(m, Math.abs(-CONVEXO.centro + (CONVEXO.centro + CONVEXO.borde) * r * r) * r);
+  }
+  return m * R;
+})();
+/**
+ * Margen de la región del filtro y del fondo alrededor del disco: el desplazamiento
+ * máximo + 2. WebKit deja transparente lo que el filtro muestrea fuera de su región
+ * (se veía el borde recto de la imagen dentro del círculo).
+ */
+const MARGEN = Math.ceil(DESPLAZAMIENTO_MAX + 2);
 function mapaConvexo() {
   const n = 2 * R;
   const canvas = document.createElement("canvas");
@@ -137,11 +169,10 @@ const limita = (m: { x: number; y: number }) => ({
 /** Qué refleja el espejo, para los lectores de pantalla. */
 function zona(m: { x: number; y: number }) {
   const cerca = (q: { x: number; y: number }, r: number) => Math.hypot(m.x - q.x, m.y - q.y) < r;
-  if (cerca(INICIO, 55)) return "los ojos de Medusa";
-  if (cerca(BOCA, 55)) return "la boca abierta de Medusa";
-  if (cerca(CUELLO, 60)) return "el cuello cortado y la sangre";
+  if (cerca(INICIO, 55)) return "los ojos de Medusa, que te miran de frente";
+  if (cerca(BOCA, 55)) return "la boca cerrada de Medusa";
   if (cerca(CARA, 115)) return "parte del rostro de Medusa";
-  return m.y < 130 ? "las serpientes de su cabeza" : "sus serpientes";
+  return m.y < 130 ? "las serpientes sobre su frente" : "las serpientes que rodean su cara";
 }
 
 /** El mundo reflejado, colocado para que el espejo muestre la zona m (en unidades del disco). */
@@ -150,7 +181,7 @@ const mundo = (m: { x: number; y: number }) => `translate(${f(R - m.x)} ${f(R - 
 /**
  * «El reflejo»: interpretación original de MANIFESTO. De frente, una escena oscura
  * con indicios (serpientes en los bordes, el brillo de unos ojos); en el espejo, que
- * se arrastra o se mueve con las flechas, la Medusa de Caravaggio invertida y curvada
+ * se arrastra o se mueve con las flechas, la Medusa de Franz von Stuck invertida y curvada
  * como en un escudo convexo. Cuatro puntos abren su contexto. Solo hay movimiento en
  * reposo si es la sección que más se ve frente al escudo de la V2, con la pestaña
  * visible y sin movimiento reducido.
@@ -412,18 +443,48 @@ export function ElReflejo() {
               <svg viewBox={`0 0 ${2 * R} ${2 * R}`} focusable="false">
                 {mapa ? (
                   <defs>
-                    <filter id={filtro} filterUnits="userSpaceOnUse" x="0" y="0" width={2 * R} height={2 * R} colorInterpolationFilters="sRGB">
+                    <filter
+                      id={filtro}
+                      filterUnits="userSpaceOnUse"
+                      x={-MARGEN}
+                      y={-MARGEN}
+                      width={2 * R + 2 * MARGEN}
+                      height={2 * R + 2 * MARGEN}
+                      colorInterpolationFilters="sRGB"
+                    >
                       <feImage href={mapa} x="0" y="0" width={2 * R} height={2 * R} preserveAspectRatio="none" result="mapa" />
                       <feDisplacementMap in="SourceGraphic" in2="mapa" scale={CONVEXO.escala} xChannelSelector="R" yChannelSelector="G" />
                     </filter>
                   </defs>
                 ) : null}
+                {/* Arriba y abajo la obra no llena la escena: se funde con el fondo, sin borde recto */}
+                <defs>
+                  <linearGradient id={`${filtro}-borde`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="#fff" stopOpacity="0" />
+                    <stop offset={FUNDIDO} stopColor="#fff" />
+                    <stop offset={1 - FUNDIDO} stopColor="#fff" />
+                    <stop offset="1" stopColor="#fff" stopOpacity="0" />
+                  </linearGradient>
+                  <mask id={`${filtro}-fundido`} maskContentUnits="objectBoundingBox">
+                    <rect width="1" height="1" fill={`url(#${filtro}-borde)`} />
+                  </mask>
+                </defs>
                 <g filter={mapa ? `url(#${filtro})` : undefined}>
-                  <rect width={2 * R} height={2 * R} className="rf-espejo__fondo" />
+                  <rect x={-MARGEN} y={-MARGEN} width={2 * R + 2 * MARGEN} height={2 * R + 2 * MARGEN} className="rf-espejo__fondo" />
                   <g ref={mundoRef} transform={mundo(INICIO)}>
                     {/* Invertida como en un espejo: x' = ANCHO − x */}
                     <g transform={`translate(${ANCHO} 0) scale(-1 1)`}>
-                      {href ? <image href={href} x={f(IMG.x)} y={f(IMG.y)} width={f(IMG.w)} height={f(IMG.h)} preserveAspectRatio="none" /> : null}
+                      {href ? (
+                        <image
+                          href={href}
+                          x={f(IMG.x)}
+                          y={f(IMG.y)}
+                          width={f(IMG.w)}
+                          height={f(IMG.h)}
+                          preserveAspectRatio="none"
+                          mask={`url(#${filtro}-fundido)`}
+                        />
+                      ) : null}
                     </g>
                   </g>
                 </g>
@@ -436,10 +497,10 @@ export function ElReflejo() {
               <span className="rf-espejo__vista">
                 <span className="rf-espejo-sinjs__invertido">
                   <Image
-                    src={MEDUSA.imagen.src}
-                    alt=""
-                    width={MEDUSA.imagen.width}
-                    height={MEDUSA.imagen.height}
+                    src={OBRA.src}
+                    alt={OBRA.alt}
+                    width={OBRA.width}
+                    height={OBRA.height}
                     sizes="(min-width: 64rem) 1200px, 220vw"
                     quality={70}
                     loading="lazy"
