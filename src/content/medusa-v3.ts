@@ -61,19 +61,21 @@ export type PuntoReflejo = {
 };
 
 /**
- * «El reflejo»: interpretación original de MANIFESTO, generada con código. Un campo
- * de fragmentos que solo se ordena a través de un espejo, como en el mito de Perseo.
+ * «El reflejo»: interpretación original de MANIFESTO. Medusa está en la escena, pero
+ * solo se ve en el espejo, como en el mito de Perseo: dentro del disco, la reproducción
+ * de la obra invertida; fuera, una escena oscura generada con código.
  */
 export const REFLEJO = {
   nombre: "El reflejo",
-  nota: "Escena original de MANIFESTO, generada con código. Evoca el escudo de Perseo; no reproduce la pintura.",
+  entrada: "Medusa está aquí. Solo puedes verla en el espejo.",
+  nota: "Escena original de MANIFESTO. En el espejo, la Medusa de Caravaggio (dominio público), reflejada; el resto de la escena se genera con código.",
   pista: "Mueve el espejo",
   puntos: [
     {
       id: "espejo",
       num: "01",
       nombre: "Espejo",
-      escena: "De frente, solo hay fragmentos. En el espejo, se ordenan: lo que no se puede mirar directamente cobra forma en el reflejo.",
+      escena: "De frente, solo hay oscuridad y algún destello. En el espejo aparece ella: lo que no se puede mirar directamente se deja ver en el reflejo.",
       hecho:
         "Según el mito, Perseo venció a Medusa sin mirarla de frente: se guió por su reflejo en un escudo pulido, con la ayuda de Atenea.",
       lectura: "El escudo de Caravaggio repite la trampa del mito: para mirar a Medusa necesitamos algo que se interponga.",
@@ -82,7 +84,7 @@ export const REFLEJO = {
       id: "sombra",
       num: "02",
       nombre: "Sombra",
-      escena: "Como los fragmentos sueltos, la sombra del cuadro engaña sobre la forma real de lo que tienes delante.",
+      escena: "El espejo invierte y curva lo que muestra. La sombra del cuadro también engaña sobre la forma real de lo que tienes delante.",
       hecho: "El escudo es convexo, pero la sombra de la cabeza está pintada como si fuera cóncavo.",
       enlace: { href: "#sombra", texto: "Probarlo en el laboratorio" },
     },
@@ -90,7 +92,7 @@ export const REFLEJO = {
       id: "rostro",
       num: "03",
       nombre: "Rostro",
-      escena: "El emblema no tiene cara. En el cuadro, la cara podría ser la del propio pintor.",
+      escena: "El rostro que buscas con el espejo podría ser el del propio pintor.",
       hecho:
         "Hay dos versiones. La primera, llamada Murtola (1596, 48 × 55 cm), está firmada y es de una colección privada; la de los Uffizi no está firmada ni fechada.",
       lectura:
@@ -100,7 +102,7 @@ export const REFLEJO = {
       id: "superficie",
       num: "04",
       nombre: "Superficie",
-      escena: "Lo que aparece en el espejo es luz y sombra, no relieve: no podría tallarse.",
+      escena: "Lo que aparece en el espejo es luz y sombra pintadas, no relieve: no podría tallarse.",
       hecho: "Caravaggio no pintó sobre la madera: pintó un lienzo y lo pegó sobre un escudo de chopo.",
       lectura:
         "Taro Kimura lo lee como un desafío a la escultura: la sombra arrojada y la sangre líquida solo puede mostrarlas la pintura.",

@@ -404,60 +404,102 @@
   /* El resto de la escena deja hacer scroll: solo el espejo captura el arrastre */
   touch-action: pan-y;
 }
-.rf-capa,
-.rf-completo {
+.rf-capa {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  /* Solo asoman: se funden con la oscuridad hacia el centro */
+  mask-image: radial-gradient(62% 58% at 50% 48%, transparent 30%, #000 100%);
 }
 .rf-capa svg {
   display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
-.rf-trazo {
+/* Indicios: serpientes que asoman por los bordes, casi fundidas con la oscuridad */
+.rf-serpiente {
   fill: none;
+  stroke: rgb(70 76 50 / 0.5);
+  stroke-width: 6.5;
   stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.rf-capa .rf-trazo {
-  stroke: rgb(230 216 194 / 0.28);
-  stroke-width: 1.4;
+.rf-serpiente--escama {
+  stroke: rgb(10 12 6 / 0.45);
+  stroke-width: 3;
+  stroke-dasharray: 1.5 6;
 }
-.rf-capa .rf-trazo--punto {
-  fill: rgb(230 216 194 / 0.25);
-  stroke: none;
+.rf-serpiente--brillo {
+  stroke: rgb(214 204 170 / 0.13);
+  stroke-width: 1.2;
 }
-/* Sin JavaScript no hay espejo que mover: se ve el emblema entero */
-.rf-completo {
-  display: none;
+.rf-serpiente__cabeza {
+  fill: rgb(70 76 50 / 0.65);
 }
-html:not(.js) .rf-completo {
-  display: block;
+.rf-serpiente__ojo {
+  fill: rgb(255 230 190 / 0.6);
 }
-html:not(.js) .rf-capa {
-  opacity: 0.25;
+/* El brillo de unos ojos donde el espejo los mostraría */
+.rf-ojo {
+  position: absolute;
+  z-index: 1;
+  width: 5%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 238 205 / 0.95) 0 14%, rgb(235 196 140 / 0.35) 38%, transparent 70%);
+  opacity: 0.55;
+  pointer-events: none;
 }
-/* Sin JavaScript el espejo, la pista y los puntos no harían nada: los puntos van en <noscript> */
+@media (prefers-reduced-motion: no-preference) {
+  .rf-ojo {
+    animation: rf-ojo 6.5s ease-in-out infinite;
+  }
+  .rf-ojo + .rf-ojo {
+    animation-delay: -0.35s;
+  }
+  .rf-escena.is-quieto .rf-ojo {
+    animation-play-state: paused;
+  }
+}
+@keyframes rf-ojo {
+  0%,
+  100% {
+    opacity: 0.2;
+    scale: 0.8;
+  }
+  40%,
+  52% {
+    opacity: 0.85;
+    scale: 1.1;
+  }
+  46% {
+    opacity: 0.15;
+    scale: 0.9;
+  }
+}
+/* Sin JavaScript el espejo, la pista y los puntos no harían nada: el disco queda quieto
+   sobre los ojos y los puntos van en <noscript> */
 html:not(.js) .rf-espejo,
 html:not(.js) .rf-pista,
 html:not(.js) .rf-hot,
 html:not(.js) .rf-instrucciones {
   display: none;
 }
-.rf-completo .rf-trazo,
-.rf-espejo .rf-trazo {
-  stroke: #e3c48a;
-  stroke-width: 1.8;
+.rf-espejo-sinjs {
+  position: absolute;
+  z-index: 2;
+  border-radius: 50%;
 }
-.rf-completo .rf-trazo--anillo,
-.rf-espejo .rf-trazo--anillo {
-  stroke: #f0dfbf;
+.rf-espejo-sinjs__invertido {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(-1);
 }
-.rf-completo .rf-trazo--punto,
-.rf-espejo .rf-trazo--punto {
-  fill: #e3c48a;
-  stroke: none;
+.rf-espejo-sinjs__invertido img {
+  position: absolute;
+  max-width: none;
+  height: auto;
 }
 
 /* El espejo: un disco pulido que se arrastra (touch-action: none solo aquí) */
@@ -492,22 +534,24 @@ html:not(.js) .rf-instrucciones {
     0 18px 40px -10px rgb(0 0 0 / 0.85),
     inset 0 0 30px rgb(0 0 0 / 0.6);
 }
-.rf-espejo__mundo {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-.rf-espejo__mundo svg {
+.rf-espejo__vista svg {
   display: block;
   width: 100%;
   height: 100%;
+}
+.rf-espejo__fondo {
+  fill: #140d0d;
 }
 .rf-espejo__brillo {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
-  background: linear-gradient(130deg, transparent 38%, rgb(255 240 210 / 0.16) 47%, transparent 56%);
+  /* Destello, brillo de superficie abombada y borde que se oscurece: un disco convexo pulido */
+  background:
+    linear-gradient(130deg, transparent 38%, rgb(255 240 210 / 0.16) 47%, transparent 56%),
+    radial-gradient(circle at 32% 26%, rgb(255 245 225 / 0.14), transparent 38%),
+    radial-gradient(circle, transparent 60%, rgb(0 0 0 / 0.5) 100%);
 }
 @media (prefers-reduced-motion: no-preference) {
   .rf-espejo__brillo {

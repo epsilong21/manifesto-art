@@ -174,7 +174,9 @@ export default function MedusaPage() {
             </p>
             <p>
               El laboratorio «La sombra que miente» y la escena «{REFLEJO.nombre}» son creaciones de MANIFESTO,
-              generadas con código. El laboratorio muestra además un recorte de la reproducción de la obra.
+              generadas con código. El laboratorio muestra además un recorte de la reproducción de la obra, y el
+              espejo de «{REFLEJO.nombre}», la misma reproducción invertida y con una ligera deformación de espejo
+              convexo.
             </p>
           </>
         }
