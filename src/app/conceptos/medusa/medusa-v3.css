@@ -1,0 +1,731 @@
+/* ─────────────────────────────────────────────────────────────
+   03 · MEDUSA V3 — laboratorio «La sombra que miente» e
+   interpretación original «El reflejo». Archivo aparte: la V2
+   (medusa.css) no se toca.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Enlace tras los cinco puntos del escudo ── */
+
+.mv-enlace {
+  margin: clamp(1.5rem, 4vw, 2.5rem) 0 0;
+  text-align: center;
+}
+.mv-enlace a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.4rem 0;
+  color: var(--c-ink);
+  font-size: 1.05rem;
+  text-decoration: underline;
+  text-decoration-color: var(--c-accent);
+  text-underline-offset: 0.3em;
+}
+.mv-enlace a::after {
+  content: "↓";
+  color: var(--c-accent);
+}
+@media (hover: hover) {
+  .mv-enlace a:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* ── Mandos (réplica del patrón de Noche y Los elefantes) ── */
+
+.mv-range {
+  display: grid;
+  gap: 0.4rem;
+}
+.mv-range > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.mv-range output {
+  color: var(--c-ink);
+  font-variant-numeric: tabular-nums;
+}
+.mv-range input {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--c-accent);
+}
+
+/* ── Laboratorio «La sombra que miente» ── */
+
+.mv-lab-section {
+  --lab-hueco: clamp(2rem, 4vw, 3.5rem);
+  border-top: 1px solid var(--c-line);
+}
+.mv-lab {
+  /* Figura con techo: 900 px de ancho y un alto de min(64svh, 600px), en 16:10 */
+  --lab-ancho: min(100%, 900px, calc(min(64svh, 600px) * 1.6));
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+}
+@media (min-width: 64rem) {
+  /* Figura y mandos, centrados como un solo bloque; el encabezado, del mismo ancho */
+  .mv-lab {
+    grid-template-columns: minmax(0, 900px) minmax(20rem, 26rem);
+    justify-content: center;
+    column-gap: var(--lab-hueco);
+    align-items: center;
+  }
+  .mv-lab__obra {
+    grid-column: 1 / -1;
+  }
+  .mv-lab-section > .md-section__head {
+    max-width: calc(900px + var(--lab-hueco) + 26rem);
+    margin-inline: auto;
+  }
+}
+.mv-lab__fig {
+  width: var(--lab-ancho);
+  margin: 0 auto;
+  min-width: 0;
+}
+.mv-lab__view {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: clip;
+  background: radial-gradient(80% 90% at 50% 45%, rgb(57 11 20 / 0.45), transparent 75%), #0d0c0e;
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+.mv-lab__view svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.mv-lab__tag {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  margin: 0;
+  padding: 0.2rem 0.6rem;
+  background: rgb(8 8 10 / 0.8);
+  color: var(--c-ink);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.mv-lab__fig figcaption {
+  margin-top: 0.6rem;
+  max-width: var(--mf-measure);
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+
+/* Vista frontal y corte lateral: se sustituyen con un fundido, sin rotación 3D */
+.mv-frente,
+.mv-corte {
+  transition:
+    opacity 0.6s var(--ease-cine),
+    transform 0.6s var(--ease-cine);
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+.mv-corte {
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
+}
+.mv-lab[data-perfil] .mv-frente {
+  opacity: 0;
+  transform: scaleX(0.35);
+}
+.mv-lab[data-perfil] .mv-corte {
+  opacity: 1;
+  transform: none;
+}
+.mv-sombra {
+  transition:
+    transform 0.5s var(--ease-cine),
+    opacity 0.5s var(--ease-cine);
+}
+.mv-canto {
+  fill: #2a1d14;
+  stroke: rgb(201 160 96 / 0.55);
+  stroke-width: 2;
+}
+.mv-luz {
+  fill: none;
+  stroke: #f3d9a6;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.mv-rotulo {
+  fill: var(--c-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.mv-rotulo--real {
+  fill: var(--c-ink);
+}
+.mv-rotulo--sugerida {
+  fill: #e98b8b;
+}
+.mv-real {
+  fill: none;
+  stroke: #c9a060;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.mv-sugerida {
+  fill: none;
+  stroke: #e98b8b;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+.mv-ojo {
+  fill: none;
+  stroke: var(--c-ink);
+  stroke-width: 1.5;
+}
+
+.mv-lab__controls {
+  display: grid;
+  gap: 1.1rem;
+}
+.mv-lab__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.mv-lab__perfil {
+  justify-self: start;
+}
+.mv-lab__result {
+  padding: 1rem;
+  border: 1px solid var(--c-line);
+  background: rgb(8 8 10 / 0.5);
+}
+.mv-lab__result p {
+  margin: 0.45rem 0 0;
+  color: var(--c-muted);
+}
+.mv-lab__verdict {
+  margin: 0 !important;
+  font-family: var(--font-gloock), Georgia, serif;
+  font-size: 2rem;
+  line-height: 1.05;
+  color: var(--c-ink) !important;
+}
+.mv-lab[data-lectura="concava"] .mv-lab__verdict {
+  color: #e98b8b !important;
+}
+.mv-lab__real {
+  font-size: 0.8125rem;
+}
+
+/* Recorte de la obra y textos */
+.mv-lab__obra {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  padding-top: clamp(1.5rem, 3vw, 2rem);
+  border-top: 1px solid var(--c-line);
+}
+@media (min-width: 48rem) {
+  .mv-lab__obra {
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+@media (min-width: 64rem) {
+  .mv-lab__obra {
+    max-width: calc(900px + var(--lab-hueco) + 26rem);
+    margin-inline: auto;
+    width: 100%;
+  }
+}
+.mv-recorte {
+  margin: 0;
+}
+.mv-recorte__marco {
+  position: relative;
+  overflow: clip;
+  max-width: min(15rem, 62vw);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+.mv-recorte__marco img {
+  position: absolute;
+  max-width: none;
+  height: auto;
+}
+.mv-recorte__zona {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.mv-recorte__zona ellipse {
+  fill: none;
+  stroke: #f3d9a6;
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+  vector-effect: non-scaling-stroke;
+}
+.mv-recorte figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+.mv-lab__texto {
+  display: grid;
+  gap: 1rem;
+  max-width: var(--mf-measure);
+}
+.mv-bloque p {
+  margin: 0.4rem 0 0;
+  color: var(--c-muted);
+}
+.mv-mas {
+  border-top: 1px solid var(--c-line);
+}
+.mv-mas summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  color: var(--c-ink);
+  cursor: pointer;
+  list-style: none;
+}
+.mv-mas summary::-webkit-details-marker {
+  display: none;
+}
+.mv-mas summary::before {
+  content: "+";
+  width: 1rem;
+  color: var(--c-accent);
+  text-align: center;
+}
+.mv-mas[open] summary::before {
+  content: "−";
+}
+.mv-mas ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--c-muted);
+  font-size: 0.875rem;
+}
+.mv-mas li + li {
+  margin-top: 0.3rem;
+}
+.mv-mas a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-ink);
+  overflow-wrap: anywhere;
+}
+
+/* ── Interpretación original «El reflejo» ── */
+
+.rf {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  padding: clamp(4rem, 10vw, 7rem) var(--mf-gutter) clamp(3rem, 8vw, 6rem);
+  background: radial-gradient(60% 50% at 65% 45%, rgb(57 11 20 / 0.35), transparent 70%), var(--c-bg);
+  border-top: 1px solid var(--c-line);
+  scroll-margin-top: 0.5rem;
+}
+/* Escritorio y móvil apaisado: texto y escena a la vez, centrados como un bloque */
+@media (min-width: 64rem), (orientation: landscape) and (max-height: 30rem) {
+  .rf {
+    grid-template-columns: minmax(0, 36rem) minmax(0, calc(min(72svh, 680px) * 0.8));
+    justify-content: center;
+    grid-template-areas:
+      ". stage"
+      "copy stage"
+      "panel stage"
+      ". stage";
+    grid-template-rows: 1fr auto auto 1fr;
+    gap: 0 clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  .rf-copy {
+    grid-area: copy;
+  }
+  .rf-stage {
+    grid-area: stage;
+    position: sticky;
+    top: 1rem;
+  }
+  .rf-panel {
+    grid-area: panel;
+    margin-top: 2rem;
+  }
+  /* El pie cuelga bajo la escena sin contar en el alto: el texto se centra respecto a ella */
+  .rf-nota {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+  }
+}
+.rf-copy {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+.rf-eyebrow {
+  margin: 0;
+  color: var(--c-accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.rf-lede,
+.rf-instrucciones {
+  margin: 0;
+  max-width: var(--mf-measure);
+  color: var(--c-muted);
+}
+.rf-instrucciones {
+  font-size: 0.875rem;
+}
+.rf-stage {
+  min-width: 0;
+}
+.rf-escena {
+  position: relative;
+  isolation: isolate;
+  container: rf / inline-size;
+  aspect-ratio: 4 / 5;
+  width: min(100%, calc(min(72svh, 680px) * 0.8));
+  margin-inline: auto;
+  overflow: clip;
+  background: radial-gradient(70% 60% at 50% 50%, #1a1012, #08080a 75%);
+  box-shadow:
+    0 0 0 1px var(--c-line),
+    0 40px 90px -30px rgb(0 0 0 / 0.9);
+  /* El resto de la escena deja hacer scroll: solo el espejo captura el arrastre */
+  touch-action: pan-y;
+}
+.rf-capa,
+.rf-completo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.rf-capa svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.rf-trazo {
+  fill: none;
+  stroke-linecap: round;
+}
+.rf-capa .rf-trazo {
+  stroke: rgb(230 216 194 / 0.28);
+  stroke-width: 1.4;
+}
+.rf-capa .rf-trazo--punto {
+  fill: rgb(230 216 194 / 0.25);
+  stroke: none;
+}
+/* Sin JavaScript no hay espejo que mover: se ve el emblema entero */
+.rf-completo {
+  display: none;
+}
+html:not(.js) .rf-completo {
+  display: block;
+}
+html:not(.js) .rf-capa {
+  opacity: 0.25;
+}
+/* Sin JavaScript el espejo, la pista y los puntos no harían nada: los puntos van en <noscript> */
+html:not(.js) .rf-espejo,
+html:not(.js) .rf-pista,
+html:not(.js) .rf-hot,
+html:not(.js) .rf-instrucciones {
+  display: none;
+}
+.rf-completo .rf-trazo,
+.rf-espejo .rf-trazo {
+  stroke: #e3c48a;
+  stroke-width: 1.8;
+}
+.rf-completo .rf-trazo--anillo,
+.rf-espejo .rf-trazo--anillo {
+  stroke: #f0dfbf;
+}
+.rf-completo .rf-trazo--punto,
+.rf-espejo .rf-trazo--punto {
+  fill: #e3c48a;
+  stroke: none;
+}
+
+/* El espejo: un disco pulido que se arrastra (touch-action: none solo aquí) */
+.rf-espejo {
+  position: absolute;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.rf-espejo:active {
+  cursor: grabbing;
+}
+.rf-espejo:focus-visible {
+  outline: 3px solid var(--c-accent);
+  outline-offset: 4px;
+}
+.rf-espejo__vista {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a2a24, #140d0d 70%);
+  box-shadow:
+    0 0 0 3px #6e5536,
+    0 0 0 5px #2a1d14,
+    0 18px 40px -10px rgb(0 0 0 / 0.85),
+    inset 0 0 30px rgb(0 0 0 / 0.6);
+}
+.rf-espejo__mundo {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.rf-espejo__mundo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.rf-espejo__brillo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: linear-gradient(130deg, transparent 38%, rgb(255 240 210 / 0.16) 47%, transparent 56%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rf-espejo__brillo {
+    animation: rf-brillo 7s ease-in-out infinite;
+  }
+  .rf-escena.is-quieto .rf-espejo__brillo {
+    animation-play-state: paused;
+  }
+}
+@keyframes rf-brillo {
+  0%,
+  100% {
+    transform: rotate(-12deg);
+  }
+  50% {
+    transform: rotate(14deg);
+  }
+}
+.rf-pista {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 6%;
+  translate: -50% 0;
+  margin: 0;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: rgb(8 8 10 / 0.8);
+  color: var(--c-ink);
+  font-size: 0.8125rem;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.rf[data-tocado] .rf-pista {
+  opacity: 0;
+}
+
+/* Puntos */
+.rf-hot {
+  --size: 44px;
+  position: absolute;
+  z-index: 3;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.rf-hot__ring {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-accent);
+  background: rgb(8 8 10 / 0.82);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color 0.3s,
+    scale 0.3s var(--ease-cine);
+}
+.rf-hot[aria-expanded="true"] .rf-hot__ring {
+  background: var(--c-accent);
+  scale: 1.12;
+}
+.rf-hot__label {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 0.1rem 0.4rem;
+  background: rgb(8 8 10 / 0.85);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+@container rf (max-width: 300px) {
+  .rf-hot__label {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (hover: hover) {
+  .rf-hot:hover .rf-hot__ring {
+    scale: 1.12;
+  }
+}
+.rf-hot:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+.rf-nota {
+  margin: 1.25rem auto 0;
+  max-width: 34rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+.rf-sinjs {
+  margin: 1.5rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--c-muted);
+}
+.rf-sinjs li + li {
+  margin-top: 0.75rem;
+}
+
+/* Panel */
+.rf-panel[hidden] {
+  display: none;
+}
+.rf-panel__inner {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.1rem 1.1rem 1.25rem;
+  border: 1px solid var(--c-line);
+  border-top: 2px solid var(--c-accent);
+  background: rgb(8 8 10 / 0.75);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rf-panel__inner {
+    animation: md-fade 0.5s var(--ease-cine) both;
+  }
+}
+.rf-panel__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.rf-panel__kicker {
+  margin: 0;
+  color: var(--c-accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.rf-panel__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -0.5rem -0.5rem -0.5rem 0;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+.rf-panel__t {
+  margin: 0;
+  font-family: var(--font-gloock), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.3rem, 1.1rem + 0.7vw, 1.7rem);
+  line-height: 1.15;
+}
+.rf-panel__t:focus {
+  outline: none;
+}
+.rf-panel__t:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+}
+.rf-panel__obra[hidden] {
+  display: none;
+}
+.rf-panel__obra p {
+  margin: 0.4rem 0 0;
+  color: var(--c-muted);
+  font-size: 0.9375rem;
+}
+.rf-panel__more {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+.rf-panel__link {
+  margin: 0;
+}
+.rf-panel__link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-ink);
+  text-decoration-color: var(--c-accent);
+  text-underline-offset: 0.25em;
+}
+.rf-panel__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Movimiento reducido: cambios instantáneos */
+@media (prefers-reduced-motion: reduce) {
+  .mv-frente,
+  .mv-corte,
+  .mv-sombra,
+  .rf-pista {
+    transition: none !important;
+  }
+}

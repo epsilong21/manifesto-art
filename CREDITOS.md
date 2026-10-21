@@ -8,7 +8,7 @@ MANIFESTO es una plataforma cultural y educativa sin ánimo de lucro. No vende p
 
 - **Reproducción:** [«Caravaggio - Medusa - Google Art Project.jpg»](https://commons.wikimedia.org/wiki/File:Caravaggio_-_Medusa_-_Google_Art_Project.jpg) (Wikimedia Commons; fuente: Google Arts & Culture, asset `FAFPqU12CekL8Q`). Licencia en Commons: `PD-Art`, dominio público.
 - **Archivo en el repositorio:** `public/obras/medusa.jpg`, solo recortado y redimensionado (2400 × 2350 px). El sitio sirve variantes WebP de hasta 2048 px.
-- **Capas de MANIFESTO:** la petrificación, la luz, el relieve del escudo y los tratamientos de color son capas artísticas propias que no alteran el archivo.
+- **Capas de MANIFESTO:** la petrificación, la luz, el relieve del escudo y los tratamientos de color son capas artísticas propias que no alteran el archivo. El laboratorio «La sombra que miente» muestra un recorte de esta misma reproducción con la zona de la sombra señalada encima.
 - **Patrimonio cultural italiano:** la difusión de imágenes de bienes culturales se acoge al art. 108, apartado 3-bis, del Codice dei beni culturali e del paesaggio (D.Lgs. 42/2004). Ese apartado solo ampara usos sin ánimo de lucro con fines de estudio, investigación, libre expresión o promoción del conocimiento del patrimonio. **No es una autorización de las Gallerie degli Uffizi** ni se ha solicitado ninguna. Cualquier reutilización con fines comerciales de estas imágenes requiere la concesión de la institución.
 
 ### La noche estrellada · Vincent van Gogh, 1889 · The Museum of Modern Art, Nueva York (472.1941)
@@ -33,6 +33,8 @@ El código, el diseño, los shaders, las composiciones gráficas (incluidos «El
 
 En *La noche estrellada*, la escena «La ventana», el laboratorio «Turbulencia» y la escala «De la ventana a Venus» también son creaciones de MANIFESTO, generadas con código. «La ventana» evoca la recomposición del cuadro, pero no reproduce ni imita la pintura. El laboratorio es un modelo de juguete, no una simulación de fluidos.
 
+En *Medusa*, el laboratorio «La sombra que miente» y la escena «El reflejo» también son creaciones de MANIFESTO, generadas con código. El laboratorio es un modelo didáctico que simplifica la óptica y no reproduce la del cuadro. «El reflejo» evoca el escudo de Perseo y no reproduce la pintura.
+
 ## Tipografías
 
 Archivo, Gloock, Instrument Serif, Big Shoulders y Bodoni Moda, de Google Fonts, con licencia SIL Open Font License. Se autoalojan al compilar.
@@ -52,3 +54,9 @@ Fuentes añadidas en *La noche estrellada*:
   - Venus (junio de 1889): NASA [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/).
   - Asilo de Saint-Paul-de-Mausole: coordenadas de Wikipedia en francés.
   - Próxima Centauri: Wikipedia, *[Proxima Centauri](https://en.wikipedia.org/wiki/Proxima_Centauri)*.
+
+Fuentes añadidas en *Medusa*:
+
+- **Wikipedia, *[Medusa (Caravaggio)](https://en.wikipedia.org/wiki/Medusa_(Caravaggio))*** (fuente secundaria): las dos versiones (la primera, llamada Murtola, de 1596, y la de los Uffizi), el soporte y la lectura como autorretrato.
+- **Conceptual Fine Arts, [la sombra del escudo y el argumento de Taro Kimura](https://www.conceptualfinearts.com/cfa/?p=5166):** la sombra pintada como si el escudo fuera cóncavo y el escudo como argumento del *paragone* entre pintura y escultura.
+- **BeCulture, [*Medusa by Caravaggio*, la historia](https://www.beculture.it/en/medusa-by-caravaggio-story/):** la historia de la obra y el lienzo pegado sobre un escudo de madera de chopo.

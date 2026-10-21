@@ -1,0 +1,109 @@
+/**
+ * Medusa V3 · Bajo «El expediente»: el laboratorio «La sombra que miente» y la
+ * interpretación original «El reflejo». «hecho» = Documentado (con fuente);
+ * «lectura» = Interpretación. Lo que las fuentes no sostienen queda fuera.
+ */
+
+export type Fuente = { label: string; href: string };
+
+export const FUENTES_MEDUSA_V3 = {
+  wikipedia: { label: "Wikipedia: Medusa (Caravaggio) (fuente secundaria)", href: "https://en.wikipedia.org/wiki/Medusa_(Caravaggio)" },
+  cfa: {
+    label: "Conceptual Fine Arts: la sombra del escudo y el argumento de Taro Kimura",
+    href: "https://www.conceptualfinearts.com/cfa/?p=5166",
+  },
+  beculture: { label: "BeCulture: Medusa by Caravaggio, la historia", href: "https://www.beculture.it/en/medusa-by-caravaggio-story/" },
+} satisfies Record<string, Fuente>;
+
+/** Zona de la sombra arrojada sobre el fondo verde, en fracciones de la reproducción (0-1). */
+export const ZONA_SOMBRA = { cx: 0.665, cy: 0.6, rx: 0.09, ry: 0.17 };
+/** Recorte de la obra que muestra el laboratorio (fracciones de la reproducción). */
+export const RECORTE_SOMBRA = { x0: 0.52, x1: 0.9, y0: 0.36, y1: 0.82 };
+
+export type Lectura = "convexa" | "plana" | "concava";
+
+/** Laboratorio «La sombra que miente». */
+export const SOMBRA = {
+  aviso:
+    "Modelo didáctico de MANIFESTO: una esfera y la sombra que «pinta» sobre un disco. Simplifica la óptica; no reproduce la del cuadro.",
+  veredictos: {
+    convexa: {
+      nombre: "Se lee convexa",
+      texto: "La sombra cae como lo haría sobre una superficie que sale hacia ti. Coincide con la forma real del escudo.",
+    },
+    plana: {
+      nombre: "Se lee plana",
+      texto: "La sombra no delata ninguna curvatura: el disco parece una tabla.",
+    },
+    concava: {
+      nombre: "Se lee cóncava",
+      texto: "La sombra se recoge hacia dentro, como en un cuenco. Es el engaño de Caravaggio: la superficie real sigue siendo convexa.",
+    },
+  } satisfies Record<Lectura, { nombre: string; texto: string }>,
+  perfil: "De perfil, el escudo siempre sale hacia ti: es convexo. La línea discontinua es la superficie que sugiere la sombra.",
+  hecho:
+    "El escudo es convexo, pero la sombra que la cabeza proyecta sobre el fondo verde está pintada como si la superficie fuera cóncava. Esa sombra crea la ilusión de un hueco donde hay un relieve.",
+  recorte: "Recorte de la obra: la sombra de la cabeza sobre el fondo verde, señalada por MANIFESTO.",
+  soporte: "Lienzo pegado sobre un escudo de madera de chopo. Mide unos 60 × 55 cm.",
+  lectura:
+    "Para el historiador Taro Kimura, el escudo es un argumento del paragone, el viejo debate sobre si la pintura supera a la escultura: un escudo tallado no puede mostrar una sombra arrojada ni sangre líquida; uno pintado, sí.",
+  fuentes: [FUENTES_MEDUSA_V3.cfa, FUENTES_MEDUSA_V3.beculture, FUENTES_MEDUSA_V3.wikipedia],
+};
+
+export type PuntoReflejo = {
+  id: "espejo" | "sombra" | "rostro" | "superficie";
+  num: string;
+  nombre: string;
+  escena: string;
+  hecho: string;
+  lectura?: string;
+  enlace?: { href: string; texto: string };
+};
+
+/**
+ * «El reflejo»: interpretación original de MANIFESTO, generada con código. Un campo
+ * de fragmentos que solo se ordena a través de un espejo, como en el mito de Perseo.
+ */
+export const REFLEJO = {
+  nombre: "El reflejo",
+  nota: "Escena original de MANIFESTO, generada con código. Evoca el escudo de Perseo; no reproduce la pintura.",
+  pista: "Mueve el espejo",
+  puntos: [
+    {
+      id: "espejo",
+      num: "01",
+      nombre: "Espejo",
+      escena: "De frente, solo hay fragmentos. En el espejo, se ordenan: lo que no se puede mirar directamente cobra forma en el reflejo.",
+      hecho:
+        "Según el mito, Perseo venció a Medusa sin mirarla de frente: se guió por su reflejo en un escudo pulido, con la ayuda de Atenea.",
+      lectura: "El escudo de Caravaggio repite la trampa del mito: para mirar a Medusa necesitamos algo que se interponga.",
+    },
+    {
+      id: "sombra",
+      num: "02",
+      nombre: "Sombra",
+      escena: "Como los fragmentos sueltos, la sombra del cuadro engaña sobre la forma real de lo que tienes delante.",
+      hecho: "El escudo es convexo, pero la sombra de la cabeza está pintada como si fuera cóncavo.",
+      enlace: { href: "#sombra", texto: "Probarlo en el laboratorio" },
+    },
+    {
+      id: "rostro",
+      num: "03",
+      nombre: "Rostro",
+      escena: "El emblema no tiene cara. En el cuadro, la cara podría ser la del propio pintor.",
+      hecho:
+        "Hay dos versiones. La primera, llamada Murtola (1596, 48 × 55 cm), está firmada y es de una colección privada; la de los Uffizi no está firmada ni fechada.",
+      lectura:
+        "Varias fuentes leen el rostro como un autorretrato. Si lo es, Caravaggio se pinta como el monstruo y, a la vez, queda a salvo: es él quien sostiene la imagen.",
+    },
+    {
+      id: "superficie",
+      num: "04",
+      nombre: "Superficie",
+      escena: "Lo que aparece en el espejo es luz y sombra, no relieve: no podría tallarse.",
+      hecho: "Caravaggio no pintó sobre la madera: pintó un lienzo y lo pegó sobre un escudo de chopo.",
+      lectura:
+        "Taro Kimura lo lee como un desafío a la escultura: la sombra arrojada y la sangre líquida solo puede mostrarlas la pintura.",
+    },
+  ] satisfies PuntoReflejo[],
+};

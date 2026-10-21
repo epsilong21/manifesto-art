@@ -1,0 +1,450 @@
+"use client";
+
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
+import { KindTag } from "@/components/concepts/ConceptChrome";
+import { REFLEJO, type PuntoReflejo } from "@/content/medusa-v3";
+import { gsap } from "@/lib/gsap";
+
+/* ── Geometría generada (semilla fija: servidor y cliente dibujan lo mismo) ── */
+
+function semilla(s: number) {
+  return () => {
+    s = (s + 0x6d2b79f5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rnd = semilla(1598);
+const f = (n: number) => Math.round(n * 10) / 10;
+
+/** Escena 400 × 500; el emblema se centra en E. */
+const ANCHO = 400;
+const ALTO = 500;
+const E = { x: 200, y: 250 };
+/** Radio del espejo, en unidades de la escena. */
+const R = 92;
+
+type Fragmento = { d: string; cx: number; cy: number; dx: number; dy: number; r: number; tipo: "anillo" | "rayo" | "punto" };
+
+/** Emblema abstracto: anillos rotos, trazos serpenteantes que se abren desde el centro y una corona de puntos. */
+const FRAGMENTOS: Fragmento[] = (() => {
+  const out: Omit<Fragmento, "dx" | "dy" | "r">[] = [];
+  const pol = (r: number, a: number) => [E.x + r * Math.cos(a), E.y + r * Math.sin(a)];
+  // Anillos partidos en arcos
+  [30, 58, 88, 122].forEach((r, k) => {
+    const n = 6 + k * 4;
+    const giro = rnd() * Math.PI;
+    for (let i = 0; i < n; i++) {
+      const a0 = giro + (i / n) * Math.PI * 2;
+      const a1 = a0 + ((Math.PI * 2) / n) * (0.72 + rnd() * 0.12);
+      const [x0, y0] = pol(r, a0);
+      const [x1, y1] = pol(r, a1);
+      const [cx, cy] = pol(r, (a0 + a1) / 2);
+      out.push({ d: `M${f(x0)} ${f(y0)} A${r} ${r} 0 0 1 ${f(x1)} ${f(y1)}`, cx, cy, tipo: "anillo" });
+    }
+  });
+  // Trazos serpenteantes: nueve, desiguales (el emblema no es simétrico), cada uno en tres tramos
+  for (let i = 0; i < 9; i++) {
+    const a = (i / 9) * Math.PI * 2 + rnd() * 0.25;
+    const largo = 150 + rnd() * 50;
+    const onda = 10 + rnd() * 8;
+    const puntos: number[][] = [];
+    for (let s = 0; s <= 12; s++) {
+      const r = 34 + ((largo - 34) * s) / 12;
+      const desvio = Math.sin(s * 1.15 + i) * onda * (s / 12);
+      puntos.push([E.x + r * Math.cos(a) - desvio * Math.sin(a), E.y + r * Math.sin(a) + desvio * Math.cos(a)]);
+    }
+    for (let t = 0; t < 3; t++) {
+      const tramo = puntos.slice(t * 4, t * 4 + 5);
+      const d = "M" + tramo.map(([x, y]) => `${f(x)} ${f(y)}`).join(" L");
+      const [cx, cy] = tramo[2];
+      out.push({ d, cx, cy, tipo: "rayo" });
+    }
+  }
+  // Corona de puntos entre los trazos
+  for (let i = 0; i < 18; i++) {
+    const [cx, cy] = pol(146 + rnd() * 10, (i / 18) * Math.PI * 2 + 0.17);
+    out.push({ d: `M${f(cx - 2.4)} ${f(cy)} a2.4 2.4 0 1 0 4.8 0 a2.4 2.4 0 1 0 -4.8 0`, cx, cy, tipo: "punto" });
+  }
+  // Dispersión de cada fragmento fuera del espejo
+  return out.map((x) => ({
+    ...x,
+    dx: f((rnd() - 0.5) * 2 * (60 + rnd() * 90)),
+    dy: f((rnd() - 0.5) * 2 * (60 + rnd() * 90)),
+    r: f((rnd() - 0.5) * 260),
+  }));
+})();
+const CAPAS = [0, 1, 2].map((k) => FRAGMENTOS.filter((_, i) => i % 3 === k));
+
+/** El emblema ordenado, invertido como en un espejo (x' = ANCHO − x). */
+function Emblema({ clase }: { clase?: string }) {
+  return (
+    <g className={clase} transform={`translate(${ANCHO} 0) scale(-1 1)`}>
+      {FRAGMENTOS.map((x, i) => (
+        <path key={i} d={x.d} className={`rf-trazo rf-trazo--${x.tipo}`} />
+      ))}
+    </g>
+  );
+}
+
+/** Posición de cada punto sobre la escena (%), lejos del espejo inicial. */
+const POS: Record<PuntoReflejo["id"], { x: number; y: number }> = {
+  espejo: { x: 14, y: 10 },
+  sombra: { x: 86, y: 13 },
+  rostro: { x: 14, y: 88 },
+  superficie: { x: 86, y: 88 },
+};
+const PUNTOS = REFLEJO.puntos;
+
+/** El espejo empieza sobre el centro del emblema, algo desplazado: ya se reconoce un fragmento. */
+const INICIO = { x: 226, y: 226 };
+const limita = (m: { x: number; y: number }) => ({
+  x: Math.min(ANCHO - R * 0.4, Math.max(R * 0.4, m.x)),
+  y: Math.min(ALTO - R * 0.4, Math.max(R * 0.4, m.y)),
+});
+
+/** Zona del emblema que refleja el espejo, para los lectores de pantalla. */
+function zona(m: { x: number; y: number }) {
+  const dx = m.x - E.x;
+  const dy = m.y - E.y;
+  if (Math.hypot(dx, dy) < 45) return "sobre el centro del emblema";
+  const v = dy < -45 ? "superior" : dy > 45 ? "inferior" : "";
+  const h = dx < -45 ? "izquierda" : dx > 45 ? "derecha" : "";
+  return `en la parte ${[v, h].filter(Boolean).join(" ") || "central"} del emblema`;
+}
+
+/**
+ * «El reflejo»: interpretación original de MANIFESTO. De frente, un campo de
+ * fragmentos; a través del espejo (que se arrastra o se mueve con las flechas), los
+ * mismos fragmentos se ordenan, invertidos, en un emblema. Cuatro puntos abren su
+ * contexto. Solo hay movimiento en reposo si es la sección que más se ve frente al
+ * escudo de la V2, con la pestaña visible y sin movimiento reducido.
+ */
+export function ElReflejo() {
+  const [sel, setSel] = useState<PuntoReflejo["id"] | null>(null);
+  const [amplio, setAmplio] = useState(false);
+  const [tocado, setTocado] = useState(false);
+  const [aviso, setAviso] = useState(zona(INICIO));
+  const escenaRef = useRef<HTMLDivElement>(null);
+  const espejoRef = useRef<HTMLButtonElement>(null);
+  const mundoRef = useRef<HTMLDivElement>(null);
+  const capasRef = useRef<(HTMLDivElement | null)[]>([]);
+  const panelTitulo = useRef<HTMLHeadingElement>(null);
+  const ultimo = useRef<HTMLElement | null>(null);
+  const selRef = useRef(sel);
+  const m = useRef({ ...INICIO });
+  const arrastre = useRef<{ id: number; ox: number; oy: number } | null>(null);
+
+  /** Coloca el espejo y su contenido (solo transform: no repinta la escena). */
+  const pon = (nuevo: { x: number; y: number }) => {
+    m.current = limita(nuevo);
+    const { x, y } = m.current;
+    if (espejoRef.current) {
+      espejoRef.current.style.left = `${((x - R) / ANCHO) * 100}%`;
+      espejoRef.current.style.top = `${((y - R) / ALTO) * 100}%`;
+    }
+    if (mundoRef.current) mundoRef.current.style.transform = `translate(${(-(x - R) / ANCHO) * 100}%, ${(-(y - R) / ALTO) * 100}%)`;
+  };
+
+  // Movimiento en reposo: deriva lenta de las capas de fragmentos, con relevo frente al escudo
+  useEffect(() => {
+    const escena = escenaRef.current;
+    if (!escena) return;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    const tweens = capasRef.current.map((capa, k) =>
+      capa
+        ? gsap.to(capa, {
+            x: [10, -8, 6][k],
+            y: [-6, 8, -10][k],
+            rotation: [1.2, -0.9, 0.7][k],
+            duration: [9, 11, 13][k],
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            paused: true,
+          })
+        : null,
+    );
+    const ratios = { escena: 0, escudo: 0 };
+    const decide = () => {
+      const vivo = ratios.escena > 0 && ratios.escena >= ratios.escudo && !document.hidden && !reduce.matches;
+      tweens.forEach((t) => (vivo ? t?.play() : t?.pause()));
+      escena.classList.toggle("is-quieto", !vivo);
+    };
+    const umbrales = [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1];
+    const ioEscena = new IntersectionObserver(([e]) => {
+      ratios.escena = e.isIntersecting ? e.intersectionRatio || 0.001 : 0;
+      decide();
+    }, { threshold: umbrales });
+    ioEscena.observe(escena);
+    // El escudo de la V2 se observa en solo lectura: no se modifica
+    const escudo = document.querySelector(".md-stage");
+    const ioEscudo = new IntersectionObserver(([e]) => {
+      ratios.escudo = e.isIntersecting ? e.intersectionRatio || 0.001 : 0;
+      decide();
+    }, { threshold: umbrales });
+    if (escudo) ioEscudo.observe(escudo);
+    document.addEventListener("visibilitychange", decide);
+    reduce.addEventListener("change", decide);
+    decide();
+    return () => {
+      tweens.forEach((t) => t?.kill());
+      ioEscena.disconnect();
+      ioEscudo.disconnect();
+      document.removeEventListener("visibilitychange", decide);
+      reduce.removeEventListener("change", decide);
+    };
+  }, []);
+
+  useEffect(() => {
+    pon(m.current);
+  }, []);
+
+  useEffect(() => {
+    const antes = selRef.current;
+    selRef.current = sel;
+    // Al abrir (no al pasar de un punto a otro) el foco entra en el panel
+    if (sel && !antes) panelTitulo.current?.focus({ preventScroll: false });
+  }, [sel]);
+
+  useEffect(() => {
+    if (!sel) return;
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setSel(null);
+      ultimo.current?.focus({ preventScroll: true });
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [sel]);
+
+  /* ── Espejo: arrastre solo sobre el disco (touch-action: none únicamente ahí) ── */
+  const aEscena = (e: PointerEvent) => {
+    const r = escenaRef.current!.getBoundingClientRect();
+    return { x: ((e.clientX - r.left) / r.width) * ANCHO, y: ((e.clientY - r.top) / r.height) * ALTO };
+  };
+  const onDown = (e: PointerEvent<HTMLButtonElement>) => {
+    const p = aEscena(e);
+    arrastre.current = { id: e.pointerId, ox: p.x - m.current.x, oy: p.y - m.current.y };
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setTocado(true);
+  };
+  const onMove = (e: PointerEvent<HTMLButtonElement>) => {
+    const a = arrastre.current;
+    if (!a || a.id !== e.pointerId) return;
+    const p = aEscena(e);
+    pon({ x: p.x - a.ox, y: p.y - a.oy });
+  };
+  const onUp = (e: PointerEvent<HTMLButtonElement>) => {
+    if (arrastre.current?.id !== e.pointerId) return;
+    arrastre.current = null;
+    setAviso(zona(m.current));
+  };
+  const onKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const paso = e.shiftKey ? 40 : 12;
+    const mov: Record<string, [number, number]> = { ArrowLeft: [-paso, 0], ArrowRight: [paso, 0], ArrowUp: [0, -paso], ArrowDown: [0, paso] };
+    if (e.key === "Home") {
+      e.preventDefault();
+      pon({ ...E });
+    } else if (mov[e.key]) {
+      e.preventDefault();
+      pon({ x: m.current.x + mov[e.key][0], y: m.current.y + mov[e.key][1] });
+    } else return;
+    setTocado(true);
+    setAviso(zona(m.current));
+  };
+
+  /* ── Panel de los puntos (patrón del desierto y de La ventana) ── */
+  const abre = (id: PuntoReflejo["id"], trigger: HTMLElement) => {
+    ultimo.current = trigger;
+    setAmplio(false);
+    setSel((s) => (s === id ? null : id));
+  };
+  const cierra = (e?: MouseEvent) => {
+    setSel(null);
+    // El anillo de foco solo se muestra si se cerró con teclado
+    ultimo.current?.focus({ preventScroll: true, focusVisible: !e || e.detail === 0 } as FocusOptions);
+  };
+  const paso = (delta: number) => {
+    const i = PUNTOS.findIndex((p) => p.id === sel);
+    setAmplio(false);
+    setSel(PUNTOS[(i + delta + PUNTOS.length) % PUNTOS.length].id);
+  };
+  const punto = PUNTOS.find((p) => p.id === sel) ?? null;
+
+  // Tamaño y posición inicial en línea: el HTML del servidor (y sin JavaScript) ya trae el espejo en su sitio
+  const espejoTam: CSSProperties = {
+    width: `${((2 * R) / ANCHO) * 100}%`,
+    height: `${((2 * R) / ALTO) * 100}%`,
+    left: `${((INICIO.x - R) / ANCHO) * 100}%`,
+    top: `${((INICIO.y - R) / ALTO) * 100}%`,
+  };
+  const mundoTam: CSSProperties = {
+    width: `${(ANCHO / (2 * R)) * 100}%`,
+    height: `${(ALTO / (2 * R)) * 100}%`,
+    transform: `translate(${(-(INICIO.x - R) / ANCHO) * 100}%, ${(-(INICIO.y - R) / ALTO) * 100}%)`,
+  };
+
+  return (
+    <section id="reflejo" className="rf" aria-labelledby="rf-title" data-tocado={tocado || undefined}>
+      <div className="rf-copy">
+        {/* Sección secundaria: no es la pintura, sino una lectura propia */}
+        <p className="rf-eyebrow">Interpretación original de MANIFESTO inspirada en la obra</p>
+        <h2 id="rf-title" className="md-h2">
+          El reflejo
+        </h2>
+        <p className="rf-lede">
+          Perseo solo pudo mirar a Medusa a través de un escudo pulido. Aquí ocurre lo mismo: de frente no hay nada que ver;
+          en el espejo, todo encaja.
+        </p>
+        <p className="rf-instrucciones">
+          Arrastra el espejo o, con el teclado, muévelo con las flechas (Mayús para ir más rápido; Inicio lo devuelve al centro).
+        </p>
+      </div>
+
+      <div className="rf-stage">
+        <div ref={escenaRef} className="rf-escena">
+          {/* De frente: el campo de fragmentos, en tres capas que derivan despacio */}
+          {CAPAS.map((capa, k) => (
+            <div
+              key={k}
+              ref={(el) => {
+                capasRef.current[k] = el;
+              }}
+              className="rf-capa"
+              aria-hidden="true"
+            >
+              <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} focusable="false">
+                {capa.map((x, i) => (
+                  <path
+                    key={i}
+                    d={x.d}
+                    className={`rf-trazo rf-trazo--${x.tipo}`}
+                    transform={`translate(${x.dx} ${x.dy}) rotate(${x.r} ${f(x.cx)} ${f(x.cy)})`}
+                  />
+                ))}
+              </svg>
+            </div>
+          ))}
+
+          {/* Sin JavaScript: el emblema completo, ya recompuesto */}
+          <svg className="rf-completo" viewBox={`0 0 ${ANCHO} ${ALTO}`} aria-hidden="true" focusable="false">
+            <Emblema />
+          </svg>
+
+          {/* El espejo: se arrastra solo desde aquí; dentro, el emblema ordenado e invertido */}
+          <button
+            ref={espejoRef}
+            type="button"
+            className="rf-espejo"
+            style={espejoTam}
+            aria-label={`Espejo, ${aviso}. Arrástralo o muévelo con las flechas.`}
+            onPointerDown={onDown}
+            onPointerMove={onMove}
+            onPointerUp={onUp}
+            onPointerCancel={onUp}
+            onKeyDown={onKey}
+          >
+            <span className="rf-espejo__vista" aria-hidden="true">
+              <span ref={mundoRef} className="rf-espejo__mundo" style={mundoTam}>
+                <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} focusable="false">
+                  <Emblema />
+                </svg>
+              </span>
+            </span>
+            <span className="rf-espejo__brillo" aria-hidden="true" />
+          </button>
+          <p className="rf-pista" aria-hidden="true">
+            {REFLEJO.pista}
+          </p>
+
+          {PUNTOS.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              className="rf-hot"
+              style={{ left: `${POS[p.id].x}%`, top: `${POS[p.id].y}%` } as CSSProperties}
+              aria-expanded={sel === p.id}
+              aria-controls="rf-panel"
+              onClick={(e) => abre(p.id, e.currentTarget)}
+            >
+              {/* El número visible forma parte del nombre accesible (WCAG 2.5.3) */}
+              <span className="rf-hot__ring">{p.num}</span>{" "}
+              <span className="rf-hot__label">{p.nombre}</span>
+            </button>
+          ))}
+        </div>
+        <p className="sr-only" aria-live="polite">
+          {tocado ? `El espejo refleja ${aviso.replace(/^(sobre|en) /, "")}.` : ""}
+        </p>
+        <p className="rf-nota">{REFLEJO.nota}</p>
+        <noscript>
+          <ol className="rf-sinjs">
+            {PUNTOS.map((p) => (
+              <li key={p.id}>
+                <strong>
+                  {p.num} · {p.nombre}.
+                </strong>{" "}
+                {p.escena} {p.hecho} {p.lectura ?? ""}
+              </li>
+            ))}
+          </ol>
+        </noscript>
+      </div>
+
+      {/* Siempre montado: aria-controls apunta a un elemento que existe */}
+      <div id="rf-panel" className="rf-panel" role="region" aria-labelledby="rf-panel-t" hidden={!punto}>
+        {punto ? (
+          <div className="rf-panel__inner">
+            <div className="rf-panel__bar">
+              <p className="rf-panel__kicker">
+                {punto.num} · {punto.nombre}
+              </p>
+              <button type="button" className="rf-panel__close" onClick={cierra} aria-label="Cerrar detalle">
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <h3 id="rf-panel-t" ref={panelTitulo} tabIndex={-1} className="rf-panel__t">
+              {punto.escena}
+            </h3>
+            <div className="rf-panel__obra">
+              <KindTag tipo="hecho" />
+              <p>{punto.hecho}</p>
+            </div>
+            {punto.lectura ? (
+              <>
+                <button
+                  type="button"
+                  className="rf-panel__more"
+                  aria-expanded={amplio}
+                  aria-controls="rf-panel-body"
+                  onClick={() => setAmplio((a) => !a)}
+                >
+                  {amplio ? "Leer menos" : "Leer más"}
+                </button>
+                <div id="rf-panel-body" className="rf-panel__obra" hidden={!amplio}>
+                  <KindTag tipo="lectura" />
+                  <p>{punto.lectura}</p>
+                </div>
+              </>
+            ) : null}
+            {punto.enlace ? (
+              <p className="rf-panel__link">
+                <a href={punto.enlace.href}>{punto.enlace.texto}</a>
+              </p>
+            ) : null}
+            <div className="rf-panel__nav">
+              <button type="button" className="mf-btn" onClick={() => paso(-1)}>
+                Anterior
+              </button>
+              <button type="button" className="mf-btn" onClick={() => paso(1)}>
+                Siguiente
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}

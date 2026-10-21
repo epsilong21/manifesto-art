@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { ConceptFooter, ConceptHeader, Etiqueta, KindTag } from "@/components/concepts/ConceptChrome";
+import { ElReflejo } from "@/components/medusa/ElReflejo";
 import { MedusaShield } from "@/components/medusa/MedusaShield";
+import { SombraLab } from "@/components/medusa/SombraLab";
 import { DOSSIER_MEDUSA, MEDUSA } from "@/content/medusa";
+import { FUENTES_MEDUSA_V3, REFLEJO } from "@/content/medusa-v3";
 import { gloock } from "@/lib/fonts/gloock";
 import "./medusa.css";
+import "./medusa-v3.css";
 
 export const metadata: Metadata = {
   title: "Medusa de Caravaggio: la mirada prohibida — MANIFESTO",
@@ -89,6 +93,10 @@ export default function MedusaPage() {
             </p>
           </header>
           <MedusaShield />
+          {/* Fuera del componente del escudo: tras los cinco puntos, a la interpretación original */}
+          <p className="mv-enlace">
+            <a href="#reflejo">Ya conoces la obra. Ahora descubre nuestra interpretación</a>
+          </p>
         </section>
 
         <section className="md-section md-dossier" aria-labelledby="md-dossier-t">
@@ -117,6 +125,21 @@ export default function MedusaPage() {
             ))}
           </div>
         </section>
+
+        <section id="sombra" className="md-section mv-lab-section" aria-labelledby="mv-lab-t">
+          <header className="md-section__head">
+            <h2 id="mv-lab-t" className="md-h2">
+              La sombra que miente
+            </h2>
+            <p>
+              El escudo sale hacia ti, pero su sombra dice lo contrario. Mueve la sombra pintada y mira cómo cambia la
+              forma que crees ver.
+            </p>
+          </header>
+          <SombraLab />
+        </section>
+
+        <ElReflejo />
       </main>
 
       <ConceptFooter
@@ -125,6 +148,7 @@ export default function MedusaPage() {
           { label: "Gallerie degli Uffizi (ficha en Google Arts & Culture)", href: "https://artsandculture.google.com/asset/medusa/FAFPqU12CekL8Q" },
           { label: "Gallerie degli Uffizi", href: "https://www.uffizi.it/" },
           { label: "Historia Arte: Medusa de Caravaggio", href: "https://historia-arte.com/obras/medusa-de-caravaggio" },
+          ...Object.values(FUENTES_MEDUSA_V3),
         ]}
         rights={
           <>
@@ -147,6 +171,10 @@ export default function MedusaPage() {
             <p>
               La petrificación, la luz y los tratamientos de color son capas artísticas de MANIFESTO: no
               alteran el archivo de la reproducción.
+            </p>
+            <p>
+              El laboratorio «La sombra que miente» y la escena «{REFLEJO.nombre}» son creaciones de MANIFESTO,
+              generadas con código. El laboratorio muestra además un recorte de la reproducción de la obra.
             </p>
           </>
         }
