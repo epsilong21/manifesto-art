@@ -32,27 +32,6 @@
   }
 }
 
-/* ── Mandos (réplica del patrón de Noche y Los elefantes) ── */
-
-.mv-range {
-  display: grid;
-  gap: 0.4rem;
-}
-.mv-range > span {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.mv-range output {
-  color: var(--c-ink);
-  font-variant-numeric: tabular-nums;
-}
-.mv-range input {
-  width: 100%;
-  min-height: 44px;
-  accent-color: var(--c-accent);
-}
-
 /* ── Laboratorio «La sombra que miente» ── */
 
 .mv-lab-section {
@@ -116,38 +95,194 @@
   font-size: 0.8125rem;
   color: var(--c-muted);
 }
-
-/* Vista frontal y corte lateral: se sustituyen con un fundido, sin rotación 3D */
-.mv-frente,
-.mv-corte {
-  transition:
-    opacity 0.6s var(--ease-cine),
-    transform 0.6s var(--ease-cine);
-  transform-box: view-box;
-  transform-origin: 50% 50%;
+.mv-lab__pies {
+  display: grid;
 }
-.mv-corte {
-  opacity: 0;
-  transform: translateX(24px);
+.mv-lab__pies > span {
+  grid-area: 1 / 1;
+}
+.mv-lab__pies > [aria-hidden="true"] {
+  visibility: hidden;
+}
+
+/* El escudo: la pintura en un disco con canto, girado con CSS 3D; la luz, del material WebGL2 de la V2 */
+.mv-escena {
+  --giro: 0;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  perspective: 900px;
+  cursor: grab;
+  /* El arrastre horizontal gira; el vertical sigue desplazando la página en táctil */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.5s var(--ease-cine),
+    scale 0.5s var(--ease-cine);
+}
+.mv-escena:active {
+  cursor: grabbing;
+}
+/* Sombra sobre la pared: se desplaza al contrario del giro */
+.mv-escena__sombra {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 62%;
+  height: 86%;
+  translate: calc(-50% + var(--giro) * -6%) -44%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.35) 70%, transparent);
   pointer-events: none;
 }
-.mv-lab[data-perfil] .mv-frente {
+.mv-escudo {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  /* Un poco por encima del centro: la pista de abajo no tapa la obra */
+  height: 78%;
+  translate: 0 -3%;
+  aspect-ratio: 2400 / 2350;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+}
+.mv-escudo__canto {
+  position: absolute;
+  inset: 0.7%;
+  border-radius: 50%;
+  /* Madera algo más clara que en el escudo de la V2: de perfil, el canto debe leerse sobre el fondo oscuro */
+  background: linear-gradient(155deg, #8a6440, #4a3020 45%, #1f150d 80%);
+  transform: translateZ(calc(var(--i) * -2.2px));
+}
+.mv-escudo__canto:last-of-type {
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.6);
+}
+.mv-escudo__cara {
+  position: absolute;
+  inset: 0;
+  clip-path: ellipse(49.3% 49.3% at 50% 50%);
+}
+.mv-escudo__cara img,
+.mv-escudo__gl {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.mv-escudo__gl {
   opacity: 0;
-  transform: scaleX(0.35);
+  transition: opacity 0.6s ease;
+  pointer-events: none;
 }
-.mv-lab[data-perfil] .mv-corte {
+/* Sin WebGL: un brillo CSS sugiere la superficie abombada */
+.mv-escudo__brillo {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at calc(32% - var(--giro) * 12%) 28%, rgb(255 248 235 / 0.28), transparent 42%),
+    radial-gradient(circle, transparent 58%, rgb(0 0 0 / 0.4));
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+.mv-escena.has-gl .mv-escudo__gl {
   opacity: 1;
-  transform: none;
 }
-.mv-sombra {
-  transition:
-    transform 0.5s var(--ease-cine),
-    opacity 0.5s var(--ease-cine);
+.mv-escena.has-gl :is(.mv-escudo__cara img, .mv-escudo__brillo) {
+  visibility: hidden;
+  transition: visibility 0s 0.6s;
 }
-.mv-canto {
-  fill: #2a1d14;
-  stroke: rgb(201 160 96 / 0.55);
-  stroke-width: 2;
+.mv-pista {
+  position: absolute;
+  left: 50%;
+  bottom: 0.5rem;
+  translate: -50% 0;
+  margin: 0;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: rgb(8 8 10 / 0.8);
+  color: var(--c-ink);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.mv-lab:is([data-tocado], [data-vista="seccion"]) .mv-pista {
+  opacity: 0;
+}
+html:not(.js) .mv-pista,
+html:not(.js) .mv-lab__controls,
+html:not(.js) .mv-lab__tag {
+  display: none;
+}
+/* Sin JavaScript no hay vistas: el escudo de frente y, debajo, el esquema de la sección */
+html:not(.js) .mv-lab__view {
+  aspect-ratio: auto;
+}
+html:not(.js) .mv-escena,
+html:not(.js) .mv-corte {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  opacity: 1;
+}
+html:not(.js) .mv-lab .mv-real {
+  stroke-dashoffset: 0;
+}
+html:not(.js) .mv-lab .mv-sugerida {
+  opacity: 1;
+}
+html:not(.js) .mv-lab__pies > span {
+  grid-area: auto;
+  visibility: visible;
+}
+
+/* Sección: el escudo gira hacia el perfil y se funde en su corte */
+.mv-corte {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease-cine);
+}
+/* Al entrar, el escudo gira antes de fundirse; al salir, vuelve sin espera (fundido cruzado) */
+.mv-lab[data-vista="seccion"] .mv-escena {
+  opacity: 0;
+  scale: 0.9;
+  pointer-events: none;
+  transition-delay: 0.35s;
+}
+.mv-lab[data-vista="seccion"] .mv-corte {
+  opacity: 1;
+  transition-delay: 0.35s;
+}
+.mv-lab:not([data-vista="seccion"]) .mv-real {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+.mv-lab[data-vista="seccion"] .mv-real {
+  stroke-dasharray: 1 1;
+  transition: stroke-dashoffset 0.9s var(--ease-cine) 0.5s;
+}
+.mv-lab:not([data-vista="seccion"]) .mv-sugerida {
+  opacity: 0;
+}
+.mv-lab[data-vista="seccion"] .mv-sugerida {
+  transition: opacity 0.5s ease 1.2s;
+}
+/* El esquema se amplía mucho en escritorio: rótulos más pequeños para que no pesen más que el texto */
+@media (min-width: 64rem) {
+  .mv-corte .mv-rotulo {
+    font-size: 9px;
+  }
+}
+.mv-flecha {
+  fill: none;
+  stroke: #c9a060;
+  stroke-width: 1.5;
+  stroke-linecap: round;
 }
 .mv-luz {
   fill: none;
@@ -188,18 +323,26 @@
   display: grid;
   gap: 1.1rem;
 }
-.mv-lab__presets {
+.mv-lab__vistas {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
 }
-.mv-lab__perfil {
-  justify-self: start;
+.mv-lab__volver[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: default;
 }
 .mv-lab__result {
+  display: grid;
   padding: 1rem;
   border: 1px solid var(--c-line);
   background: rgb(8 8 10 / 0.5);
+}
+.mv-lab__result > div {
+  grid-area: 1 / 1;
+}
+.mv-lab__molde {
+  visibility: hidden;
 }
 .mv-lab__result p {
   margin: 0.45rem 0 0;
@@ -211,9 +354,6 @@
   font-size: 2rem;
   line-height: 1.05;
   color: var(--c-ink) !important;
-}
-.mv-lab[data-lectura="concava"] .mv-lab__verdict {
-  color: #e98b8b !important;
 }
 .mv-lab__real {
   font-size: 0.8125rem;
@@ -766,9 +906,10 @@ html:not(.js) .rf-instrucciones {
 
 /* Movimiento reducido: cambios instantáneos */
 @media (prefers-reduced-motion: reduce) {
-  .mv-frente,
+  .mv-escena,
   .mv-corte,
-  .mv-sombra,
+  .mv-corte *,
+  .mv-pista,
   .rf-pista {
     transition: none !important;
   }

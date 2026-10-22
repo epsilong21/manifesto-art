@@ -25,27 +25,33 @@ export const ZONA_SOMBRA = { cx: 0.665, cy: 0.6, rx: 0.09, ry: 0.17 };
 /** Recorte de la obra que muestra el laboratorio (fracciones de la reproducción). */
 export const RECORTE_SOMBRA = { x0: 0.52, x1: 0.9, y0: 0.36, y1: 0.82 };
 
-export type Lectura = "convexa" | "plana" | "concava";
+export type Vista = "frente" | "perfil" | "seccion" | "libre";
 
-/** Laboratorio «La sombra que miente». */
+/** Laboratorio «La sombra que miente»: el escudo bajo otra perspectiva. */
 export const SOMBRA = {
+  pista: "Arrastra para examinar el escudo",
+  vistas: {
+    frente: {
+      nombre: "De frente",
+      texto: "Así se mira el escudo. La sombra de la cabeza, a la derecha, se recoge sobre el fondo verde como si el disco se hundiera.",
+    },
+    perfil: {
+      nombre: "De perfil",
+      texto: "Al girarlo aparece el canto y la luz resbala por la superficie: no es una imagen plana, es un objeto.",
+    },
+    seccion: {
+      nombre: "En sección",
+      texto: "Cortado por la mitad, el escudo sale hacia ti: es convexo. La línea discontinua es la superficie cóncava que sugiere la sombra pintada.",
+    },
+    libre: {
+      nombre: "Girado",
+      texto: "La cabeza sigue en su sitio: la pintura no se deforma, solo cambia tu punto de vista.",
+    },
+  } satisfies Record<Vista, { nombre: string; texto: string }>,
+  /** Pies de escena: lo que la escena hace realmente. */
   aviso:
-    "Modelo didáctico de MANIFESTO: una esfera y la sombra que «pinta» sobre un disco. Simplifica la óptica; no reproduce la del cuadro.",
-  veredictos: {
-    convexa: {
-      nombre: "Se lee convexa",
-      texto: "La sombra cae como lo haría sobre una superficie que sale hacia ti. Coincide con la forma real del escudo.",
-    },
-    plana: {
-      nombre: "Se lee plana",
-      texto: "La sombra no delata ninguna curvatura: el disco parece una tabla.",
-    },
-    concava: {
-      nombre: "Se lee cóncava",
-      texto: "La sombra se recoge hacia dentro, como en un cuenco. Es el engaño de Caravaggio: la superficie real sigue siendo convexa.",
-    },
-  } satisfies Record<Lectura, { nombre: string; texto: string }>,
-  perfil: "De perfil, el escudo siempre sale hacia ti: es convexo. La línea discontinua es la superficie que sugiere la sombra.",
+    "Reproducción de la obra sobre un disco: el giro y el canto son una simulación de MANIFESTO y la curvatura se sugiere con luz, sin deformar la pintura.",
+  seccion: "Esquema explicativo de MANIFESTO, no una medición: la curvatura y el grosor no están a escala.",
   hecho:
     "El escudo es convexo, pero la sombra que la cabeza proyecta sobre el fondo verde está pintada como si la superficie fuera cóncava. Esa sombra crea la ilusión de un hueco donde hay un relieve.",
   recorte: "Recorte de la obra: la sombra de la cabeza sobre el fondo verde, señalada por MANIFESTO.",

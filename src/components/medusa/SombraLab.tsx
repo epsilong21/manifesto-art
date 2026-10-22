@@ -1,29 +1,41 @@
 "use client";
 
-import Image from "next/image";
-import { useId, useState, type CSSProperties } from "react";
+import Image, { getImageProps } from "next/image";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { KindTag } from "@/components/concepts/ConceptChrome";
+import { crearEscudoGL, type EscudoGL, type Uniformes } from "@/components/medusa/escudoGL";
 import { MEDUSA } from "@/content/medusa";
-import { RECORTE_SOMBRA, SOMBRA, ZONA_SOMBRA, type Lectura } from "@/content/medusa-v3";
+import { RECORTE_SOMBRA, SOMBRA, ZONA_SOMBRA, type Vista } from "@/content/medusa-v3";
 
-/** Posición de la sombra: -1 la recoge hacia dentro (cóncava), 0 la deja neutra (plana), 1 la empuja hacia fuera (convexa). */
-const PRESETS: { nombre: string; posicion: number; intensidad: number }[] = [
-  { nombre: "Convexa", posicion: 80, intensidad: 70 },
-  { nombre: "Plana", posicion: 0, intensidad: 70 },
-  { nombre: "Como Caravaggio", posicion: -80, intensidad: 75 },
-];
+/** Límites del giro (grados): de lado basta para ver el canto sin esconder la obra. */
+const MAX_Y = 40;
+const MAX_X = 14;
+const PERFIL = { rx: -4, ry: 36 };
+const FRENTE = { rx: 0, ry: 0 };
+const RIM = 8; // capas del canto
+/** Luz fija en la sala, arriba a la izquierda; sobre la superficie se desplaza al girar el escudo. */
+const LUZ = { lx: -0.35, ly: -0.45 };
 
-const lectura = (p: number): Lectura => (p > 0.33 ? "convexa" : p < -0.33 ? "concava" : "plana");
+/** Variantes del optimizador de imágenes (como en el escudo de la V2): la textura comparte caché. */
+const VARIANTES = (getImageProps({ src: MEDUSA.imagen.src, alt: "", width: MEDUSA.imagen.width, height: MEDUSA.imagen.height, sizes: "100vw", quality: 70 }).props.srcSet ?? "")
+  .split(", ")
+  .map((c) => {
+    const [url, w] = c.split(" ");
+    return { url, w: parseInt(w, 10) };
+  })
+  .filter((v) => v.w > 0)
+  .sort((a, b) => a.w - b.w);
+const variante = (px: number) => VARIANTES.find((v) => v.w >= px) ?? VARIANTES.at(-1);
 
-/** Esfera y disco, en el sistema del dibujo (viewBox 400 × 250). */
-const DISCO = { cx: 200, cy: 125, r: 108 };
-const ESFERA = { cx: 182, cy: 104, r: 24 };
+const limita = (v: number, m: number) => Math.max(-m, Math.min(m, v));
 
 /** Recorte de la obra: la reproducción se coloca para que la ventana [x0, x1] × [y0, y1] llene el marco. */
 const rw = RECORTE_SOMBRA.x1 - RECORTE_SOMBRA.x0;
 const rh = RECORTE_SOMBRA.y1 - RECORTE_SOMBRA.y0;
 const RECORTE_ESTILO: CSSProperties = {
   width: `${100 / rw}%`,
+  // Alto explícito (no auto): Chrome lo pide en imágenes diferidas
+  height: `${100 / rh}%`,
   left: `${(-RECORTE_SOMBRA.x0 / rw) * 100}%`,
   top: `${(-RECORTE_SOMBRA.y0 / rh) * 100}%`,
 };
@@ -36,134 +48,267 @@ const ZONA = {
 };
 
 /**
- * Laboratorio «La sombra que miente»: la misma superficie se lee convexa, plana o
- * cóncava según la sombra que se le pinta. «Ver de perfil» enseña un corte lateral
- * con la forma real, siempre convexa. Sin bucle de animación: solo transiciones CSS.
+ * Laboratorio «La sombra que miente»: el escudo bajo otra perspectiva. Se arrastra para
+ * girarlo (con límites), «Ver perfil» lo lleva a una vista oblicua y «Ver sección» lo
+ * sustituye por un corte esquemático. Reutiliza el material WebGL2 del escudo de la V2
+ * (la curvatura es luz, no geometría: la pintura no se deforma). Solo hay bucle mientras
+ * el escudo se mueve.
  */
 export function SombraLab() {
-  const [posicion, setPosicion] = useState(-80);
-  const [intensidad, setIntensidad] = useState(75);
-  const [perfil, setPerfil] = useState(false);
+  const [vista, setVista] = useState<Vista>("frente");
+  const [tocado, setTocado] = useState(false);
+  const [conGL, setConGL] = useState(false);
   const id = useId().replace(/:/g, "");
+  const escenaRef = useRef<HTMLDivElement>(null);
+  const escudoRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const gl = useRef<EscudoGL | null>(null);
+  const u = useRef<Uniformes>({ s: 1, tx: 0, ty: 0, lx: LUZ.lx, ly: LUZ.ly, p: 0, c: 0, t: 0 });
+  const target = useRef({ ...FRENTE });
+  const current = useRef({ ...FRENTE });
+  const arrastre = useRef<{ x: number; y: number; rx: number; ry: number; movido: boolean } | null>(null);
+  const raf = useRef(0);
+  const visible = useRef(false);
+  const reduced = useRef(false);
 
-  const p = posicion / 100;
-  const a = intensidad / 100;
-  const estado = lectura(p);
-  const v = SOMBRA.veredictos[estado];
+  const v = SOMBRA.vistas[vista];
+  const seccion = vista === "seccion";
 
-  // Sombra pintada: hacia fuera y comprimida (convexa) o recogida y alargada (cóncava)
-  const sombra: CSSProperties = {
-    transform: `translate(${ESFERA.cx + 30 + 22 * p}px, ${ESFERA.cy + 28 + 16 * p}px) rotate(${32 + 18 * p}deg) scale(${1.15 - 0.35 * p}, ${0.62 - 0.2 * p})`,
-    opacity: 0.2 + 0.75 * a,
+  /** Un fotograma: suaviza el giro, mueve la luz sobre la superficie y repinta el material. */
+  const frame = useCallback(function step() {
+    raf.current = 0;
+    const c = current.current;
+    const t = target.current;
+    const k = reduced.current || arrastre.current ? 1 : 0.12;
+    c.rx += (t.rx - c.rx) * k;
+    c.ry += (t.ry - c.ry) * k;
+    escudoRef.current?.style.setProperty("--rx", `${c.rx.toFixed(2)}deg`);
+    escudoRef.current?.style.setProperty("--ry", `${c.ry.toFixed(2)}deg`);
+    escenaRef.current?.style.setProperty("--giro", (c.ry / MAX_Y).toFixed(3));
+    if (gl.current && visible.current) {
+      u.current.lx = LUZ.lx - (c.ry / MAX_Y) * 0.5;
+      u.current.ly = LUZ.ly + (c.rx / MAX_X) * 0.4;
+      gl.current.pinta(u.current);
+    }
+    if (Math.abs(t.rx - c.rx) > 0.02 || Math.abs(t.ry - c.ry) > 0.02) raf.current = requestAnimationFrame(step);
+  }, []);
+  const pedir = useCallback(() => {
+    if (!raf.current) raf.current = requestAnimationFrame(frame);
+  }, [frame]);
+
+  const ir = useCallback(
+    (destino: Vista) => {
+      setVista(destino);
+      // La sección parte de la vista de perfil: el escudo gira y se convierte en su corte
+      target.current = { ...(destino === "frente" ? FRENTE : PERFIL) };
+      pedir();
+    },
+    [pedir],
+  );
+
+  useEffect(() => {
+    const mq = matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      reduced.current = mq.matches;
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => {
+      mq.removeEventListener("change", sync);
+      cancelAnimationFrame(raf.current);
+      raf.current = 0;
+    };
+  }, []);
+
+  // WebGL al acercarse a la vista; sin repintar fuera de ella
+  useEffect(() => {
+    const escena = escenaRef.current;
+    const canvas = canvasRef.current;
+    if (!escena || !canvas) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        visible.current = e.isIntersecting;
+        if (!e.isIntersecting) return;
+        if (!gl.current && !canvas.dataset.fallo) {
+          gl.current = crearEscudoGL(canvas, matchMedia("(pointer: coarse)").matches ? 1.5 : 2);
+          if (!gl.current) canvas.dataset.fallo = "1";
+          else {
+            const img = new window.Image();
+            img.decoding = "async";
+            img.src = variante(canvas.clientWidth * Math.min(devicePixelRatio || 1, 2))?.url ?? MEDUSA.imagen.src;
+            img
+              .decode()
+              .then(() => {
+                if (!gl.current) return;
+                gl.current.textura(img);
+                setConGL(true);
+                pedir();
+              })
+              .catch(() => {});
+          }
+        }
+        pedir();
+      },
+      { rootMargin: "200px 0px" },
+    );
+    io.observe(escena);
+    const perdido = (e: Event) => {
+      e.preventDefault();
+      gl.current = null;
+      canvas.dataset.fallo = "1";
+      setConGL(false);
+    };
+    canvas.addEventListener("webglcontextlost", perdido);
+    const ro = new ResizeObserver(() => pedir());
+    ro.observe(escena);
+    return () => {
+      io.disconnect();
+      ro.disconnect();
+      canvas.removeEventListener("webglcontextlost", perdido);
+      gl.current?.libera();
+      gl.current = null;
+      setConGL(false);
+    };
+  }, [pedir]);
+
+  const onDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (seccion || (e.pointerType === "mouse" && e.button !== 0)) return;
+    arrastre.current = { x: e.clientX, y: e.clientY, ...target.current, movido: false };
+    e.currentTarget.setPointerCapture(e.pointerId);
   };
-  // Sombreado del disco: la luz cae arriba a la izquierda si sale hacia ti, abajo a la derecha si es un cuenco
-  const luz = { fx: 0.5 - 0.22 * p, fy: 0.5 - 0.24 * p };
-  const contraste = Math.abs(p);
+  const onMove = (e: PointerEvent<HTMLDivElement>) => {
+    const a = arrastre.current;
+    if (!a) return;
+    const dx = e.clientX - a.x;
+    const dy = e.clientY - a.y;
+    if (!a.movido && Math.hypot(dx, dy) < 4) return;
+    // En táctil, un gesto vertical es desplazar la página, no girar el escudo
+    if (!a.movido && e.pointerType !== "mouse" && Math.abs(dy) > Math.abs(dx)) {
+      arrastre.current = null;
+      return;
+    }
+    if (!a.movido) {
+      a.movido = true;
+      setVista("libre");
+      setTocado(true);
+    }
+    const r = e.currentTarget.getBoundingClientRect();
+    target.current = { rx: limita(a.rx - (dy / r.height) * 60, MAX_X), ry: limita(a.ry + (dx / r.width) * 110, MAX_Y) };
+    pedir();
+  };
+  const onUp = () => {
+    arrastre.current = null;
+    pedir();
+  };
 
-  const titulo = perfil
-    ? `Corte lateral: el escudo real es convexo. La sombra pintada sugiere una superficie ${estado === "concava" ? "cóncava" : estado}.`
-    : `Disco con una esfera delante y su sombra pintada. ${v.nombre}; la superficie real es convexa.`;
+  const titulo = `Corte esquemático del escudo: la superficie real es convexa y sale hacia ti; la línea discontinua es la superficie cóncava que sugiere la sombra pintada. Sin escala.`;
 
   return (
-    <div className="mv-lab" data-lectura={estado} data-perfil={perfil || undefined}>
+    <div
+      className="mv-lab"
+      data-vista={vista}
+      data-tocado={tocado || undefined}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && vista !== "frente") {
+          e.stopPropagation();
+          ir("frente");
+        }
+      }}
+    >
       <figure className="mv-lab__fig">
         <div className="mv-lab__view">
-          <svg viewBox="0 0 400 250" role="img" aria-labelledby={`${id}-t`}>
+          <div
+            ref={escenaRef}
+            className={`mv-escena ${conGL ? "has-gl" : ""}`}
+            aria-hidden={seccion || undefined}
+            onPointerDown={onDown}
+            onPointerMove={onMove}
+            onPointerUp={onUp}
+            onPointerCancel={onUp}
+          >
+            <div className="mv-escena__sombra" aria-hidden="true" />
+            <div ref={escudoRef} className="mv-escudo">
+              {Array.from({ length: RIM }, (_, i) => (
+                <div key={i} className="mv-escudo__canto" style={{ "--i": i + 1 } as CSSProperties} aria-hidden="true" />
+              ))}
+              <div className="mv-escudo__cara">
+                <Image
+                  src={MEDUSA.imagen.src}
+                  alt="El escudo de la Medusa de Caravaggio, con la cabeza gritando en el centro sobre un fondo verde."
+                  width={MEDUSA.imagen.width}
+                  height={MEDUSA.imagen.height}
+                  sizes="(min-width: 64rem) 480px, 60vw"
+                  quality={70}
+                  loading="lazy"
+                  draggable={false}
+                />
+                <canvas ref={canvasRef} className="mv-escudo__gl" aria-hidden="true" />
+                <div className="mv-escudo__brillo" aria-hidden="true" />
+              </div>
+            </div>
+          </div>
+
+          {/* Sección: esquema explicativo, no una medición */}
+          <svg className="mv-corte" viewBox="0 0 400 250" role="img" aria-labelledby={`${id}-t`} aria-hidden={!seccion || undefined}>
             <title id={`${id}-t`}>{titulo}</title>
-            <defs>
-              <radialGradient id={`${id}-disco`} cx={luz.fx} cy={luz.fy} r="0.75">
-                <stop offset="0" stopColor={`rgb(${150 + 20 * contraste} ${158 + 18 * contraste} ${108 + 10 * contraste})`} />
-                <stop offset="0.6" stopColor="#5f6a3d" />
-                <stop offset="1" stopColor={`rgb(${70 - 25 * contraste} ${80 - 25 * contraste} ${44 - 18 * contraste})`} />
-              </radialGradient>
-              <radialGradient id={`${id}-esfera`} cx="0.35" cy="0.3" r="0.8">
-                <stop offset="0" stopColor="#f3ecdc" />
-                <stop offset="0.55" stopColor="#b8ae98" />
-                <stop offset="1" stopColor="#4d4639" />
-              </radialGradient>
-              <filter id={`${id}-difusa`} x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="4" />
-              </filter>
-              <clipPath id={`${id}-recorte`}>
-                <circle cx={DISCO.cx} cy={DISCO.cy} r={DISCO.r} />
-              </clipPath>
-            </defs>
-
-            {/* Vista frontal */}
-            <g className="mv-frente">
-              <circle cx={DISCO.cx} cy={DISCO.cy} r={DISCO.r + 7} className="mv-canto" />
-              <circle cx={DISCO.cx} cy={DISCO.cy} r={DISCO.r} fill={`url(#${id}-disco)`} />
-              <g clipPath={`url(#${id}-recorte)`}>
-                <g className="mv-sombra" style={sombra}>
-                  <ellipse rx="26" ry="26" fill="#141a0b" filter={`url(#${id}-difusa)`} />
-                </g>
-              </g>
-              <circle cx={ESFERA.cx} cy={ESFERA.cy} r={ESFERA.r} fill={`url(#${id}-esfera)`} />
-              {/* Debajo de la etiqueta del veredicto (arriba a la izquierda) */}
-              <path className="mv-luz" d="M70 64 L136 98 M136 98 l-14 -2 M136 98 l-5 -13" />
-              <text x="38" y="68" className="mv-rotulo">Luz</text>
-            </g>
-
-            {/* Corte lateral: la forma real */}
-            <g className="mv-corte" aria-hidden={!perfil || undefined}>
-              <path className="mv-luz" d="M378 22 L326 70 M326 70 l13 -3 M326 70 l3 -13" />
-              <text x="352" y="16" className="mv-rotulo">Luz</text>
-              <path
-                className="mv-sugerida"
-                d={estado === "concava" ? "M220 28 Q172 125 220 222" : estado === "plana" ? "M220 28 L220 222" : "M220 28 Q268 125 220 222"}
-              />
-              <path className="mv-real" d="M220 28 Q268 125 220 222" />
-              <circle cx="300" cy="104" r="18" fill={`url(#${id}-esfera)`} />
-              <path className="mv-ojo" d="M364 125 q12 -9 22 0 q-10 9 -22 0 Z" />
-              <text x="366" y="148" className="mv-rotulo">Tú</text>
-              <text x="160" y="240" className="mv-rotulo mv-rotulo--real">Escudo real: convexo</text>
-              <text x="22" y="125" className="mv-rotulo mv-rotulo--sugerida">Lo que sugiere la sombra</text>
-            </g>
+            <path className="mv-luz" d="M372 22 L322 62 M322 62 l13 -2 M322 62 l2 -13" />
+            <text x="346" y="16" className="mv-rotulo">Luz</text>
+            <path className="mv-sugerida" d="M200 30 Q140 125 200 220" />
+            <path className="mv-real" d="M200 30 Q260 125 200 220" pathLength={1} />
+            <path className="mv-flecha" d="M236 125 L272 125 M272 125 l-8 -5 M272 125 l-8 5" />
+            <path className="mv-ojo" d="M344 125 q12 -9 22 0 q-10 9 -22 0 Z" />
+            <text x="346" y="148" className="mv-rotulo">Tú</text>
+            <text x="244" y="88" className="mv-rotulo mv-rotulo--real">Superficie real:</text>
+            <text x="244" y="101" className="mv-rotulo mv-rotulo--real">convexa</text>
+            <text x="158" y="186" textAnchor="end" className="mv-rotulo mv-rotulo--sugerida">Lo que sugiere</text>
+            <text x="158" y="199" textAnchor="end" className="mv-rotulo mv-rotulo--sugerida">la sombra: cóncava</text>
+            <text x="200" y="242" textAnchor="middle" className="mv-rotulo">Esquema sin escala</text>
           </svg>
+
           <p className="mv-lab__tag" aria-hidden="true">
-            {perfil ? "De perfil" : v.nombre}
+            {v.nombre}
+          </p>
+          <p className="mv-pista" aria-hidden="true">
+            {SOMBRA.pista}
           </p>
         </div>
-        <figcaption>{perfil ? SOMBRA.perfil : SOMBRA.aviso}</figcaption>
+        {/* Los dos pies ocupan la misma celda: el alto no cambia al pasar a la sección */}
+        <figcaption className="mv-lab__pies">
+          <span aria-hidden={seccion || undefined}>{SOMBRA.aviso}</span>
+          <span aria-hidden={!seccion || undefined}>{SOMBRA.seccion}</span>
+        </figcaption>
       </figure>
 
       <div className="mv-lab__controls">
-        <label className="mv-range">
-          <span>
-            Sombra pintada{" "}
-            <output htmlFor={`${id}-p`}>{posicion > 33 ? "hacia fuera" : posicion < -33 ? "hacia dentro" : "neutra"}</output>
-          </span>
-          <input id={`${id}-p`} type="range" min={-100} max={100} step={1} value={posicion} onChange={(e) => setPosicion(+e.target.value)} />
-        </label>
-        <label className="mv-range">
-          <span>
-            Intensidad <output htmlFor={`${id}-i`}>{intensidad} %</output>
-          </span>
-          <input id={`${id}-i`} type="range" min={10} max={90} step={1} value={intensidad} onChange={(e) => setIntensidad(+e.target.value)} />
-        </label>
-        <div className="mv-lab__presets" role="group" aria-label="Lecturas de ejemplo">
-          {PRESETS.map((x) => (
-            <button
-              key={x.nombre}
-              type="button"
-              className="mf-btn"
-              aria-pressed={posicion === x.posicion && intensidad === x.intensidad}
-              onClick={() => {
-                setPosicion(x.posicion);
-                setIntensidad(x.intensidad);
-              }}
-            >
-              {x.nombre}
-            </button>
-          ))}
+        <div className="mv-lab__vistas" role="group" aria-label="Vistas del escudo">
+          <button type="button" className="mf-btn" aria-pressed={vista === "perfil"} onClick={() => ir("perfil")}>
+            Ver perfil
+          </button>
+          <button type="button" className="mf-btn" aria-pressed={seccion} onClick={() => ir("seccion")}>
+            Ver sección
+          </button>
+          {/* aria-disabled y no disabled: el foco no se pierde al volver */}
+          <button
+            type="button"
+            className="mf-btn mv-lab__volver"
+            aria-disabled={vista === "frente"}
+            onClick={() => vista !== "frente" && ir("frente")}
+          >
+            Volver al frente
+          </button>
         </div>
-        <button type="button" className="mf-btn mv-lab__perfil" aria-pressed={perfil} onClick={() => setPerfil((x) => !x)}>
-          {perfil ? "Ver de frente" : "Ver de perfil"}
-        </button>
-        <div className="mv-lab__result" aria-live="polite">
-          <p className="mv-lab__verdict">{v.nombre}</p>
-          <p>{v.texto}</p>
-          <p className="mv-lab__real">La superficie real es convexa.</p>
+        <div className="mv-lab__result">
+          <div aria-live="polite">
+            <p className="mv-lab__verdict">{v.nombre}</p>
+            <p>{v.texto}</p>
+            <p className="mv-lab__real">La superficie real es convexa.</p>
+          </div>
+          {/* Molde invisible con el texto más largo: el recuadro no cambia de alto entre vistas */}
+          <div className="mv-lab__molde" aria-hidden="true">
+            <p className="mv-lab__verdict">{SOMBRA.vistas.seccion.nombre}</p>
+            <p>{SOMBRA.vistas.seccion.texto}</p>
+            <p className="mv-lab__real">La superficie real es convexa.</p>
+          </div>
         </div>
       </div>
 

@@ -8,7 +8,7 @@ MANIFESTO es una plataforma cultural y educativa sin ánimo de lucro. No vende p
 
 - **Reproducción:** [«Caravaggio - Medusa - Google Art Project.jpg»](https://commons.wikimedia.org/wiki/File:Caravaggio_-_Medusa_-_Google_Art_Project.jpg) (Wikimedia Commons; fuente: Google Arts & Culture, asset `FAFPqU12CekL8Q`). Licencia en Commons: `PD-Art`, dominio público.
 - **Archivo en el repositorio:** `public/obras/medusa.jpg`, solo recortado y redimensionado (2400 × 2350 px). El sitio sirve variantes WebP de hasta 2048 px.
-- **Capas de MANIFESTO:** la petrificación, la luz, el relieve del escudo y los tratamientos de color son capas artísticas propias que no alteran el archivo. El laboratorio «La sombra que miente» muestra un recorte de esta misma reproducción con la zona de la sombra señalada encima. El espejo de «El reflejo» muestra otra obra (ver la entrada siguiente).
+- **Capas de MANIFESTO:** la petrificación, la luz, el relieve del escudo y los tratamientos de color son capas artísticas propias que no alteran el archivo. El laboratorio «La sombra que miente» muestra esta misma reproducción sobre un disco que se puede girar, sin deformarla, y un recorte con la zona de la sombra señalada encima. El espejo de «El reflejo» muestra otra obra (ver la entrada siguiente).
 - **Patrimonio cultural italiano:** la difusión de imágenes de bienes culturales se acoge al art. 108, apartado 3-bis, del Codice dei beni culturali e del paesaggio (D.Lgs. 42/2004). Ese apartado solo ampara usos sin ánimo de lucro con fines de estudio, investigación, libre expresión o promoción del conocimiento del patrimonio. **No es una autorización de las Gallerie degli Uffizi** ni se ha solicitado ninguna. Cualquier reutilización con fines comerciales de estas imágenes requiere la concesión de la institución.
 
 ### Cabeza de Medusa · Franz von Stuck, hacia 1892 · colección particular
@@ -40,7 +40,7 @@ El código, el diseño, los shaders, las composiciones gráficas (incluidos «El
 
 En *La noche estrellada*, la escena «La ventana», el laboratorio «Turbulencia» y la escala «De la ventana a Venus» también son creaciones de MANIFESTO, generadas con código. «La ventana» evoca la recomposición del cuadro, pero no reproduce ni imita la pintura. El laboratorio es un modelo de juguete, no una simulación de fluidos.
 
-En *Medusa*, el laboratorio «La sombra que miente» y la escena «El reflejo» también son creaciones de MANIFESTO, generadas con código. El laboratorio es un modelo didáctico que simplifica la óptica y no reproduce la del cuadro. En «El reflejo», la escena oscura y las serpientes se generan con código; dentro del espejo se ve la reproducción de dominio público de la *Cabeza de Medusa* de Franz von Stuck, reflejada y deformada (ver arriba).
+En *Medusa*, el laboratorio «La sombra que miente» y la escena «El reflejo» también son creaciones de MANIFESTO, generadas con código. En el laboratorio, el giro, el canto y la luz del disco son una simulación (la curvatura se sugiere con luz, no con relieve), y la sección es un esquema explicativo sin escala, no una medición del escudo. En «El reflejo», la escena oscura y las serpientes se generan con código; dentro del espejo se ve la reproducción de dominio público de la *Cabeza de Medusa* de Franz von Stuck, reflejada y deformada (ver arriba).
 
 ## Tipografías
 

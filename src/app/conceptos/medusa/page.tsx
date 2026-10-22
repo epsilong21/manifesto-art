@@ -132,8 +132,8 @@ export default function MedusaPage() {
               La sombra que miente
             </h2>
             <p>
-              El escudo sale hacia ti, pero su sombra dice lo contrario. Mueve la sombra pintada y mira cómo cambia la
-              forma que crees ver.
+              El escudo sale hacia ti, pero su sombra dice lo contrario. Gíralo, míralo de perfil y en sección para ver
+              su forma real.
             </p>
           </header>
           <SombraLab />
