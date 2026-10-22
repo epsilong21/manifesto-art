@@ -526,6 +526,19 @@ html:not(.js) .mv-lab__pies > span {
 .rf-instrucciones {
   font-size: 0.875rem;
 }
+/* La llamada a la acción, en su línea y con el color del texto; debajo, la ayuda de teclado */
+.rf-instrucciones__perseo {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--c-ink);
+  font-size: 1rem;
+}
+/* En pantallas táctiles sin ratón la ayuda de teclado sobra; el espejo la conserva en su etiqueta accesible */
+@media (hover: none) and (pointer: coarse) {
+  .rf-instrucciones__teclado {
+    display: none;
+  }
+}
 .rf-stage {
   min-width: 0;
 }

@@ -174,7 +174,8 @@ export default function MedusaPage() {
             </p>
             <p>
               El laboratorio «La sombra que miente» y la escena «{REFLEJO.nombre}» son creaciones de MANIFESTO,
-              generadas con código. El laboratorio muestra además un recorte de la reproducción de la obra.
+              generadas con código. El laboratorio muestra además la reproducción de la obra sobre un disco que se puede
+              girar, sin deformarla, y un recorte con la zona de la sombra señalada.
             </p>
             <p>
               En el espejo de «{REFLEJO.nombre}»: Franz von Stuck, Cabeza de Medusa, hacia 1892. Obra en dominio

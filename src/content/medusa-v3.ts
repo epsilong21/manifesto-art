@@ -79,7 +79,10 @@ export type PuntoReflejo = {
  */
 export const REFLEJO = {
   nombre: "El reflejo",
-  entrada: "Medusa está aquí. Solo puedes verla en el espejo.",
+  entrada: "Para vencer a Medusa, Perseo debía enfrentarse a ella sin mirarla directamente.",
+  contexto:
+    "Según una versión del mito griego, quien contemplaba el rostro de Medusa quedaba convertido en piedra. Con ayuda de Atenea, Perseo utilizó el reflejo de un escudo pulido para localizarla sin cruzar su mirada.",
+  instruccion: "Ahora estás en el lugar de Perseo. Mueve el reflejo para encontrar a Medusa sin mirarla directamente.",
   nota: "Escena original de MANIFESTO. En el espejo, Cabeza de Medusa de Franz von Stuck (dominio público), reflejada; el resto de la escena se genera con código.",
   /** Reproducción de Wikimedia Commons sin modificar (ver CREDITOS.md). */
   imagen: {
@@ -94,16 +97,17 @@ export const REFLEJO = {
       id: "espejo",
       num: "01",
       nombre: "Espejo",
-      escena: "De frente, solo hay oscuridad y algún destello. En el espejo aparece ella: lo que no se puede mirar directamente se deja ver en el reflejo.",
-      hecho:
-        "Según el mito, Perseo venció a Medusa sin mirarla de frente: se guió por su reflejo en un escudo pulido, con la ayuda de Atenea.",
-      lectura: "El escudo de Caravaggio repite la trampa del mito: para mirar a Medusa necesitamos algo que se interponga.",
+      escena: "Haces lo mismo que Perseo: no la miras de frente, la buscas en el espejo. Fuera de él solo hay oscuridad y algún destello.",
+      hecho: "Ovidio cuenta en las Metamorfosis que Perseo la decapitó guiándose por su reflejo en un escudo de bronce.",
+      lectura:
+        "El gesto de Perseo es también el del espectador: nadie ha visto nunca a Medusa, solo imágenes de ella. Cada cuadro es otro escudo pulido.",
     },
     {
       id: "sombra",
       num: "02",
       nombre: "Sombra",
-      escena: "El espejo invierte y curva lo que muestra. La sombra del cuadro también engaña sobre la forma real de lo que tienes delante.",
+      escena:
+        "El reflejo que guió a Perseo no era Medusa, solo una imagen de ella, invertida como en cualquier espejo. La sombra del cuadro también engaña sobre la forma de lo que tienes delante.",
       hecho: "El escudo es convexo, pero la sombra de la cabeza está pintada como si fuera cóncavo.",
       enlace: { href: "#sombra", texto: "Probarlo en el laboratorio" },
     },
@@ -111,18 +115,21 @@ export const REFLEJO = {
       id: "rostro",
       num: "03",
       nombre: "Rostro",
-      escena: "En el espejo no está la Medusa de Caravaggio, sino la de Franz von Stuck: no grita, te mira.",
+      escena:
+        "En el espejo no está la Medusa de Caravaggio, sino la de Franz von Stuck: no grita, te mira. A través del reflejo puedes sostener esa mirada, como Perseo.",
       hecho:
         "Franz von Stuck fue en 1892 uno de los fundadores de la Secesión de Múnich. Su Cabeza de Medusa se fecha hacia 1892: pastel sobre papel, 26,5 × 32,5 cm, en una colección particular (según Wikimedia Commons; pendiente de verificar).",
       lectura:
-        "Caravaggio pinta el instante del grito, con la boca abierta y la sangre; Stuck, tres siglos después, una cara quieta que sostiene la mirada. En el mito, mirarla petrifica: aquí es ella quien no aparta los ojos.",
+        "Caravaggio pinta el instante del grito, con la boca abierta y la sangre; Stuck, tres siglos después, una cara quieta que sostiene la mirada. Si la de Caravaggio es el monstruo vencido, la de Stuck es la amenaza intacta.",
     },
     {
       id: "superficie",
       num: "04",
       nombre: "Superficie",
-      escena: "Lo que hay en el escudo de Caravaggio es luz y sombra pintadas, no relieve: no podría tallarse.",
-      hecho: "Caravaggio no pintó sobre la madera: pintó un lienzo y lo pegó sobre un escudo de chopo.",
+      escena:
+        "Tras la victoria de Perseo, la cabeza de Medusa siguió siendo un arma. Caravaggio la lleva a un escudo, pero lo que hay en él es luz y sombra pintadas, no relieve.",
+      hecho:
+        "Según el mito, la cabeza acabó en la égida de Atenea, como arma. Caravaggio no la pintó sobre la madera: pintó un lienzo y lo pegó sobre un escudo de chopo.",
       lectura:
         "Taro Kimura lo lee como un desafío a la escultura: la sombra arrojada y la sangre líquida solo puede mostrarlas la pintura.",
     },

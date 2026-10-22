@@ -388,9 +388,15 @@ export function ElReflejo() {
         <h2 id="rf-title" className="md-h2">
           El reflejo
         </h2>
-        <p className="rf-lede">{REFLEJO.entrada}</p>
+        <p className="rf-lede">
+          <strong>{REFLEJO.entrada}</strong>
+        </p>
+        <p className="rf-lede">{REFLEJO.contexto}</p>
         <p className="rf-instrucciones">
-          Arrastra el espejo o, con el teclado, muévelo con las flechas (Mayús para ir más rápido; Inicio lo devuelve a los ojos).
+          <span className="rf-instrucciones__perseo">{REFLEJO.instruccion}</span>{" "}
+          <span className="rf-instrucciones__teclado">
+            Arrastra el espejo o, con el teclado, muévelo con las flechas (Mayús para ir más rápido; Inicio lo devuelve a los ojos).
+          </span>
         </p>
       </div>
 
