@@ -212,6 +212,8 @@ body:has(.mf-theme) { background: transparent; }
 .mf-obras__obra[data-obra="medusa"] { --o-accent: #e5636d; }
 .mf-obras__obra[data-obra="noche-estrellada"] { --o-accent: #e0aa45; }
 .mf-obras__obra[data-obra="los-elefantes"] { --o-accent: #dc9b65; }
+.mf-obras__obra[data-obra="basquiat-untitled"] { --o-accent: #f0c53a; }
+.mf-obras__obra[data-obra="glenn"] { --o-accent: #a8f5d0; }
 .mf-obras__num {
   grid-row: span 2;
   font-variation-settings: "wdth" 75;
@@ -404,6 +406,22 @@ body:has(.mf-theme) { background: transparent; }
   text-underline-offset: 0.15em;
   text-decoration-color: var(--c-accent);
 }
+/* Obra relacionada (p. ej. del mismo artista), debajo de «Siguiente obra» */
+.mf-footer__rel {
+  margin: -0.5rem 0 2.5rem;
+  font-size: 1rem;
+}
+.mf-footer__rel a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--c-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.25em;
+}
 .mf-footer__cols {
   display: grid;
   gap: 2rem;
@@ -575,6 +593,20 @@ body:has(.mf-theme) { background: transparent; }
   --u-accent: #dc9b65;
   --u-num: #dc9b65;
 }
+.sel-item--basquiat {
+  --u-bg: #121110;
+  --u-ink: #ede6d6;
+  --u-muted: #b3ab9e;
+  --u-accent: #f0c53a;
+  --u-num: #f0c53a;
+}
+.sel-item--glenn {
+  --u-bg: #0f0f0e;
+  --u-ink: #efece4;
+  --u-muted: #b0aca2;
+  --u-accent: #a8f5d0;
+  --u-num: #a8f5d0;
+}
 
 .sel-plate {
   position: relative;
@@ -635,6 +667,117 @@ body:has(.mf-theme) { background: transparent; }
   .sel-item--elefantes:hover .eg-marcas circle {
     fill-opacity: 0.9;
   }
+}
+.sel-item--basquiat .sel-shade {
+  background: linear-gradient(to top, var(--u-bg) 0%, transparent 18%);
+}
+
+/* Basquiat: composición tipográfica de su imagen OG (BasquiatGrafico), sin la pintura */
+.bqg {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  background: #121110;
+}
+.bqg__lamina {
+  display: grid;
+  align-content: center;
+  gap: 7cqh;
+  box-sizing: border-box;
+  height: 84%;
+  max-width: 84%;
+  aspect-ratio: 1759 / 2057;
+  padding: 0 11%;
+  outline: 1px dashed rgb(237 230 214 / 0.28);
+  outline-offset: -6px;
+  /* Marcas de registro en dos esquinas, como en la lámina del hero */
+  background:
+    linear-gradient(#5a554d, #5a554d) top 12px left 12px / 16px 1px no-repeat,
+    linear-gradient(#5a554d, #5a554d) top 12px left 12px / 1px 16px no-repeat,
+    linear-gradient(#5a554d, #5a554d) bottom 12px right 12px / 16px 1px no-repeat,
+    linear-gradient(#5a554d, #5a554d) bottom 12px right 12px / 1px 16px no-repeat,
+    #0b0a09;
+}
+.bqg__lectura {
+  padding-bottom: 0.3em;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: clamp(0.85rem, 8.5cqh, 2.25rem);
+  line-height: 1;
+  text-transform: uppercase;
+  color: #ede6d6;
+  background: var(--trazo) left bottom / 100% 3px no-repeat;
+}
+.bqg__lectura[data-l="craneo"] { --trazo: linear-gradient(#ede6d6, #ede6d6); }
+.bqg__lectura[data-l="rostro"] { --trazo: repeating-linear-gradient(90deg, #f0c53a 0 14px, transparent 14px 22px); }
+.bqg__lectura[data-l="mascara"] { --trazo: repeating-linear-gradient(90deg, #4fb6f0 0 18px, transparent 18px 24px, #4fb6f0 24px 28px, transparent 28px 34px); }
+
+/* Glenn: composición propia (GlennGrafico), sin la pintura: hoja apaisada, retícula de copias */
+.sel-item--glenn .sel-shade {
+  background: linear-gradient(to top, var(--u-bg) 0%, transparent 18%);
+}
+.glg {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  background: #0f0f0e;
+}
+.glg__hoja {
+  position: relative;
+  overflow: clip;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 4cqh;
+  box-sizing: border-box;
+  width: min(88%, calc(80cqh * 2896 / 2540));
+  aspect-ratio: 2896 / 2540;
+  padding: 0 9%;
+  /* Retícula de hojas fotocopiadas: líneas discontinuas, sin imágenes */
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(100% / 6 - 1px), rgb(233 229 218 / 0.22) calc(100% / 6 - 1px) calc(100% / 6)),
+    repeating-linear-gradient(0deg, transparent 0 calc(100% / 4 - 1px), rgb(233 229 218 / 0.22) calc(100% / 4 - 1px) calc(100% / 4)),
+    #161614;
+  outline: 1px solid rgb(233 229 218 / 0.3);
+}
+.glg__mascara {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40%;
+  height: 72%;
+  translate: -50% -50%;
+  border: 2px dashed #a8f5d0;
+  border-radius: 50%;
+  background: rgb(15 15 14 / 0.85);
+}
+.glg__lectura {
+  position: relative;
+  padding: 0.1em 0.25em 0;
+  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-variation-settings: "wdth" 62;
+  font-weight: 900;
+  font-size: clamp(0.85rem, 10cqh, 2.4rem);
+  line-height: 1;
+  text-transform: uppercase;
+  color: #efece4;
+}
+.glg__lectura[data-l="mascara"] { justify-self: center; }
+.glg__lectura[data-l="archivo"] {
+  justify-self: end;
+  background: #e9e5da;
+  color: #0f0f0e;
+  rotate: -1deg;
+}
+.glg__luz {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 72%;
+  width: 3px;
+  background: #a8f5d0;
+  box-shadow: 0 0 14px 4px rgb(168 245 208 / 0.5);
 }
 
 /* En columna: el enlace baja al pie y las tres láminas quedan alineadas */
@@ -705,6 +848,18 @@ body:has(.mf-theme) { background: transparent; }
   transform-origin: bottom left;
   /* compensa el estiramiento para no pisar la línea superior */
   margin-top: 0.45em;
+}
+.sel-item--glenn .sel-name {
+  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-weight: 900;
+  font-variation-settings: "wdth" 62;
+  text-transform: uppercase;
+}
+.sel-item--basquiat .sel-name {
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  text-transform: uppercase;
 }
 .sel-meta {
   margin: 0;
@@ -783,6 +938,12 @@ body:has(.mf-theme) { background: transparent; }
   }
   .sel-item:nth-child(3) {
     animation-delay: 0.2s;
+  }
+  .sel-item:nth-child(4) {
+    animation-delay: 0.3s;
+  }
+  .sel-item:nth-child(5) {
+    animation-delay: 0.4s;
   }
   /* En táctil, el arte se desliza con el scroll (sin JS) */
   @supports (animation-timeline: view()) {

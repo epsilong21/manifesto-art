@@ -1,0 +1,416 @@
+/* ─────────────────────────────────────────────────────────────
+   04 · BASQUIAT — Dentro de la cabeza
+   Exposición editorial: negro carbón, blanco hueso y acentos tomados de la
+   pintura. Lenguaje secundario de lámina anatómica (rótulo, cotas), siempre
+   fuera de la imagen. Nada imita la escritura ni los signos de Basquiat.
+   Sin animación continua.
+   ───────────────────────────────────────────────────────────── */
+
+.theme-basquiat {
+  --c-bg: #121110;
+  --c-ink: #ede6d6;
+  --c-muted: #b3ab9e;
+  --c-accent: #f0c53a;
+  --c-line: rgb(237 230 214 / 0.16);
+  /* Colores muestreados en la reproducción: fondo, dientes, franja superior, rosa */
+  --bq-azul: #3ba4e1;
+  --bq-amarillo: #f0c53a;
+  --bq-rojo: #d33a3a;
+  --bq-salmon: #f3a68f;
+  /* Lo que la lámina reserva en vertical además de la pintura (cabecera, rótulo, cota, márgenes) */
+  --bq-reserva: 6.5rem;
+}
+html:has(.theme-basquiat) { background: #121110; }
+
+/* ── Hero: cabeza (título) · lámina · pie (acciones y cartela) ── */
+
+.bq-hero {
+  display: grid;
+  grid-template-areas: "cabeza" "obra" "pie";
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  padding: clamp(1.25rem, 4vw, 2.5rem) var(--mf-gutter) clamp(3rem, 7vw, 5rem);
+}
+.bq-hero__cabeza { grid-area: cabeza; min-width: 0; }
+.bq-hero__pie { grid-area: pie; min-width: 0; display: grid; gap: 1.5rem; align-content: start; }
+
+.bq-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0 0 1.1rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-kicker__concepto {
+  color: var(--c-ink);
+  padding-bottom: 0.2rem;
+  border-bottom: 3px solid var(--bq-azul);
+}
+
+/* Título de cartel: grotesca estrecha y pesada, con una línea en romana cursiva */
+.bq-t {
+  margin: 0;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(3rem, 15vw, 5.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.bq-t > span { display: block; }
+.bq-t__l2 {
+  margin: 0.08em 0 0.04em;
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.56em;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--bq-salmon);
+}
+/* «Ruido»: una etiqueta pegada, como en un collage de imprenta */
+.bq-t__l3 {
+  width: fit-content;
+  margin-top: 0.06em;
+  padding: 0.04em 0.1em 0;
+  background: var(--bq-amarillo);
+  color: #121110;
+  transform: rotate(-1.5deg);
+  transform-origin: left bottom;
+  box-shadow: 0.06em 0.06em 0 var(--bq-rojo);
+}
+
+.bq-pregunta {
+  max-width: 22ch;
+  margin: 1.25rem 0 0;
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.3rem, 5vw, 1.75rem);
+  line-height: 1.2;
+  color: var(--c-ink);
+}
+
+/* ── La lámina: rótulo arriba, pintura, cotas del lienzo a la derecha y debajo ── */
+
+.bq-lamina {
+  --cota: 1.75rem;
+  grid-area: obra;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--cota);
+  grid-template-areas:
+    "rotulo rotulo"
+    "obra alto"
+    "ancho ."
+    "credito credito";
+  justify-self: center;
+  align-self: start;
+  /* La pintura cabe a lo alto de la pantalla, también en horizontal */
+  width: min(100%, calc((100svh - var(--bq-reserva)) * var(--bq-ratio) + var(--cota)));
+  margin: 0;
+}
+.bq-lamina__rotulo {
+  grid-area: rotulo;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--c-line);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-lamina__rotulo cite { font-style: italic; text-transform: none; letter-spacing: 0.02em; }
+.bq-lamina__obra {
+  grid-area: obra;
+  position: relative;
+  background: #0b0a09;
+  box-shadow:
+    0 0 0 1px rgb(237 230 214 / 0.12),
+    0 40px 90px -40px rgb(0 0 0 / 0.95);
+}
+.bq-lamina__obra img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.bq-lamina__credito {
+  grid-area: credito;
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--c-muted);
+}
+
+/* Cotas: línea fina con remates en los extremos y la medida en el centro */
+.bq-cota {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--c-muted);
+}
+.bq-cota::before,
+.bq-cota::after {
+  content: "";
+  position: absolute;
+  opacity: 0.55;
+}
+.bq-cota > span {
+  position: relative;
+  padding: 0.4em;
+  background: var(--c-bg);
+  white-space: nowrap;
+}
+.bq-cota--alto { grid-area: alto; writing-mode: vertical-rl; }
+.bq-cota--alto::before { top: 0; bottom: 0; left: 50%; border-left: 1px solid currentColor; }
+/* Bordes físicos: en escritura vertical, border-block caería a los lados */
+.bq-cota--alto::after { top: 0; bottom: 0; left: 30%; right: 30%; border-top: 1px solid currentColor; border-bottom: 1px solid currentColor; }
+.bq-cota--ancho { grid-area: ancho; height: var(--cota); }
+.bq-cota--ancho::before { left: 0; right: 0; top: 50%; border-top: 1px solid currentColor; }
+.bq-cota--ancho::after { left: 0; right: 0; top: 30%; bottom: 30%; border-left: 1px solid currentColor; border-right: 1px solid currentColor; }
+
+/* Sin reproducción: lámina vacía con marcas de registro y la explicación */
+.bq-pendiente {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: 0.9rem;
+  padding: clamp(1.25rem, 8%, 3rem);
+  background:
+    linear-gradient(var(--c-line), var(--c-line)) top 1rem left 1rem / 1.25rem 1px no-repeat,
+    linear-gradient(var(--c-line), var(--c-line)) top 1rem left 1rem / 1px 1.25rem no-repeat,
+    linear-gradient(var(--c-line), var(--c-line)) bottom 1rem right 1rem / 1.25rem 1px no-repeat,
+    linear-gradient(var(--c-line), var(--c-line)) bottom 1rem right 1rem / 1px 1.25rem no-repeat,
+    #0b0a09;
+  outline: 1px dashed rgb(237 230 214 / 0.22);
+  outline-offset: -0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--c-muted);
+}
+.bq-pendiente p { margin: 0; max-width: 32ch; }
+.bq-pendiente__t {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+.bq-pendiente__enlace {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--bq-azul);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.3em;
+}
+
+/* ── Pie del hero: «Ver solo la obra» y cartela ── */
+
+.bq-ver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-self: start;
+  min-height: 48px;
+  padding: 0 1.25rem;
+  border: 1px solid var(--c-ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.bq-ver__marco {
+  width: 0.85rem;
+  height: 1rem;
+  border: 2px solid var(--bq-amarillo);
+}
+@media (hover: hover) {
+  .bq-ver:hover { background: var(--c-ink); color: var(--c-bg); }
+}
+
+.bq-cartela {
+  max-width: 34rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.bq-cartela__ficha {
+  margin: 0 0 1rem;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--bq-rojo);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--c-ink);
+}
+.bq-cartela__datos {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bq-cartela__datos p { margin: 0; }
+.bq-cartela__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  margin-top: 0.35rem !important;
+  font-size: 0.75rem;
+  color: var(--c-muted);
+}
+.bq-cartela__aviso {
+  margin: 1rem 0 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px dashed var(--bq-salmon);
+  font-size: 0.8125rem;
+  color: var(--c-ink);
+}
+
+/* ── Escritorio: título y cartela a la izquierda, la lámina domina la derecha ── */
+
+@media (min-width: 64rem) {
+  .theme-basquiat { --bq-reserva: 10.5rem; }
+  .bq-hero {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "cabeza obra"
+      "pie obra";
+    column-gap: clamp(2rem, 5vw, 6rem);
+    row-gap: 2rem;
+  }
+  .bq-hero__pie { align-content: end; }
+  .bq-t { font-size: clamp(4rem, 7.4vw, 9.5rem); }
+  .bq-pregunta { font-size: clamp(1.5rem, 2.1vw, 2.4rem); }
+  .bq-lamina {
+    --cota: 2rem;
+    justify-self: end;
+    width: min(100%, 64rem, calc((100svh - var(--bq-reserva)) * var(--bq-ratio) + var(--cota)));
+  }
+}
+@media (min-width: 120rem) {
+  .bq-cartela { font-size: 1rem; max-width: 38rem; }
+  /*
+   * Pantallas muy anchas: el contenido de las cuatro secciones se centra en 112rem.
+   * Sin esto, a 3440 px el título y la pintura del hero quedaban a ~1400 px. Los
+   * fondos y filetes de sección siguen a todo el ancho; hasta 1920 px no cambia nada.
+   */
+  .theme-basquiat main > section { padding-inline: max(var(--mf-gutter), calc((100% - 112rem) / 2)); }
+}
+
+/* ── Ver solo la obra: diálogo a pantalla completa, nada encima de la pintura ── */
+
+html:has(.bq-contemplar[open]) { overflow: hidden; }
+
+.bq-contemplar {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: max(0.75rem, env(safe-area-inset-top)) max(var(--mf-gutter), env(safe-area-inset-right))
+    max(0.75rem, env(safe-area-inset-bottom)) max(var(--mf-gutter), env(safe-area-inset-left));
+  border: 0;
+  background: #0b0a09;
+  color: var(--c-ink);
+}
+.bq-contemplar[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+}
+.bq-contemplar::backdrop { background: #0b0a09; }
+.bq-contemplar__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.bq-contemplar__t {
+  margin: 0;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-contemplar__salir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: none;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--c-ink);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.bq-contemplar__tecla {
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--c-line);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--c-muted);
+}
+@media (hover: none) {
+  .bq-contemplar__tecla { display: none; }
+}
+@media (hover: hover) {
+  .bq-contemplar__salir:hover { background: var(--c-ink); color: var(--c-bg); }
+}
+.bq-contemplar__obra { min-height: 0; }
+.bq-contemplar__obra img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.bq-contemplar__credito {
+  margin: 0;
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--c-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bq-contemplar[open] { animation: bq-entra 0.28s ease-out; }
+  @keyframes bq-entra {
+    from { opacity: 0; }
+  }
+}

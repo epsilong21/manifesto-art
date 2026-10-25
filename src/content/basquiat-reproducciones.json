@@ -1,0 +1,29 @@
+{
+  "calibracion": {
+    "width": 921,
+    "height": 1080,
+    "nota": "Encuadre de la referencia: el lienzo completo (175,9 × 205,74 cm, proporción 0,855). Las capas de P2 se medirán sobre él; otra reproducción con otra proporción o encuadre obliga a recalibrarlas."
+  },
+  "publica": {
+    "nota": "Hueco para una futura reproducción con licencia de The Estate of Jean-Michel Basquiat (Artestar, Nueva York). Hoy no existe ni el archivo ni la licencia: los campos vacíos impiden usarla. Completarlos solo con los datos de una licencia real.",
+    "archivo": "basquiat-untitled.jpg",
+    "publicable": true,
+    "width": 0,
+    "height": 0,
+    "sha256": "",
+    "imagen": "",
+    "autorizacion": "",
+    "pie": ""
+  },
+  "referencia": {
+    "nota": "Sin licencia. Solo para desarrollo local: no se publica y el archivo no entra en Git.",
+    "archivo": "basquiat-untitled-referencia.jpg",
+    "publicable": false,
+    "width": 921,
+    "height": 1080,
+    "sha256": "b44809b105d56bcacd3d18ae1c168888afd1b41990e09134308bd7f7d4dd01c2",
+    "imagen": "Imagen: ficha de la obra en The Broad (thebroad.org); crédito fotográfico de la ficha: Douglas M. Parker Studio, Los Ángeles.",
+    "autorizacion": "Sin licencia de reproducción de The Estate of Jean-Michel Basquiat (Artestar).",
+    "pie": "Reproducción de referencia para desarrollo local, sin licencia de reproducción: no se publica."
+  }
+}

@@ -1,0 +1,516 @@
+/* ─────────────────────────────────────────────────────────────
+   04 · BASQUIAT — 01 · Descifrar capas (P2)
+   La pintura como lámina: contornos finos con halo, números en los bordes
+   de cada zona y todos los textos fuera de la obra. Sin animación continua.
+   ───────────────────────────────────────────────────────────── */
+
+.bq-capas {
+  /* Proporción de la reproducción calibrada (921 × 1080) y lo que la lámina reserva en vertical */
+  --bq-r: 0.8528;
+  --bq-reserva-capas: 4.75rem;
+  padding: clamp(3rem, 8vw, 6rem) var(--mf-gutter) clamp(3rem, 7vw, 5rem);
+  border-top: 1px solid var(--c-line);
+}
+
+.bq-capas__head { max-width: 46rem; margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+.bq-capas__k {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-capas__t {
+  margin: 0;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(2.25rem, 9vw, 4.5rem);
+  /* 0,98 y no menos: con 0,9 la cola de la Q («¿QUÉ ESTAMOS») tocaba la línea siguiente */
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+.bq-capas__intro {
+  max-width: 38rem;
+  margin: 1rem 0 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--c-muted);
+}
+
+/* ── Mesa: mandos · lámina · panel (móvil); lámina a la izquierda en escritorio ── */
+
+.bq-mesa {
+  display: grid;
+  grid-template-areas: "mandos" "tabla" "panel";
+  gap: 1.25rem;
+}
+.bq-mandos { grid-area: mandos; display: grid; gap: 0.5rem; }
+.bq-panel { grid-area: panel; display: grid; gap: 1.5rem; align-content: start; min-width: 0; }
+
+.bq-mandos__capas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.bq-capa-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+}
+.bq-capa-btn[aria-pressed="true"] {
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 13%, transparent);
+  box-shadow: inset 4px 0 0 var(--c);
+}
+.bq-capa-btn__muestra { flex: none; width: 1.75rem; height: 0.5rem; overflow: visible; }
+.bq-capa-btn__muestra line { stroke: var(--c); stroke-width: 2.5; }
+
+.bq-mandos__aux { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.bq-aux {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 0.95rem;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.bq-aux[aria-pressed="true"] { background: var(--c-ink); color: var(--c-bg); border-color: var(--c-ink); }
+.bq-aux:disabled { opacity: 0.45; cursor: default; }
+@media (hover: hover) {
+  .bq-capa-btn:hover,
+  .bq-aux:not(:disabled):hover { border-color: var(--c-ink); }
+}
+
+/* ── La lámina ── */
+
+.bq-tabla {
+  grid-area: tabla;
+  justify-self: center;
+  width: min(100%, calc((100svh - var(--bq-reserva-capas)) * var(--bq-r)));
+  margin: 0;
+}
+.bq-tabla__rotulo {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--c-line);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-tabla__rotulo span:last-child { text-align: right; }
+.bq-tabla__lienzo {
+  position: relative;
+  background: #0b0a09;
+  box-shadow:
+    0 0 0 1px rgb(237 230 214 / 0.12),
+    0 40px 90px -40px rgb(0 0 0 / 0.95);
+}
+.bq-tabla__lienzo img { display: block; width: 100%; height: 100%; }
+
+.bq-guias {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.bq-g { opacity: 0; }
+.bq-g[data-on] { opacity: 1; }
+.bq-halo,
+.bq-trazo,
+.bq-escuadra {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bq-halo { stroke: #0b0a09; stroke-width: 5px; opacity: 0.5; }
+.bq-trazo { stroke: var(--c); stroke-width: 2px; stroke-dasharray: var(--trazo); }
+.bq-g [data-sel] .bq-halo { stroke-width: 8px; opacity: 0.6; }
+.bq-g [data-sel] .bq-trazo { stroke-width: 3.5px; }
+.bq-velo { fill: rgb(11 10 9 / 0.64); }
+.bq-escuadra { stroke: var(--bq-amarillo); stroke-width: 3px; stroke-linecap: square; }
+
+/* Números de las capas: pequeños, en el borde de cada zona */
+.bq-num {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  padding: 0;
+  border: 2px solid var(--c);
+  border-radius: 50%;
+  background: #121110;
+  color: var(--c-ink);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+  /* --dx/--dy: desvío de presentación cuando dos marcas se tocan (CapasObra, separarMarcas) */
+  transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px)));
+  cursor: pointer;
+}
+/* Área táctil de 44 px alrededor del círculo visible */
+.bq-num::before { content: ""; position: absolute; inset: -0.7rem; border-radius: 50%; }
+.bq-num[data-sel] { background: var(--c); color: #121110; box-shadow: 0 0 0 2px #121110, 0 0 0 4px var(--c); }
+
+/* Hallazgos: «+» en un cuadrado amarillo, distinto de los números de capa.
+   El botón mide 44 × 44 px (área táctil real, transparente); el cuadrado visible va dentro */
+.bq-marca {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px)));
+  cursor: pointer;
+}
+.bq-marca__cuadro {
+  display: grid;
+  place-items: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border: 2px solid #121110;
+  background: var(--bq-amarillo);
+  color: #121110;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.bq-marca[aria-pressed="true"] .bq-marca__cuadro { background: #121110; color: var(--bq-amarillo); border-color: var(--bq-amarillo); }
+
+/*
+ * Jerarquía con tres o cuatro capas: la que se explica (pestaña activa) manda. Las
+ * demás siguen visibles pero atenuadas, con línea fina y números pequeños sin relleno.
+ * La distinción no depende solo del color: grosor, relleno y tamaño, además del
+ * patrón de trazo propio de cada capa.
+ */
+.bq-tabla[data-jerarquia] .bq-g[data-on]:not([data-vista]) { opacity: 0.5; }
+.bq-tabla[data-jerarquia] .bq-g:not([data-vista]) .bq-trazo { stroke-width: 1.25px; }
+.bq-tabla[data-jerarquia] .bq-g:not([data-vista]) .bq-halo { stroke-width: 3px; opacity: 0.35; }
+.bq-tabla[data-jerarquia] .bq-g[data-vista] .bq-trazo { stroke-width: 2.5px; }
+.bq-tabla[data-jerarquia] .bq-g[data-vista] .bq-halo { stroke-width: 6px; opacity: 0.6; }
+.bq-tabla[data-jerarquia] .bq-num[data-principal] { z-index: 1; background: var(--c); color: #121110; }
+.bq-tabla[data-jerarquia] .bq-num:not([data-principal]) {
+  width: 1rem;
+  height: 1rem;
+  border-width: 1.5px;
+  background: rgb(18 17 16 / 0.8);
+  font-size: 0.5625rem;
+  opacity: 0.75;
+}
+.bq-tabla[data-jerarquia] .bq-num:not([data-principal])::before { inset: -0.875rem; }
+
+.bq-tabla[data-hallazgo] .bq-g[data-on] { opacity: 0.22; }
+.bq-tabla[data-hallazgo] .bq-num { visibility: hidden; }
+.bq-tabla[data-hallazgo] .bq-marca:not([aria-pressed="true"]) { opacity: 0.5; }
+.bq-tabla[data-limpio] :is(.bq-guias, .bq-num, .bq-marca) { visibility: hidden; }
+
+/* ── Panel: índice de hallazgos y lectura ── */
+
+.bq-panel__t {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-indice ol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bq-indice button {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+}
+.bq-indice button[aria-pressed="true"] { border-color: var(--bq-amarillo); box-shadow: inset 4px 0 0 var(--bq-amarillo); }
+@media (hover: hover) {
+  .bq-indice button:hover { border-color: var(--c-ink); }
+}
+.bq-indice__n {
+  flex: none;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--bq-amarillo);
+}
+
+.bq-lectura {
+  min-height: 7rem;
+  padding-top: 1rem;
+  border-top: 3px solid var(--bq-amarillo);
+}
+.bq-lectura__k {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-lectura__t {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.bq-lectura__texto { margin: 0 0 0.75rem; font-size: 1rem; line-height: 1.5; }
+.bq-lectura__vacia { margin: 0; font-size: 0.9375rem; line-height: 1.5; color: var(--c-muted); }
+.bq-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: var(--c-muted);
+}
+.bq-entradas { display: grid; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+.bq-entradas li { padding-left: 0.75rem; border-left: 2px solid var(--c-line); font-size: 0.9375rem; line-height: 1.45; }
+.bq-entradas p { margin: 0; }
+.bq-lectura__nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.bq-tecla {
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--c-line);
+  font-size: 0.625rem;
+  color: var(--c-muted);
+}
+@media (hover: none) {
+  .bq-tecla { display: none; }
+}
+
+/* Leyenda de la capa que se explica: pestañas (si hay varias), introducción y zonas */
+.bq-pestanas { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.9rem; }
+.bq-pestanas button {
+  min-height: 44px;
+  padding: 0 0.8rem;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-muted);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.bq-pestanas button[aria-pressed="true"] { border-color: var(--c); color: var(--c-ink); box-shadow: inset 0 -3px 0 var(--c); }
+.bq-elementos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bq-elementos button {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+.bq-elementos button[aria-pressed="true"] { border-color: var(--c); }
+.bq-elementos__n {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.375rem;
+  height: 1.375rem;
+  border: 2px solid var(--c);
+  border-radius: 50%;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+.bq-elementos button[aria-pressed="true"] .bq-elementos__n { background: var(--c); color: #121110; }
+.bq-nota {
+  margin-top: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--c);
+  background: rgb(237 230 214 / 0.04);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+.bq-nota p { margin: 0; }
+
+/* ── Versión de texto (sin JavaScript o sin reproducción) ── */
+
+.bq-texto { display: grid; gap: 1.5rem; }
+.bq-texto__aviso {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed var(--c-line);
+  color: var(--c-muted);
+}
+.bq-texto__capas { display: grid; gap: 1.5rem; }
+.bq-texto__capa { padding-top: 0.75rem; border-top: 3px solid var(--c-line); }
+.bq-texto__capa h3,
+.bq-texto__h {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+}
+.bq-texto__capa p,
+.bq-texto__capa ul { margin: 0 0 0.5rem; line-height: 1.5; }
+.bq-texto__capa ul { padding-left: 1.1rem; }
+.bq-texto__capa li { margin-bottom: 0.35rem; }
+.bq-texto__hallazgos { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.bq-texto__hallazgos summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  min-height: 44px;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--c-line);
+  font-weight: 600;
+  cursor: pointer;
+}
+.bq-texto__pregunta { font-family: var(--font-bodoni), Georgia, serif; font-style: italic; font-weight: 400; color: var(--bq-salmon); }
+.bq-texto__entrada { margin: 0.6rem 0 0; padding-left: 0.75rem; border-left: 2px solid var(--c-line); }
+.bq-texto__entrada p { margin: 0; }
+.bq-texto details > p { margin: 0.6rem 0 0; line-height: 1.5; }
+
+@media (min-width: 48rem) {
+  .bq-texto__capas { grid-template-columns: 1fr 1fr; column-gap: 2.5rem; }
+}
+
+/* ── Escritorio: la lámina a la izquierda; mandos y panel a la derecha (416 px) ── */
+
+@media (min-width: 64rem) {
+  /*
+   * Acotada por altura (como Noche V4.1): encabezado + lámina + mandos caben en una
+   * pantalla a 1440×900, 1920×1080 y 2560×1440. La lámina reserva el encabezado
+   * compacto y su rótulo, y nunca pasa de 1080 px de alto (921 de ancho): el tamaño
+   * real del archivo, sin reescalarlo hacia arriba.
+   */
+  .bq-capas {
+    --bq-reserva-capas: 10.5rem;
+    --bq-lamina-ancho: min(calc((100svh - var(--bq-reserva-capas)) * var(--bq-r)), 921px);
+    --bq-hueco: clamp(2rem, 4vw, 4rem);
+  }
+  /* Encabezado del ancho de su bloque (lámina + panel): título en una línea y entrada al lado */
+  .bq-capas > .bq-capas__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 24rem);
+    grid-template-areas:
+      "k ."
+      "t i";
+    align-items: end;
+    column-gap: 2.5rem;
+    max-width: calc(var(--bq-lamina-ancho) + var(--bq-hueco) + 26rem);
+    margin-bottom: 1.5rem;
+  }
+  .bq-capas > .bq-capas__head .bq-capas__k { grid-area: k; }
+  .bq-capas > .bq-capas__head .bq-capas__t { grid-area: t; font-size: clamp(2.5rem, 4.4vw, 4.5rem); white-space: nowrap; }
+  .bq-capas > .bq-capas__head .bq-capas__intro { grid-area: i; margin: 0; font-size: 0.9375rem; }
+  .bq-mesa {
+    /* La primera columna mide lo que la lámina: lámina y panel juntos, el sobrante al final */
+    grid-template-columns: minmax(0, var(--bq-lamina-ancho)) minmax(18rem, 26rem);
+    justify-content: start;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "tabla mandos"
+      "tabla panel";
+    column-gap: var(--bq-hueco);
+    row-gap: 1rem;
+    align-items: start;
+  }
+  .bq-tabla { width: min(100%, var(--bq-lamina-ancho)); }
+  /* Panel más compacto: el peor caso (cuatro capas con nota, o el hallazgo 4) cabe junto a la lámina */
+  .bq-panel { gap: 1rem; }
+  .bq-lectura { padding-top: 0.75rem; }
+  .bq-lectura__t { margin-bottom: 0.4rem; font-size: clamp(1.4rem, 1.9vw, 1.75rem); }
+  .bq-lectura__texto { margin-bottom: 0.5rem; font-size: 0.9375rem; line-height: 1.45; }
+  .bq-entradas { gap: 0.55rem; }
+  .bq-entradas li { font-size: 0.875rem; line-height: 1.4; }
+  .bq-lectura__nav { margin-top: 0.75rem; }
+  .bq-pestanas { margin-bottom: 0.55rem; }
+  .bq-elementos { margin-top: 0.6rem; }
+  .bq-nota { margin-top: 0.6rem; padding: 0.55rem 0.8rem; font-size: 0.875rem; }
+  /* Alineada con el encabezado de la sección (y con el texto del hero), no empujada hacia el panel */
+  .bq-tabla { justify-self: start; }
+  /* La lectura ocupa el hueco y el índice queda abajo, fijo: no salta al cambiar el texto */
+  .bq-panel { align-self: stretch; grid-template-rows: 1fr auto; }
+}
+
+/* Móvil y pantallas estrechas: números y marcas algo menores */
+@media (max-width: 47.99rem) {
+  .bq-num { width: 1.2rem; height: 1.2rem; font-size: 0.625rem; border-width: 1.5px; }
+  .bq-num::before { inset: -0.8rem; }
+  .bq-marca__cuadro { width: 1.4rem; height: 1.4rem; font-size: 1rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bq-g { transition: opacity 0.2s ease-out; }
+  .bq-marca__cuadro,
+  .bq-num { transition: background-color 0.15s, color 0.15s; }
+}

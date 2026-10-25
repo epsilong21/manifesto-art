@@ -99,7 +99,7 @@ export function ObrasMenu({ actual }: { actual?: Concepto["slug"] }) {
         <ul className="mf-obras__extra">
           <li>
             <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"} onClick={() => cerrar()}>
-              Ver las tres obras
+              Ver las cinco obras
             </Link>
           </li>
           {ENTRADA_SELECTOR ? null : (

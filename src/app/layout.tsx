@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "MANIFESTO — El arte no se contempla solamente. Se explora.",
   description:
-    "MANIFESTO es una plataforma cultural para descubrir obras de arte, sus símbolos y sus historias mediante experiencias interactivas: Medusa de Caravaggio, La noche estrellada de Van Gogh y Los elefantes de Dalí.",
+    "MANIFESTO es una plataforma cultural para descubrir obras de arte, sus símbolos y sus historias mediante experiencias interactivas: Medusa de Caravaggio, La noche estrellada de Van Gogh, Los elefantes de Dalí, y Untitled y Glenn de Basquiat.",
   alternates: { canonical: "/" },
   // Vista previa para el cliente en GitHub Pages: fuera de los buscadores
   ...(process.env.MANIFESTO_DESTINO === "pages" ? { robots: { index: false, follow: false } } : {}),
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     siteName: "MANIFESTO",
     title: "El arte no se contempla solamente. Se explora.",
-    description: "Tres obras, tres experiencias interactivas para descubrir la historia del arte.",
+    description: "Cinco obras, cinco experiencias interactivas para descubrir la historia del arte.",
   },
 };
 

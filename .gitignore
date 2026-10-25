@@ -52,6 +52,14 @@ presentation-review/**/lighthouse/
 # Originales de trabajo de la reproducción de Los elefantes (ver CREDITOS.md)
 assets-source/elefantes-referencia/*.png
 
+# Basquiat: reproducción de referencia sin licencia, solo para desarrollo local; no entra en Git
+assets-source/basquiat-referencia/*.jpg
+public/obras/basquiat-untitled-referencia.jpg
+
+# Glenn (Basquiat): ídem; no entra en Git
+assets-source/glenn-referencia/*.jpg
+public/obras/glenn-referencia.jpg
+
 # Capturas sueltas de QA: se conservan en local; en Git solo informes y herramientas
 presentation-review/**/*.jpg
 presentation-review/**/*.png

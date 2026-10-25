@@ -1,0 +1,166 @@
+/* ─────────────────────────────────────────────────────────────
+   04 · BASQUIAT — P5: revelación del hero e inspector de trazos
+   Ninguna regla altera la reproducción: solo encuadres, escalas y capas encima.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Revelación del hero ──
+   Seis fragmentos de la propia imagen se asientan sobre carbón y la capa se va.
+   Con movimiento reducido no existe: la pintura está desde el principio. */
+
+.bq-revela { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .bq-revela {
+    display: block;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    animation: bq-revela-fin 0s linear 1.5s forwards;
+  }
+  .bq-revela__fondo {
+    position: absolute;
+    inset: 0;
+    background: #0b0a09;
+    animation: bq-revela-fondo 0.3s ease-out 1.1s forwards;
+  }
+  .bq-revela__pieza {
+    position: absolute;
+    overflow: hidden;
+    animation: bq-revela-pieza 0.75s cubic-bezier(0.2, 0.75, 0.25, 1) var(--d) both;
+  }
+  .bq-revela__pieza img { position: absolute; max-width: none; height: auto; }
+  @keyframes bq-revela-pieza {
+    from {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) rotate(var(--giro));
+      box-shadow: 0 18px 40px -14px rgb(0 0 0 / 0.9);
+    }
+    70% { opacity: 1; }
+    to { opacity: 1; transform: none; box-shadow: none; }
+  }
+  @keyframes bq-revela-fondo { to { opacity: 0; } }
+  @keyframes bq-revela-fin { to { visibility: hidden; } }
+}
+
+/* ── «Examinar trazos» ── */
+
+/* Tres botones auxiliares en una fila: si una etiqueta no cabe, parte en dos líneas
+   dentro de su botón. Así «Examinar trazos» no añade una fila a la mesa (P2 cabía
+   en una pantalla a 1024×768 con las cuatro capas y debe seguir cabiendo) */
+.bq-mandos__aux { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bq-mandos__aux .bq-aux {
+  justify-content: center;
+  padding: 0.35rem 0.5rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.bq-examinar { gap: 0.55rem; }
+.bq-examinar__lente { flex: none; }
+.bq-examinar__lente {
+  position: relative;
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid var(--bq-amarillo);
+  border-radius: 50%;
+}
+.bq-examinar__lente::after {
+  content: "";
+  position: absolute;
+  right: -0.32rem;
+  bottom: -0.32rem;
+  width: 0.38rem;
+  height: 2px;
+  background: var(--bq-amarillo);
+  transform: rotate(45deg);
+}
+
+/* La lámina en modo examen: sin anotaciones, cursor de precisión y sin desplazar la página al arrastrar */
+.bq-tabla[data-examinar] :is(.bq-guias, .bq-num, .bq-marca) { visibility: hidden; }
+.bq-tabla[data-examinar] .bq-tabla__lienzo { overflow: hidden; cursor: crosshair; touch-action: none; }
+
+/* Retícula: la región que muestra la lupa; el resto de la obra se atenúa un poco */
+.bq-reticula {
+  position: absolute;
+  pointer-events: none;
+  outline: 2px solid var(--bq-amarillo);
+  box-shadow:
+    0 0 0 1px #0b0a09,
+    0 0 0 200vmax rgb(11 10 9 / 0.38);
+}
+
+.bq-inspector { display: grid; gap: 0.75rem; align-content: start; }
+.bq-lupa {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: #0b0a09;
+  outline: 2px solid var(--bq-amarillo);
+  outline-offset: 2px;
+}
+.bq-lupa__img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  height: auto;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.bq-lupa__pie {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-lupa__pie span:first-child { color: var(--c-ink); }
+.bq-inspector__ayuda { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--c-muted); }
+.bq-regiones { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.bq-regiones button {
+  min-height: 44px;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+.bq-regiones button[aria-pressed="true"] { border-color: var(--bq-amarillo); box-shadow: inset 4px 0 0 var(--bq-amarillo); }
+@media (hover: hover) {
+  .bq-regiones button:hover { border-color: var(--c-ink); }
+}
+.bq-inspector__salir { justify-self: start; }
+
+/* Escritorio: lupa apaisada para que el inspector quepa junto a la lámina acotada por
+   altura (a 1440×900 la cuadrada pasaba 11 px); con pantalla alta, 4:3 */
+@media (min-width: 64rem) {
+  .bq-lupa { aspect-ratio: 16 / 10; }
+  .bq-inspector { gap: 0.6rem; }
+}
+@media (min-width: 64rem) and (min-height: 60rem) {
+  .bq-lupa { aspect-ratio: 4 / 3; }
+}
+
+/* Una columna: la lupa va justo bajo la obra, apaisada para que ambas quepan en pantalla */
+@media (max-width: 63.99rem) {
+  .bq-lupa { aspect-ratio: 16 / 10; }
+}
+/* Móvil en horizontal: obra y lupa lado a lado mientras se examina */
+@media (max-width: 63.99rem) and (orientation: landscape) {
+  .bq-mesa[data-examinar] {
+    grid-template-columns: calc((100svh - var(--bq-reserva-capas)) * var(--bq-r)) minmax(0, 1fr);
+    grid-template-areas:
+      "mandos mandos"
+      "tabla panel";
+    column-gap: 1.25rem;
+    align-items: start;
+  }
+}

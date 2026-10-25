@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
+import { elegirReproduccion as elegirReproduccionBasquiat } from "./scripts/basquiat/reproduccion.mjs";
 import { elegirReproduccion } from "./scripts/elefantes/reproduccion.mjs";
+import { elegirReproduccion as elegirReproduccionGlenn } from "./scripts/glenn/reproduccion.mjs";
 
 /**
  * Dos destinos:
@@ -12,6 +14,10 @@ const pages = process.env.MANIFESTO_DESTINO === "pages";
 const basePath = pages ? (process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art") : "";
 // Reproducción de Los elefantes para este build (null: la página usa su alternativa)
 const { elegida: reproduccion } = elegirReproduccion();
+// Reproducción de Untitled (Basquiat): al publicar, solo una con licencia (la referencia es local)
+const { elegida: reproduccionBasquiat } = elegirReproduccionBasquiat();
+// Reproducción de Glenn (Basquiat): igual que Untitled, la referencia es solo local
+const { elegida: reproduccionGlenn } = elegirReproduccionGlenn();
 
 const nextConfig: NextConfig = {
   // Next 16 no admite Cache Components (PPR) en una exportación estática
@@ -29,6 +35,10 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_MANIFESTO_ENTRADA: process.env.MANIFESTO_ENTRADA ?? "portada",
     // Solo los datos de la reproducción elegida (ver src/content/elefantes.ts); vacío si no hay
     MANIFESTO_ELEFANTES_REPRODUCCION: reproduccion ? JSON.stringify(reproduccion) : "",
+    // Ídem para Basquiat (ver src/content/basquiat.ts)
+    MANIFESTO_BASQUIAT_REPRODUCCION: reproduccionBasquiat ? JSON.stringify(reproduccionBasquiat) : "",
+    // Ídem para Glenn (ver src/content/glenn.ts)
+    MANIFESTO_GLENN_REPRODUCCION: reproduccionGlenn ? JSON.stringify(reproduccionGlenn) : "",
   },
   ...(pages
     ? {

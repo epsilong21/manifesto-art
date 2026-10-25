@@ -39,6 +39,7 @@ export function ConceptFooter({
 }) {
   const i = CONCEPTOS.findIndex((c) => c.slug === current);
   const next = CONCEPTOS[(i + 1) % CONCEPTOS.length];
+  const relacionada = CONCEPTOS.find((c) => c.slug === CONCEPTOS[i].relacionada);
   return (
     <footer className="mf-footer">
       <Link href={`/conceptos/${next.slug}`} className="mf-footer__next">
@@ -48,8 +49,19 @@ export function ConceptFooter({
         <span className="mf-footer__title">{next.titulo}</span>
         <span className="mf-footer__meta">
           {next.autor}, {next.anio}
+          {relacionada?.slug === next.slug ? " · obra relacionada" : null}
         </span>
       </Link>
+      {relacionada && relacionada.slug !== next.slug ? (
+        <p className="mf-footer__rel">
+          <span className="mf-footer__label">
+            Obra relacionada · {relacionada.numero} / 0{CONCEPTOS.length}
+          </span>{" "}
+          <Link href={`/conceptos/${relacionada.slug}`}>
+            {relacionada.titulo}, {relacionada.autor}, {relacionada.anio}
+          </Link>
+        </p>
+      ) : null}
 
       <div className="mf-footer__cols">
         <div>
@@ -72,7 +84,7 @@ export function ConceptFooter({
           <h2 className="mf-footer__h">MANIFESTO</h2>
           <ul>
             <li>
-              <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"}>Tres obras, tres universos</Link>
+              <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"}>Cinco obras, cinco universos</Link>
             </li>
             {ENTRADA_SELECTOR ? null : (
               <li>
@@ -96,8 +108,9 @@ export function SiteFooter() {
         arte. No es una tienda.
       </p>
       <p>
-        Las reproducciones de Caravaggio y Van Gogh son de obras en dominio público. La composición de
-        Los elefantes es una interpretación gráfica de MANIFESTO, no la pintura de Dalí.
+        Las reproducciones de Caravaggio y Van Gogh son de obras en dominio público. Las imágenes de
+        Los elefantes, Untitled y Glenn son composiciones gráficas de MANIFESTO, no las pinturas de Dalí
+        y Basquiat.
       </p>
     </footer>
   );

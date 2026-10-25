@@ -1,0 +1,30 @@
+{
+  "calibracion": {
+    "width": 2896,
+    "height": 2540,
+    "provisional": false,
+    "nota": "Proporción del lienzo: 289,6 × 254 cm (ancho × alto, lista de préstamos de la Barbican, 2017). Las zonas de los hallazgos y las capas (src/content/glenn.ts) están en fracciones de la imagen, calibradas el 24/10/2026 sobre la referencia de 800 × 705 (lienzo completo, proporción 1,135). Otra reproducción con otro encuadre obliga a recalibrarlas con /conceptos/glenn?calibrar en next dev."
+  },
+  "publica": {
+    "nota": "Hueco para una futura reproducción con licencia de The Estate of Jean-Michel Basquiat (Artestar, Nueva York). Hoy no existe ni el archivo ni la licencia: los campos vacíos impiden usarla. Completarlos solo con los datos de una licencia real.",
+    "archivo": "glenn.jpg",
+    "publicable": true,
+    "width": 0,
+    "height": 0,
+    "sha256": "",
+    "imagen": "",
+    "autorizacion": "",
+    "pie": ""
+  },
+  "referencia": {
+    "nota": "Sin licencia. Solo para desarrollo local: no se publica y el archivo no entra en Git.",
+    "archivo": "glenn-referencia.jpg",
+    "publicable": false,
+    "width": 800,
+    "height": 705,
+    "sha256": "f9c1f93b40a229f17d85b877312b35e30c89d8be488d3ca06b0cc5337ee9822c",
+    "imagen": "Imagen: The Museum of Modern Art, Nueva York (moma.org), página de audio de la obra.",
+    "autorizacion": "Sin licencia de reproducción de The Estate of Jean-Michel Basquiat (Artestar).",
+    "pie": "Reproducción de referencia para desarrollo local, sin licencia de reproducción: no se publica."
+  }
+}

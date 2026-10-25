@@ -1,7 +1,7 @@
-/** Las tres obras de MANIFESTO: catálogo /conceptos, portada y navegación global. */
+/** Las cinco obras de MANIFESTO: catálogo /conceptos, portada y navegación global. */
 
 export type Concepto = {
-  slug: "medusa" | "noche-estrellada" | "los-elefantes";
+  slug: "medusa" | "noche-estrellada" | "los-elefantes" | "basquiat-untitled" | "glenn";
   numero: string;
   titulo: string;
   /** Nombre corto para la navegación. */
@@ -17,6 +17,8 @@ export type Concepto = {
   /** Mecánica principal, como invitación. */
   interaccion: string;
   descripcion: string;
+  /** Otra obra con la que dialoga (p. ej. del mismo artista): el pie de la obra la enlaza. */
+  relacionada?: Concepto["slug"];
 };
 
 export const CONCEPTOS: Concepto[] = [
@@ -61,5 +63,35 @@ export const CONCEPTOS: Concepto[] = [
     interaccion: "Descifra sus cinco misterios.",
     descripcion:
       "Toneladas sobre patas de alambre. Recorre la pintura en cinco capítulos: escala, equilibrio, obeliscos, peso y vacío.",
+  },
+  {
+    slug: "basquiat-untitled",
+    numero: "04",
+    titulo: "Untitled",
+    corto: "Untitled",
+    autor: "Jean-Michel Basquiat",
+    anio: "1981",
+    idea: "Identidad, anatomía y ruido",
+    pregunta: "¿Es un cráneo, un rostro o una máscara?",
+    gesto: "Examinar",
+    interaccion: "Examina la cabeza capa a capa.",
+    descripcion:
+      "Una cabeza llena de ruido. Separa sus cuatro capas, abre cinco hallazgos y decide cuál de las tres lecturas te convence.",
+    relacionada: "glenn",
+  },
+  {
+    slug: "glenn",
+    numero: "05",
+    titulo: "Glenn",
+    corto: "Glenn",
+    autor: "Jean-Michel Basquiat",
+    anio: "1984–1985",
+    idea: "Máscara, copia y archivo",
+    pregunta: "¿Es un retrato, una máscara o un archivo?",
+    gesto: "Ampliar",
+    interaccion: "Amplía la máscara y fotocopia el muro.",
+    descripcion:
+      "Una máscara negra sobre un muro de fotocopias. Abre cinco hallazgos, separa figura y fondo, pásala por la fotocopiadora y elige entre tres lecturas.",
+    relacionada: "basquiat-untitled",
   },
 ];

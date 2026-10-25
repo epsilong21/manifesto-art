@@ -1,0 +1,386 @@
+/* ─────────────────────────────────────────────────────────────
+   04 · BASQUIAT — 02 · ¿Qué estamos mirando? y 03 · El expediente (P3)
+   Las lecturas se eligen con radios nativos y :has(): sin JavaScript.
+   Sin :has(), todas las lecturas se muestran seguidas. Sin animaciones.
+   ───────────────────────────────────────────────────────────── */
+
+.bq-lecturas,
+.bq-expediente {
+  padding: clamp(3rem, 8vw, 6rem) var(--mf-gutter) clamp(3rem, 7vw, 5rem);
+  border-top: 1px solid var(--c-line);
+}
+
+/* ── Selector de lecturas ── */
+
+.bq-mirar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.bq-mirar__op { position: relative; display: grid; }
+.bq-mirar__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.bq-mirar label {
+  display: grid;
+  align-content: center;
+  gap: 0.2rem;
+  min-height: 4.25rem;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid var(--c-line);
+  cursor: pointer;
+}
+.bq-mirar__n {
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(1.15rem, 4.5vw, 1.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.bq-mirar__lema {
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: var(--bq-salmon);
+}
+.bq-mirar__input:checked + label {
+  border-color: var(--bq-amarillo);
+  background: rgb(240 197 58 / 0.08);
+  box-shadow: inset 0 -4px 0 var(--bq-amarillo);
+}
+.bq-mirar__input:focus-visible + label { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+@media (hover: hover) {
+  .bq-mirar label:hover { border-color: var(--c-ink); }
+}
+
+/* ── Las vistas: sin :has, todas seguidas; con :has, solo la elegida ── */
+
+.bq-vistas { display: grid; gap: clamp(2.5rem, 6vw, 4rem); }
+.bq-vistas__inicio { display: none; margin: 0; max-width: 40rem; color: var(--c-muted); }
+@supports selector(:has(*)) {
+  .bq-vistas__inicio { display: block; }
+  .bq-lecturas:has(.bq-mirar__input:checked) .bq-vistas__inicio { display: none; }
+  .bq-vista { display: none !important; }
+  .bq-lecturas:has(#bq-l-craneo:checked) .bq-vista[data-vista="craneo"],
+  .bq-lecturas:has(#bq-l-rostro:checked) .bq-vista[data-vista="rostro"],
+  .bq-lecturas:has(#bq-l-mascara:checked) .bq-vista[data-vista="mascara"],
+  .bq-lecturas:has(#bq-l-tres:checked) .bq-vista[data-vista="tres"] { display: grid !important; }
+}
+
+.bq-vista {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+}
+.bq-vista__k {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  color: var(--bq-salmon);
+}
+.bq-vista__t {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+.bq-vista__lema {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.42em;
+  line-height: 1.1;
+  text-transform: none;
+  color: var(--c-muted);
+}
+
+/* Detalle de la pintura: un encuadre, nunca una alteración */
+.bq-recorte { margin: 0; width: min(100%, 34rem, 62svh); }
+.bq-recorte__marco {
+  position: relative;
+  overflow: hidden;
+  background: #0b0a09;
+  box-shadow: 0 0 0 1px rgb(237 230 214 / 0.12);
+}
+.bq-recorte__marco img { position: absolute; max-width: none; }
+.bq-recorte figcaption {
+  margin-top: 0.5rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+/* Observación, interpretación y documento: etiqueta y filete propios (no solo color) */
+.bq-bloques { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; max-width: 40rem; }
+.bq-bloques li { padding-left: 0.9rem; border-left: 3px solid var(--c-line); font-size: 1rem; line-height: 1.5; }
+.bq-bloques li[data-tipo="observacion"] { border-left-color: var(--c-ink); }
+.bq-bloques li[data-tipo="lectura"] { border-left-style: dashed; border-left-color: var(--bq-salmon); }
+.bq-bloques li[data-tipo="hecho"] { border-left-color: var(--bq-azul); }
+.bq-bloques p { margin: 0; }
+
+.bq-limite {
+  max-width: 40rem;
+  margin: 1.5rem 0 0;
+  padding: 0.9rem 1rem;
+  border: 1px dashed var(--bq-amarillo);
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+  line-height: 1.3;
+}
+.bq-limite__k {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-style: normal;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bq-amarillo);
+}
+
+/* ── Las tres a la vez: el ciclo de límites ── */
+
+.bq-sintesis__entrada { margin: 0; max-width: 40rem; font-size: 1rem; line-height: 1.5; color: var(--c-muted); }
+.bq-ciclo {
+  display: grid;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ciclo;
+}
+.bq-ciclo li {
+  position: relative;
+  padding-top: 0.9rem;
+  border-top: 3px solid var(--c-line);
+}
+.bq-ciclo .bq-recorte { width: min(100%, 14rem); margin-bottom: 0.9rem; }
+.bq-ciclo p { margin: 0; }
+.bq-ciclo__k {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-ciclo__tropieza {
+  margin: 0.5rem 0 !important;
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+.bq-ciclo__explica { font-size: 0.9375rem; }
+.bq-ciclo__explica strong { color: var(--bq-amarillo); }
+.bq-ciclo__vuelta { color: var(--c-muted); }
+/* Flechas del ciclo: hacia abajo en una columna, hacia la derecha en tres */
+.bq-ciclo li:not(:last-child)::after {
+  content: "↓";
+  position: absolute;
+  left: 0;
+  bottom: -1.45rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--bq-amarillo);
+}
+
+.bq-sintesis__cierre { display: grid; gap: 0.9rem; max-width: 46rem; }
+.bq-conclusion {
+  margin: 0;
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.35rem, 4.5vw, 2rem);
+  line-height: 1.25;
+}
+.bq-titulo2 {
+  margin: 0;
+  padding-left: 0.9rem;
+  border-left: 4px solid var(--bq-amarillo);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* ── El expediente ── */
+
+.bq-exp__claves {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 clamp(1.5rem, 5vw, 3rem);
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--c-line);
+  list-style: none;
+  font-size: 0.875rem;
+  color: var(--c-muted);
+}
+/* Etiqueta | descripción: las cuatro claves con el mismo ritmo, también en móvil */
+.bq-exp__claves li {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  align-items: baseline;
+  justify-items: start;
+  gap: 0.6rem;
+}
+.bq-cotejo {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border: 1px dashed var(--bq-salmon);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--c-ink);
+}
+
+.bq-exp__grid { display: grid; gap: clamp(2rem, 5vw, 3rem); }
+.bq-exp__h {
+  margin: 0 0 1rem;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: 1.375rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.bq-exp__nota { margin: 1rem 0 0.5rem; font-size: 0.9375rem; line-height: 1.5; }
+
+.bq-crono { margin: 0; padding: 0; list-style: none; }
+.bq-crono li {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--c-line);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.bq-crono p { margin: 0; }
+/* En una columna, la fuente siempre en su propia línea: los nueve hitos con el mismo ritmo */
+@media (max-width: 63.99rem) {
+  .bq-crono .bq-meta { row-gap: 0.15rem; }
+  .bq-crono .bq-meta > span:last-child { flex-basis: 100%; }
+}
+.bq-crono__cuando {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--bq-amarillo);
+}
+
+.bq-exp__mas { margin-top: clamp(2rem, 5vw, 3rem); border-top: 3px solid var(--c-line); }
+.bq-exp__mas summary {
+  display: grid;
+  gap: 0.2rem;
+  min-height: 44px;
+  padding: 0.9rem 2rem 0.9rem 0;
+  position: relative;
+  cursor: pointer;
+  list-style: none;
+}
+.bq-exp__mas summary::-webkit-details-marker { display: none; }
+.bq-exp__mas summary::after {
+  content: "+";
+  position: absolute;
+  right: 0.25rem;
+  top: 0.75rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--bq-amarillo);
+}
+.bq-exp__mas[open] summary::after { content: "−"; }
+.bq-exp__mas-t {
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: 1.375rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.bq-exp__mas-d { font-size: 0.875rem; color: var(--c-muted); }
+/* La cronología plegada es una columna del expediente: sin el margen superior del bloque de fuentes */
+.bq-exp__crono.bq-exp__mas { margin-top: 0; }
+h3.bq-exp__mas-t { margin: 0; }
+.bq-exp__pie { display: grid; gap: clamp(2rem, 5vw, 3rem); margin-top: 1rem; }
+.bq-exp__grupo + .bq-exp__grupo { margin-top: 1.25rem; }
+.bq-exp__grupo h4 {
+  margin: 0;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.bq-exp__grupo-nota { margin: 0.2rem 0 0.5rem; font-size: 0.8125rem; color: var(--c-muted); }
+.bq-exp__grupo ul,
+.bq-exp__creditos ul { display: grid; gap: 0.55rem; margin: 0; padding: 0; list-style: none; font-size: 0.9375rem; line-height: 1.45; }
+.bq-exp__grupo li { display: grid; gap: 0.1rem; }
+.bq-exp__grupo a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--bq-azul);
+  text-underline-offset: 0.25em;
+}
+.bq-exp__titulo { font-weight: 600; }
+.bq-exp__detalle { font-size: 0.8125rem; color: var(--c-muted); }
+.bq-exp__creditos li { padding-left: 0.75rem; border-left: 2px solid var(--c-line); color: var(--c-muted); }
+
+/* ── Tamaños ── */
+
+@media (min-width: 36rem) {
+  .bq-crono li { grid-template-columns: 8rem minmax(0, 1fr); gap: 1rem; }
+}
+@media (min-width: 48rem) {
+  .bq-ciclo { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.5rem; }
+  .bq-ciclo li:not(:last-child)::after { content: "→"; left: auto; right: -1.75rem; bottom: auto; top: 45%; }
+  /*
+   * Tres columnas alineadas por filas: detalle (imagen + pie), pregunta, tropiezo y
+   * explicación comparten fila con sus vecinas aunque un pie ocupe dos líneas.
+   * Sin alturas fijas; sin subgrid, cada columna fluye por su cuenta.
+   */
+  @supports (grid-template-rows: subgrid) {
+    .bq-ciclo { row-gap: 0; }
+    .bq-ciclo li {
+      display: grid;
+      grid-row: span 4;
+      grid-template-rows: subgrid;
+      row-gap: 0.5rem;
+      align-content: start;
+    }
+    .bq-ciclo .bq-recorte { margin-bottom: 0.4rem; }
+    .bq-ciclo__tropieza { margin: 0 !important; }
+  }
+  .bq-exp__claves { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 64rem) {
+  .bq-mirar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .bq-vista { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+  .bq-vista.bq-sintesis { grid-template-columns: minmax(0, 1fr); }
+  .bq-exp__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: clamp(2.5rem, 5vw, 5rem); }
+  .bq-exp__pie { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: clamp(2.5rem, 5vw, 5rem); }
+}

@@ -2,15 +2,19 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ConceptHeader, SiteFooter } from "@/components/concepts/ConceptChrome";
+import { BasquiatGrafico } from "@/components/concepts/BasquiatGrafico";
 import { ElefantesGrafico } from "@/components/concepts/ElefantesGrafico";
+import { GlennGrafico } from "@/components/concepts/GlennGrafico";
 import { CONCEPTOS } from "@/content/conceptos";
+import { bricolage } from "@/lib/fonts/bricolage";
+import { plexMono } from "@/lib/fonts/plexmono";
 import ConceptosPage, { metadata as metadataSelector } from "./conceptos/page";
 import "./conceptos/conceptos.css";
 import "./portada.css";
 
 /**
  * Publicación simplificada (MANIFESTO_ENTRADA=selector, p. ej. en GitHub Pages):
- * la entrada es directamente el selector «Tres obras. Tres universos.».
+ * la entrada es directamente el selector «Cinco obras. Cinco universos.».
  */
 const entradaSelector = process.env.MANIFESTO_ENTRADA === "selector";
 
@@ -21,8 +25,10 @@ export const metadata: Metadata = entradaSelector ? { ...metadataSelector, alter
 const FRAGMENTO: Record<string, { src: string; width: number; height: number } | null> = {
   medusa: { src: "/obras/medusa.jpg", width: 2400, height: 2350 },
   "noche-estrellada": { src: "/obras/noche-estrellada.jpg", width: 3000, height: 2376 },
-  // Dalí: obra protegida. La mirilla muestra la composición propia de MANIFESTO.
+  // Dalí y Basquiat: obras protegidas. La mirilla muestra la composición propia de MANIFESTO.
   "los-elefantes": null,
+  "basquiat-untitled": null,
+  glenn: null,
 };
 
 const PASOS = [
@@ -32,7 +38,7 @@ const PASOS = [
   },
   {
     titulo: "Usa el gesto que propone",
-    texto: "Inclina el escudo de Medusa, observa cómo se mueve el cielo de Van Gogh o descifra los cinco misterios de Dalí.",
+    texto: "Inclina el escudo de Medusa, observa cómo se mueve el cielo de Van Gogh, descifra los cinco misterios de Dalí, examina la cabeza de Basquiat capa a capa o amplía la máscara de Glenn.",
   },
   {
     titulo: "Separa lo que se sabe de lo que se interpreta",
@@ -43,7 +49,7 @@ const PASOS = [
 export default function Portada() {
   if (entradaSelector) return <ConceptosPage />;
   return (
-    <div className="mf-theme theme-selector hm">
+    <div className={`mf-theme theme-selector hm ${bricolage.variable} ${plexMono.variable}`}>
       <ConceptHeader />
       <main>
         <section className="hm-hero" aria-labelledby="hm-t">
@@ -64,7 +70,7 @@ export default function Portada() {
                   <path d="M0 5h16M12 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" />
                 </svg>
               </Link>
-              <p className="hm-cuenta">Caravaggio, Van Gogh y Dalí: tres obras, tres maneras de entrar.</p>
+              <p className="hm-cuenta">Caravaggio, Van Gogh, Dalí y dos veces Basquiat: cinco obras, cinco maneras de entrar.</p>
             </div>
           </div>
 
@@ -85,6 +91,10 @@ export default function Portada() {
                           sizes="(min-width: 64rem) 28vw, 60vw"
                           quality={70}
                         />
+                      ) : c.slug === "basquiat-untitled" ? (
+                        <BasquiatGrafico className="hm-grafico" />
+                      ) : c.slug === "glenn" ? (
+                        <GlennGrafico className="hm-grafico" />
                       ) : (
                         <ElefantesGrafico id="hm-eg" className="hm-grafico" />
                       )}
@@ -100,8 +110,8 @@ export default function Portada() {
             })}
           </ul>
           <p className="hm-nota">
-            Fragmentos de Medusa y La noche estrellada. La tercera mirilla es una composición de MANIFESTO
-            sobre Los elefantes, no la pintura de Dalí.
+            Fragmentos de Medusa y La noche estrellada. Las otras tres mirillas son composiciones de
+            MANIFESTO sobre Los elefantes, Untitled y Glenn, no las pinturas de Dalí y Basquiat.
           </p>
         </section>
 
@@ -118,7 +128,7 @@ export default function Portada() {
             ))}
           </ol>
           <Link href="/conceptos" className="hm-volver">
-            Ver las tres obras
+            Ver las cinco obras
           </Link>
         </section>
       </main>

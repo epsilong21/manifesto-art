@@ -132,7 +132,7 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: clamp(0.6rem, 2.4vw, 1.5rem);
   /* La línea de horizonte: todas las mirillas se apoyan en ella */
   background: linear-gradient(var(--c-line), var(--c-line)) no-repeat 0 var(--hm-alto) / 100% 1px;
@@ -145,6 +145,8 @@
 .hm-mirilla[data-obra="medusa"] { --h: 0.84; --acento: #e5636d; }
 .hm-mirilla[data-obra="noche-estrellada"] { --h: 1; --acento: #e0aa45; }
 .hm-mirilla[data-obra="los-elefantes"] { --h: 0.72; --acento: #dc9b65; }
+.hm-mirilla[data-obra="basquiat-untitled"] { --h: 0.9; --acento: #f0c53a; }
+.hm-mirilla[data-obra="glenn"] { --h: 0.78; --acento: #a8f5d0; }
 
 .hm-mirilla__link {
   display: grid;

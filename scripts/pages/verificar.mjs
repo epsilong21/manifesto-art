@@ -1,17 +1,25 @@
 // Verifica una exportación estática antes de publicarla.
-// Uso: node scripts/pages/verificar.mjs <out> [basePath] [--elefantes=<nombre>] [--publicacion]
+// Uso: node scripts/pages/verificar.mjs <out> [basePath] [--elefantes=<nombre>] [--basquiat=<nombre>] [--glenn=<nombre>] [--publicacion]
 // Con --elefantes, la exportación debe incluir las variantes de esa reproducción
 // de la pintura de Dalí; sin él, no puede quedar ningún rastro de ninguna.
 // La reproducción de referencia (sin licencia) solo se admite sin --publicacion,
 // y con cualquier otra no puede quedar ningún rastro de ella.
+// --basquiat funciona igual para Untitled (Basquiat), cuya referencia nunca es publicable,
+// y --glenn, para Glenn (Basquiat), ídem.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import { REPRODUCCIONES as REPRODUCCIONES_BASQUIAT } from "../basquiat/reproduccion.mjs";
 import { REPRODUCCIONES } from "../elefantes/reproduccion.mjs";
+import { REPRODUCCIONES as REPRODUCCIONES_GLENN } from "../glenn/reproduccion.mjs";
 
 const args = process.argv.slice(2);
 const elefantes = args.find((a) => a.startsWith("--elefantes="))?.slice("--elefantes=".length);
+const basquiat = args.find((a) => a.startsWith("--basquiat="))?.slice("--basquiat=".length);
+const glenn = args.find((a) => a.startsWith("--glenn="))?.slice("--glenn=".length);
 const publicacion = args.includes("--publicacion");
 const conReferencia = elefantes === "los-elefantes-referencia";
+const basquiatReferencia = basquiat === "basquiat-untitled-referencia";
+const glennReferencia = glenn === "glenn-referencia";
 const [out = "out", base = "/manifesto-art"] = args.filter((a) => !a.startsWith("--"));
 const errores = [];
 const archivos = [];
@@ -24,10 +32,17 @@ const recorre = (dir) => {
 };
 recorre(out);
 
-// 1. Las cinco rutas públicas y la página 404
-const RUTAS = ["", "conceptos/", "conceptos/medusa/", "conceptos/noche-estrellada/", "conceptos/los-elefantes/"];
+// 1. Las siete rutas públicas (entrada, catálogo y las cinco obras) y la página 404
+const RUTAS = ["", "conceptos/", "conceptos/medusa/", "conceptos/noche-estrellada/", "conceptos/los-elefantes/", "conceptos/basquiat-untitled/", "conceptos/glenn/"];
 for (const r of RUTAS) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
 if (!existsSync(join(out, "404.html"))) errores.push("Falta 404.html");
+// La entrada y el catálogo enlazan las cinco obras
+for (const r of ["", "conceptos/"]) {
+  const p = join(out, r, "index.html");
+  if (!existsSync(p)) continue;
+  const t = readFileSync(p, "utf8");
+  for (const o of RUTAS.slice(2)) if (!t.includes(`href="${base}/${o}"`)) errores.push(`/${r} no enlaza /${o}`);
+}
 
 // 2. Nada ajeno al sitio: ni originales (/obras), ni Dante, ni carpetas internas
 const PROHIBIDO = /(barca-de-dante|prototipos|presentation-review|assets-source|qa-reports|\.map$|^obras\/)/;
@@ -46,6 +61,30 @@ if (!conReferencia) {
 if (!elefantes) {
   for (const a of archivos) if (/^img\/los-elefantes/.test(a)) errores.push(`Archivo no permitido: ${a}`);
   for (const [a, t] of textos) if (/\/obras\/los-elefantes|img\/los-elefantes/.test(t)) errores.push(`${a} referencia una reproducción de Dalí`);
+}
+
+// 2c. La pintura de Basquiat: lo mismo, y su referencia nunca sale al publicar
+if (publicacion && basquiatReferencia && !REPRODUCCIONES_BASQUIAT.referencia.publicable) errores.push("La reproducción de referencia de Basquiat no se puede publicar");
+if (basquiat && !archivos.some((a) => new RegExp(`^img/${basquiat}-\\d+\\.webp$`).test(a))) errores.push("Faltan las variantes de la pintura de Basquiat");
+if (!basquiatReferencia) {
+  for (const a of archivos) if (/basquiat-untitled-referencia/.test(a)) errores.push(`Archivo no permitido: ${a}`);
+  for (const [a, t] of textos) if (/basquiat-untitled-referencia|thebroad\.org\/sites\/default\/files/.test(t)) errores.push(`${a} contiene datos de la reproducción de referencia de Basquiat`);
+}
+if (!basquiat) {
+  for (const a of archivos) if (/^img\/basquiat/.test(a)) errores.push(`Archivo no permitido: ${a}`);
+  for (const [a, t] of textos) if (/\/obras\/basquiat|img\/basquiat/.test(t)) errores.push(`${a} referencia una reproducción de Basquiat`);
+}
+
+// 2d. La pintura de Glenn: lo mismo, y su referencia nunca sale al publicar
+if (publicacion && glennReferencia && !REPRODUCCIONES_GLENN.referencia.publicable) errores.push("La reproducción de referencia de Glenn no se puede publicar");
+if (glenn && !archivos.some((a) => new RegExp(`^img/${glenn}-\\d+\\.webp$`).test(a))) errores.push("Faltan las variantes de la pintura de Glenn");
+if (!glennReferencia) {
+  for (const a of archivos) if (/glenn-referencia/.test(a)) errores.push(`Archivo no permitido: ${a}`);
+  for (const [a, t] of textos) if (/glenn-referencia/.test(t)) errores.push(`${a} contiene datos de la reproducción de referencia de Glenn`);
+}
+if (!glenn) {
+  for (const a of archivos) if (/^img\/glenn/.test(a)) errores.push(`Archivo no permitido: ${a}`);
+  for (const [a, t] of textos) if (/\/obras\/glenn|img\/glenn/.test(t)) errores.push(`${a} referencia una reproducción de Glenn`);
 }
 
 // 3. Ninguna página enlaza la reproducción de Dalí ni a Dante

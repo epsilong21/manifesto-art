@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { PointerEvent } from "react";
+import { BasquiatGrafico } from "@/components/concepts/BasquiatGrafico";
 import { ElefantesGrafico } from "@/components/concepts/ElefantesGrafico";
+import { GlennGrafico } from "@/components/concepts/GlennGrafico";
 import { CONCEPTOS } from "@/content/conceptos";
 
 const ART: Record<string, { src: string; width: number; height: number } | null> = {
@@ -11,12 +13,18 @@ const ART: Record<string, { src: string; width: number; height: number } | null>
   "noche-estrellada": { src: "/obras/noche-estrellada.jpg", width: 3000, height: 2376 },
   // Dalí: sin reproducción (obra protegida). El arte del panel es propio.
   "los-elefantes": null,
+  // Basquiat: obra protegida y sin licencia. Composición tipográfica propia, sin la pintura.
+  "basquiat-untitled": null,
+  // Glenn: también protegida. Composición propia (retícula de copias y tres lecturas)
+  glenn: null,
 };
 
 const MOD: Record<string, string> = {
   medusa: "sel-item--medusa",
   "noche-estrellada": "sel-item--noche",
   "los-elefantes": "sel-item--elefantes",
+  "basquiat-untitled": "sel-item--basquiat",
+  glenn: "sel-item--glenn",
 };
 
 /** El arte de cada entrada sigue al puntero con un leve desplazamiento (solo ratón). */
@@ -33,7 +41,7 @@ function reset(e: PointerEvent<HTMLLIElement>) {
 
 export function SelectorList() {
   return (
-    <ol className="sel-list" aria-label="Las tres obras">
+    <ol className="sel-list" aria-label="Las cinco obras">
       {CONCEPTOS.map((c, i) => {
         const art = ART[c.slug];
         return (
@@ -56,6 +64,10 @@ export function SelectorList() {
                   loading={i === 0 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : "auto"}
                 />
+              ) : c.slug === "basquiat-untitled" ? (
+                <BasquiatGrafico className="sel-grafico" />
+              ) : c.slug === "glenn" ? (
+                <GlennGrafico className="sel-grafico" />
               ) : (
                 <ElefantesGrafico id="sel-eg" className="sel-grafico" />
               )}
@@ -82,6 +94,10 @@ export function SelectorList() {
               <p className="sel-gesto">{c.interaccion}</p>
               {c.slug === "los-elefantes" ? (
                 <p className="sel-nota">Imagen: composición gráfica de MANIFESTO, no la pintura de Dalí.</p>
+              ) : c.slug === "basquiat-untitled" ? (
+                <p className="sel-nota">Imagen: composición tipográfica de MANIFESTO, no la pintura de Basquiat.</p>
+              ) : c.slug === "glenn" ? (
+                <p className="sel-nota">Imagen: composición gráfica de MANIFESTO, no la pintura de Basquiat.</p>
               ) : null}
               <Link href={`/conceptos/${c.slug}`} className="sel-link">
                 Entrar en {c.titulo}
