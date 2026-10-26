@@ -362,3 +362,181 @@ div.bq-acetato { cursor: inherit; }
   .bq-acetato,
   .bq-acetato__pestana { transition: none; }
 }
+
+/* ── Rayos X: la pila de frente; la lente deja ver la Anatomía ── */
+
+.bq-lab__escena[data-rayos] { cursor: none; touch-action: none; }
+.bq-lab__pila[data-rayos] {
+  --rr: clamp(52px, 13vmin, 110px);
+  --c-rx: #bfe6ff;
+}
+.bq-lab__pila[data-rayos] .bq-acetato:not([data-capa="anatomia"]) {
+  -webkit-mask-image: radial-gradient(circle var(--rr) at var(--mx) var(--my), transparent 97%, #000 100%);
+  mask-image: radial-gradient(circle var(--rr) at var(--mx) var(--my), transparent 97%, #000 100%);
+}
+.bq-lab__pila[data-rayos] .bq-acetato[data-capa="anatomia"] {
+  --c: var(--c-rx);
+  background: rgb(120 190 255 / 0.1);
+  -webkit-mask-image: radial-gradient(circle var(--rr) at var(--mx) var(--my), #000 97%, transparent 100%);
+  mask-image: radial-gradient(circle var(--rr) at var(--mx) var(--my), #000 97%, transparent 100%);
+}
+.bq-lab__pila[data-rayos] .bq-acetato[data-capa="anatomia"] .bq-esq { filter: drop-shadow(0 0 5px rgb(150 210 255 / 0.9)); }
+.bq-lab__pila[data-rayos] .bq-esq__num,
+.bq-lab__pila[data-rayos] .bq-acetato__pestana { visibility: hidden; }
+.bq-lab__lente {
+  position: absolute;
+  left: var(--mx);
+  top: var(--my);
+  width: calc(var(--rr) * 2);
+  aspect-ratio: 1;
+  border: 1.5px solid var(--c-rx);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.6), 0 0 30px rgb(150 210 255 / 0.35), inset 0 0 30px rgb(150 210 255 / 0.25);
+  transform: translate(-50%, -50%) translateZ(12px);
+  pointer-events: none;
+}
+.bq-lab__lente::before,
+.bq-lab__lente::after {
+  content: "";
+  position: absolute;
+  background: var(--c-rx);
+  opacity: 0.7;
+}
+.bq-lab__lente::before { left: 50%; top: -10px; width: 1px; height: 18px; }
+.bq-lab__lente::after { top: 50%; left: -10px; height: 1px; width: 18px; }
+.bq-lab__boton--rayos { background: transparent; border-color: #8fcfff; color: #bfe6ff; }
+.bq-lab__boton--rayos[aria-pressed="true"] { background: #bfe6ff; color: #0d0c0b; }
+.bq-lab__boton:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Ruido interior: dentro de la bóveda del acetato de Anatomía ── */
+
+.bq-ruido {
+  position: absolute;
+  left: 28%;
+  top: 16%;
+  width: 44%;
+  height: 32%;
+  clip-path: ellipse(50% 50% at 50% 55%);
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 0.6s;
+  pointer-events: none;
+}
+.bq-ruido[data-activo] { opacity: 1; }
+
+/* ── Cinco hallazgos ── */
+
+.bq-lab__k {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-lab__hallazgos ol { display: grid; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.bq-lab__hallazgos button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.6rem 0.35rem 0.35rem;
+  border: 1px solid transparent;
+  border-bottom-color: var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+}
+.bq-lab__hallazgos button[aria-pressed="true"] { border-color: var(--bq-salmon); background: rgb(243 166 143 / 0.1); }
+.bq-lab__hallazgos button:focus-visible { outline: 2px solid var(--bq-amarillo); outline-offset: 2px; }
+.bq-lab__mas {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1.5px solid var(--bq-salmon);
+  color: var(--bq-salmon);
+  font-weight: 700;
+  transition: background 0.3s, color 0.3s;
+}
+.bq-lab__hallazgos button[aria-pressed="true"] .bq-lab__mas { background: var(--bq-salmon); color: #121110; }
+.bq-lab__pregunta { font-family: var(--font-bodoni), Georgia, serif; font-style: italic; font-size: 1.05rem; color: var(--bq-salmon); }
+.bq-lab__fpregunta {
+  margin: 0 0 0.25rem !important;
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  color: var(--bq-salmon);
+}
+.bq-lab__entradas { display: grid; gap: 0.75rem; margin: 0.9rem 0 0; padding: 0; list-style: none; }
+.bq-lab__entradas li { padding-left: 0.75rem; border-left: 2px solid var(--c-line); }
+.bq-lab__entradas p { margin: 0; line-height: 1.5; }
+.bq-lab__rayos-dato { margin-top: 0.75rem; padding-left: 0.75rem; border-left: 2px solid #bfe6ff; }
+.bq-lab__rayos-dato p { margin: 0; line-height: 1.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bq-ruido,
+  .bq-lab__mas { transition: none; }
+}
+
+/* ── 02 · Tres lecturas: el contorno que se transforma ── */
+
+.bq-lecturas__cuerpo[data-figura] { display: grid; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+@media (min-width: 64rem) {
+  .bq-lecturas__cuerpo[data-figura] { grid-template-columns: minmax(16rem, 0.75fr) minmax(0, 1.25fr); }
+  .bq-lecturas__cuerpo[data-figura] .bq-contorno { position: sticky; top: 5.5rem; }
+}
+.bq-contorno {
+  position: relative;
+  width: min(100%, 26rem);
+  margin-inline: auto;
+  padding: 1rem 1rem 2.5rem;
+  border: 1px solid var(--c-line);
+  background:
+    radial-gradient(70% 60% at 50% 40%, rgb(240 197 58 / 0.06), transparent 70%),
+    #0d0c0b;
+}
+@media (max-width: 63.99rem) {
+  .bq-contorno { width: min(100%, 20rem); }
+}
+.bq-contorno svg { display: block; width: 100%; height: auto; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.bq-contorno__principal path { stroke: #8f887a; stroke-width: 4; }
+.bq-contorno__principal [data-parte="boca"],
+.bq-contorno__principal [data-parte^="ojo"] { stroke-width: 3; }
+.bq-contorno__fantasma { visibility: hidden; opacity: 0; stroke-width: 2; stroke-dasharray: 6 6; }
+.bq-contorno[data-vista="tres"] .bq-contorno__principal { opacity: 0; }
+.bq-contorno__nombre {
+  margin: 0.5rem 0 0;
+  text-align: center;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  text-transform: uppercase;
+}
+.bq-contorno__nombre span { display: none; }
+.bq-contorno[data-vista="craneo"] [data-de="craneo"],
+.bq-contorno[data-vista="rostro"] [data-de="rostro"],
+.bq-contorno[data-vista="mascara"] [data-de="mascara"],
+.bq-contorno[data-vista="tres"] [data-de="tres"],
+.bq-contorno[data-vista="neutra"] [data-de="neutra"] { display: inline; }
+.bq-contorno[data-vista="neutra"] .bq-contorno__nombre { color: var(--c-muted); font-size: 1.25rem; }
+.bq-contorno__aviso {
+  position: absolute;
+  left: 0.9rem;
+  bottom: 0.7rem;
+  margin: 0;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(237 230 214 / 0.45);
+}
+/* Sin recortes de la pintura, el texto de cada lectura ocupa toda su columna */
+.bq-lecturas__cuerpo[data-figura] .bq-vista { grid-template-columns: minmax(0, 1fr); max-width: 46rem; }

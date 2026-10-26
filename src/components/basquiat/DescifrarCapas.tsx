@@ -41,9 +41,8 @@ export function DescifrarCapas({ conImagen }: { conImagen: boolean }) {
           <LaboratorioAcetatos />
           <noscript>
             <style>{".bq-lab__mandos{display:none}"}</style>
-            <CapasTexto sinObra partes="capas" />
+            <CapasTexto sinObra />
           </noscript>
-          <CapasTexto partes="hallazgos" />
         </>
       )}
     </section>

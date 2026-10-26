@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import { KindTag } from "@/components/concepts/ConceptChrome";
-import { CAPAS, type CapaId } from "@/content/basquiat-capas";
+import { CAPAS, HALLAZGOS, type CapaId, type Hallazgo } from "@/content/basquiat-capas";
 import { PlanoCabeza } from "./EsquemaCabeza";
+import { RuidoInterior } from "./RuidoInterior";
 
 /** Giro de partida: la pila vista desde arriba y de lado, para que se lea la profundidad. */
 const GIRO_INICIAL = { x: -16, y: -30 };
@@ -19,6 +20,12 @@ const limitar = (v: number, max: number) => Math.max(-max, Math.min(max, v));
  * deslizador), se elige uno tocándolo o desde los mandos y la pila gira al
  * arrastrar o con las flechas. La luz sigue al puntero sobre la escena.
  *
+ * - Rayos X: la pila se pone de frente y una lente que sigue al puntero (o al dedo,
+ *   o a las flechas) deja ver la Anatomía a través de las otras tres capas.
+ * - Cinco hallazgos: cada uno coloca la pila (capa, separación, giro) y abre su ficha.
+ * - Ruido interior (RuidoInterior): estática dentro de la bóveda, con la Anatomía,
+ *   los rayos X o el hallazgo 4.
+ *
  * - `hero`: versión decorativa del hero, sin mandos; se abre sola al montarse y solo
  *   responde al puntero con la inclinación y la luz.
  * - Sin JavaScript, la pila queda junta y quieta; los textos están en <noscript>.
@@ -28,6 +35,10 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
   const [sep, setSep] = useState(hero ? 0 : 0.6);
   const [sel, setSel] = useState<CapaId | null>(null);
   const [elemento, setElemento] = useState<number | null>(null);
+  const [hallazgo, setHallazgo] = useState<number | null>(null);
+  const [rayos, setRayos] = useState(false);
+  const giroPrevio = useRef(GIRO_INICIAL);
+  const lente = useRef({ x: 50, y: 42 });
   const escena = useRef<HTMLDivElement>(null);
   const pilaRef = useRef<HTMLDivElement>(null);
   // El giro va directo al estilo de la pila: arrastrar no vuelve a pintar los acetatos
@@ -57,8 +68,24 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
     return r;
   };
 
+  /** La lente de rayos X, en % de la pila (de frente, la pila no está girada). */
+  const moverLente = (x: number, y: number) => {
+    lente.current = { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
+    pilaRef.current?.style.setProperty("--mx", `${lente.current.x.toFixed(1)}%`);
+    pilaRef.current?.style.setProperty("--my", `${lente.current.y.toFixed(1)}%`);
+  };
+  const lenteEn = (e: PointerEvent<HTMLDivElement>) => {
+    const r = pilaRef.current?.getBoundingClientRect();
+    if (r) moverLente(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
+  };
+
   const abajo = (e: PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
+    if (rayos) {
+      escena.current?.setPointerCapture(e.pointerId);
+      lenteEn(e);
+      return;
+    }
     suprimirClic.current = false;
     gesto.current = { id: e.pointerId, x: e.clientX, y: e.clientY, giro: giro.current, movido: false };
   };
@@ -73,6 +100,10 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
         const ny = (e.clientY - r.top) / r.height - 0.5;
         setGiro({ x: GIRO_INICIAL.x - ny * 14, y: GIRO_INICIAL.y + nx * 24 });
       }
+      return;
+    }
+    if (rayos) {
+      if (e.pointerType === "mouse" || e.buttons & 1) lenteEn(e);
       return;
     }
     if (!g || g.id !== e.pointerId) return;
@@ -100,6 +131,13 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
   const teclas = (e: KeyboardEvent<HTMLDivElement>) => {
     const paso = e.shiftKey ? 15 : 5;
     const k = e.key;
+    if (rayos && k.startsWith("Arrow")) {
+      const { x, y } = lente.current;
+      const d = e.shiftKey ? 10 : 4;
+      moverLente(x + (k === "ArrowRight" ? d : k === "ArrowLeft" ? -d : 0), y + (k === "ArrowDown" ? d : k === "ArrowUp" ? -d : 0));
+      e.preventDefault();
+      return;
+    }
     if (k === "ArrowLeft") setGiro((g) => ({ ...g, y: limitar(g.y - paso, GIRO_MAX.y) }));
     else if (k === "ArrowRight") setGiro((g) => ({ ...g, y: limitar(g.y + paso, GIRO_MAX.y) }));
     else if (k === "ArrowUp") setGiro((g) => ({ ...g, x: limitar(g.x + paso, GIRO_MAX.x) }));
@@ -107,16 +145,65 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
     else if (k === "+" || k === "=") setSep((s) => Math.min(1, s + 0.2));
     else if (k === "-") setSep((s) => Math.max(0, s - 0.2));
     else if (k === "0") setGiro(GIRO_INICIAL);
-    else if (k === "Escape" && sel) setSel(null);
+    else if (k === "Escape" && rayos) alternarRayos();
+    else if (k === "Escape" && (sel || hallazgo)) {
+      setSel(null);
+      setHallazgo(null);
+    }
     else return;
     e.preventDefault();
   };
 
   const elegir = (id: CapaId) => {
+    if (rayos) salirRayos();
     setSel(sel === id ? null : id);
     setElemento(null);
-    if (sel !== id && sep < 0.35) setSep(0.6);
+    setHallazgo(null);
+    if (sel !== id && (sep < 0.35 || rayos)) setSep(0.6);
   };
+
+  const salirRayos = () => {
+    setRayos(false);
+    setGiro(giroPrevio.current);
+  };
+  const alternarRayos = () => {
+    if (rayos) {
+      salirRayos();
+      setSep(0.6);
+      return;
+    }
+    giroPrevio.current = giro.current;
+    setRayos(true);
+    setSel(null);
+    setHallazgo(null);
+    setElemento(null);
+    setSep(0);
+    setGiro({ x: 0, y: 0 });
+    moverLente(50, 42);
+  };
+
+  /** Cada hallazgo coloca la pila donde se ve mejor y abre su ficha. */
+  const abrirHallazgo = (h: Hallazgo) => {
+    if (hallazgo === h.n) {
+      setHallazgo(null);
+      return;
+    }
+    if (rayos) setRayos(false);
+    setHallazgo(h.n);
+    setElemento(null);
+    if (h.n === 1) {
+      // El nombre: la cabeza entera, con las capas juntas y casi de frente
+      setSel(null);
+      setSep(0);
+      setGiro({ x: -6, y: -14 });
+    } else {
+      setSel(h.capa ?? "anatomia");
+      setSep(0.6);
+      setGiro(GIRO_INICIAL);
+    }
+  };
+  const ficha = HALLAZGOS.find((h) => h.n === hallazgo) ?? null;
+  const ruido = !hero && (rayos || sel === "anatomia" || hallazgo === 4);
 
   const capa = CAPAS.find((c) => c.id === sel) ?? null;
   const detalle = capa?.elementos.find((el) => el.n === elemento) ?? null;
@@ -127,12 +214,15 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
       ref={escena}
       className="bq-lab__escena"
       data-hero={hero ? "" : undefined}
+      data-rayos={rayos ? "" : undefined}
       tabIndex={hero ? undefined : 0}
       role={hero ? "img" : "group"}
       aria-label={
         hero
           ? "Esquema de MANIFESTO, no la pintura: una cabeza de lámina de anatomía en cuatro acetatos superpuestos."
-          : "Pila de acetatos. Arrastra o usa las flechas para girarla; + y − para separar o juntar; 0 para volver al giro inicial."
+          : rayos
+            ? "Rayos X: mueve la lente con el puntero, el dedo o las flechas para ver la Anatomía a través de las otras capas. Escape para salir."
+            : "Pila de acetatos. Arrastra o usa las flechas para girarla; + y − para separar o juntar; 0 para volver al giro inicial."
       }
       onPointerDown={hero ? undefined : abajo}
       onPointerMove={mover}
@@ -145,14 +235,15 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
         className="bq-lab__pila"
         data-separada={sep > 0.05 ? "" : undefined}
         data-sel={sel ?? undefined}
-        style={{ "--rx": `${GIRO_INICIAL.x}deg`, "--ry": `${GIRO_INICIAL.y}deg`, "--sep": sep } as CSSProperties}
+        data-rayos={rayos ? "" : undefined}
+        style={{ "--rx": `${GIRO_INICIAL.x}deg`, "--ry": `${GIRO_INICIAL.y}deg`, "--sep": sep, "--mx": "50%", "--my": "42%" } as CSSProperties}
       >
         <div className="bq-lab__mesa" aria-hidden="true" />
         {CAPAS.map((c, i) => {
           const contenido = <PlanoCabeza capa={c.id} numeros={c.elementos.map((e) => e.n)} activo={sel === c.id ? elemento : null} />;
           const estilo = { "--i": i - (n - 1) / 2, "--c": c.color } as CSSProperties;
           return hero ? (
-            <div key={c.id} className="bq-acetato" style={estilo}>
+            <div key={c.id} className="bq-acetato" data-capa={c.id} style={estilo}>
               {contenido}
               <span className="bq-acetato__brillo" />
             </div>
@@ -161,6 +252,7 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
               key={c.id}
               type="button"
               className="bq-acetato"
+              data-capa={c.id}
               style={estilo}
               tabIndex={-1}
               aria-label={`Acetato ${c.nombre}`}
@@ -170,6 +262,7 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
                 else elegir(c.id);
               }}
             >
+              {c.id === "anatomia" ? <RuidoInterior activo={ruido} /> : null}
               {contenido}
               <span className="bq-acetato__brillo" />
               <span className="bq-acetato__pestana" aria-hidden="true">
@@ -178,6 +271,7 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
             </button>
           );
         })}
+        {rayos ? <div className="bq-lab__lente" aria-hidden="true" /> : null}
       </div>
       <p className="bq-lab__aviso" aria-hidden="true">
         Esquema de MANIFESTO · no es la pintura
@@ -201,6 +295,23 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
             </button>
           ))}
         </div>
+        <div className="bq-lab__hallazgos" role="group" aria-label="Cinco hallazgos">
+          <p className="bq-lab__k" aria-hidden="true">
+            Cinco hallazgos
+          </p>
+          <ol>
+            {HALLAZGOS.map((h) => (
+              <li key={h.n}>
+                <button type="button" aria-pressed={hallazgo === h.n} onClick={() => abrirHallazgo(h)}>
+                  <span className="bq-lab__mas" aria-hidden="true">
+                    {hallazgo === h.n ? "−" : "+"}
+                  </span>
+                  <span className="bq-lab__pregunta">{h.pregunta}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        </div>
         <div className="bq-lab__sep">
           <button type="button" className="bq-lab__boton" onClick={() => setSep(sep > 0.3 ? 0 : 0.85)}>
             {sep > 0.3 ? "Juntar las capas" : "Separar las capas"}
@@ -209,12 +320,47 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
             <span className="sr-only">Separación entre acetatos</span>
             <input type="range" min={0} max={100} value={Math.round(sep * 100)} onChange={(e) => setSep(Number(e.target.value) / 100)} aria-valuetext={sep < 0.05 ? "Juntas" : `${Math.round(sep * 100)} % separadas`} />
           </label>
-          <button type="button" className="bq-lab__boton bq-lab__boton--tenue" onClick={() => setGiro(GIRO_INICIAL)}>
+          <button type="button" className="bq-lab__boton bq-lab__boton--rayos" aria-pressed={rayos} onClick={alternarRayos}>
+            Rayos X
+          </button>
+          <button type="button" className="bq-lab__boton bq-lab__boton--tenue" onClick={() => setGiro(GIRO_INICIAL)} disabled={rayos}>
             Recolocar
           </button>
         </div>
         <div className="bq-lab__ficha" aria-live="polite">
-          {capa ? (
+          {ficha ? (
+            <>
+              <p className="bq-lab__fpregunta">{ficha.pregunta}</p>
+              <h3>{ficha.titulo}</h3>
+              <p>{ficha.texto}</p>
+              <ul className="bq-lab__entradas">
+                {ficha.entradas.map((en) => (
+                  <li key={en.texto}>
+                    <p>{en.texto}</p>
+                    <p className="bq-meta">
+                      <KindTag tipo={en.tipo} /> <span>Fuente: {en.fuente}</span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : rayos ? (
+            <>
+              <h3 style={{ "--c": "#bfe6ff" } as CSSProperties}>Rayos X</h3>
+              <p className="bq-lab__vacio">Mueve la lente sobre el esquema: la Anatomía aparece a través de las otras capas.</p>
+              {/* Lo que la lente escenifica, con su fuente: el hallazgo de la mandíbula */}
+              {HALLAZGOS.filter((h) => h.n === 2).map((h) => (
+                <div key={h.n} className="bq-lab__rayos-dato">
+                  <p>{h.entradas[1]?.texto ?? h.texto}</p>
+                  {h.entradas[1] ? (
+                    <p className="bq-meta">
+                      <KindTag tipo={h.entradas[1].tipo} /> <span>Fuente: {h.entradas[1].fuente}</span>
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </>
+          ) : capa ? (
             <>
               <h3 style={{ "--c": capa.color } as CSSProperties}>{capa.nombre}</h3>
               <p>{capa.intro.texto}</p>
