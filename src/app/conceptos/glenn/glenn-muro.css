@@ -1,0 +1,260 @@
+/* ─────────────────────────────────────────────────────────────
+   05 · GLENN — Muro de fotocopias y fotocopiadora (F2)
+   Sin la pintura: un muro de hojas propio de MANIFESTO en CSS 3D (papel de
+   copia, tóner, datos de la obra en tipografía de máquina) y una fotocopiadora
+   que lo copia generación tras generación. Nada imita a Basquiat.
+   ───────────────────────────────────────────────────────────── */
+
+.gl-muro {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  perspective: 1100px;
+  background:
+    radial-gradient(120% 90% at 30% 20%, #262623, #141413);
+  container-type: inline-size;
+}
+.gl-muro__plano {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg));
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.gl-hoja {
+  --lift: 0px;
+  position: absolute;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    linear-gradient(170deg, rgb(255 255 255 / 0.08), transparent 40%, rgb(0 0 0 / 0.1)),
+    rgb(calc(var(--tono) * 222) calc(var(--tono) * 218) calc(var(--tono) * 207));
+  color: #161615;
+  box-shadow: 0 calc(1px + var(--lift) * 0.5) calc(3px + var(--lift)) rgb(0 0 0 / 0.55);
+  transform: translateZ(calc(var(--z) + var(--lift))) rotate(var(--giro));
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.35s;
+}
+.gl-hoja[data-hueco] {
+  filter: brightness(0.3) contrast(0.9);
+  transform: translateZ(calc(-40px + var(--lift) * 0.3)) rotate(var(--giro));
+}
+
+.gl-hoja__txt {
+  max-width: 88%;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid currentColor;
+  font-family: var(--gl-mono);
+  font-size: clamp(5px, 1.15cqi, 13px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  text-align: center;
+}
+.gl-hoja__num {
+  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-size: 4.4cqi;
+  font-weight: 800;
+  font-stretch: 70%;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.gl-hoja__reg {
+  width: 42%;
+  fill: none;
+  stroke: #161615;
+  stroke-width: 1.5;
+}
+/* Trama de medios tonos que se aclara de izquierda a derecha */
+.gl-hoja[data-tipo="trama"]::before {
+  content: "";
+  position: absolute;
+  inset: 4%;
+  background-image: radial-gradient(circle, #161615 0 36%, transparent 42%);
+  background-size: 0.75cqi 0.75cqi;
+  mask-image: linear-gradient(90deg, #000 10%, transparent 95%);
+}
+.gl-hoja[data-tipo="regla"] {
+  background-image:
+    linear-gradient(90deg, transparent calc(22% - 1px), rgb(22 22 21 / 0.75) calc(22% - 1px) 22%, transparent 22%),
+    repeating-linear-gradient(180deg, transparent 0 calc(14.28% - 1px), rgb(22 22 21 / 0.55) calc(14.28% - 1px) 14.28%),
+    linear-gradient(170deg, rgb(255 255 255 / 0.08), transparent 40%, rgb(0 0 0 / 0.1)),
+    linear-gradient(rgb(calc(var(--tono) * 222) calc(var(--tono) * 218) calc(var(--tono) * 207)));
+}
+/* Esquina levantada */
+.gl-hoja[data-esquina]::after {
+  content: "";
+  position: absolute;
+  width: 20%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.45) 50%, rgb(0 0 0 / 0.35) 50%);
+}
+.gl-hoja[data-esquina="1"]::after { top: 0; left: 0; }
+.gl-hoja[data-esquina="2"]::after { top: 0; right: 0; transform: scaleX(-1); }
+.gl-hoja[data-esquina="3"]::after { bottom: 0; right: 0; transform: scale(-1); }
+.gl-hoja[data-esquina="4"]::after { bottom: 0; left: 0; transform: scaleY(-1); }
+
+/* Hueco de la máscara: el muro se hunde; rotulado como zona aproximada */
+.gl-muro__hueco {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #090908 35%, #121211);
+  box-shadow: inset 0 0 50px 22px rgb(0 0 0 / 0.85);
+  transform: translateZ(-44px);
+  transform-style: preserve-3d;
+}
+.gl-muro__hueco::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1.5px dashed rgb(168 245 208 / 0.85);
+  border-radius: 50%;
+  transform: translateZ(54px);
+}
+.gl-muro__rotulo {
+  position: absolute;
+  margin: 0;
+  transform: translate(-50%, -50%) translateZ(14px);
+  padding: 0.3em 0.6em;
+  background: rgb(15 15 14 / 0.75);
+  font-family: var(--gl-mono);
+  font-size: clamp(8px, 1.6cqi, 15px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--gl-luz);
+  pointer-events: none;
+}
+.gl-muro__aviso {
+  position: absolute;
+  left: 2.5%;
+  bottom: 3%;
+  margin: 0;
+  padding: 0.3em 0.6em;
+  background: rgb(15 15 14 / 0.85);
+  font-family: var(--gl-mono);
+  font-size: clamp(8px, 1.4cqi, 14px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  pointer-events: none;
+}
+
+.gl-lamina__obra .gl-muro,
+.gl-visor__obra .gl-muro { position: absolute; inset: 0; }
+
+/* ── Fotocopiadora ── */
+
+.gl-copiadora {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #1a1a18;
+}
+.gl-copiadora__lienzo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.gl-copiadora__luz {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  transform: translateX(-50%);
+  background: var(--gl-luz);
+  box-shadow: 0 0 26px 9px rgb(168 245 208 / 0.6);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.gl-copiadora[data-copiando] .gl-copiadora__luz { opacity: 1; }
+.gl-copiadora__asa {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 76px;
+  margin-left: 22px;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--gl-luz);
+  border-radius: 4px;
+  background: rgb(15 15 14 / 0.88);
+  color: var(--gl-luz);
+  font-size: 1.1rem;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.gl-copiadora[data-copiando] .gl-copiadora__asa { margin-left: 0; }
+.gl-copiadora__asa:focus-visible { outline: 2px solid var(--gl-luz); outline-offset: 3px; }
+.gl-copiadora__asa:disabled { opacity: 0.35; cursor: not-allowed; }
+.gl-copiadora__gen {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  margin: 0;
+  padding: 0.3rem 0.55rem;
+  background: rgb(15 15 14 / 0.88);
+  font-family: var(--gl-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gl-luz);
+}
+
+.gl-copiar { display: grid; gap: 1rem; margin-top: 0.4rem; }
+.gl-perdida__cifra { margin: 0; color: var(--c-muted); font-family: var(--gl-mono); font-size: 0.8125rem; }
+.gl-perdida__cifra span {
+  margin-right: 0.35rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--gl-luz);
+}
+.gl-perdida__barra {
+  height: 6px;
+  margin: 0.4rem 0;
+  background: var(--c-line);
+}
+.gl-perdida__barra span {
+  display: block;
+  height: 100%;
+  background: var(--gl-luz);
+  transition: width 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.gl-perdida__pie { margin: 0; font-size: 0.875rem; color: var(--c-muted); }
+.gl-generaciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gl-generaciones button {
+  display: grid;
+  gap: 0.2rem;
+  padding: 3px;
+  border: 1px solid var(--c-line);
+  background: none;
+  color: var(--c-muted);
+  font-family: var(--gl-mono);
+  font-size: 0.6875rem;
+  cursor: pointer;
+}
+.gl-generaciones img { display: block; width: 72px; height: auto; }
+.gl-generaciones button[aria-pressed="true"] { border-color: var(--gl-luz); color: var(--c-ink); }
+.gl-generaciones button:focus-visible { outline: 2px solid var(--gl-luz); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-muro__plano,
+  .gl-hoja,
+  .gl-perdida__barra span { transition: none; }
+}

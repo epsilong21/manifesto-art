@@ -4,7 +4,8 @@ import Image from "next/image";
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import { KindTag } from "@/components/concepts/ConceptChrome";
 import { CAPAS_GLENN, HALLAZGOS_GLENN, LIENZO_GLENN, OBRA_GLENN, REGIONES_GLENN, ZONAS_GLENN } from "@/content/glenn";
-import { EsquemaGlenn } from "./EsquemaGlenn";
+import { CopiaLienzo, CopiaMandos, useCopiadora } from "./Fotocopiadora";
+import { MuroHojas } from "./MuroHojas";
 
 type Modo = "hallazgos" | "capas" | "fotocopiar" | "ampliar";
 type CapaId = (typeof CAPAS_GLENN)[number]["id"];
@@ -29,9 +30,10 @@ const DEV = process.env.NODE_ENV === "development";
  *   de fotocopia en blanco y negro. Filtro en pantalla, nunca una alteración del archivo.
  * - Ampliar: zoom ×1–×4 y desplazamiento por arrastre, flechas o regiones predefinidas.
  *
- * Sin reproducción, la escena usa el esquema propio de MANIFESTO (la fotocopiadora
- * queda desactivada: no hay nada que copiar). Sin JavaScript, los hallazgos se leen
- * como lista. Sin animación continua: solo transiciones al interactuar.
+ * Sin reproducción, la escena usa el muro de hojas propio de MANIFESTO (MuroHojas) y
+ * la fotocopiadora copia ese muro, no la pintura: cada pasada es una generación más
+ * degradada (Fotocopiadora). Sin JavaScript, los hallazgos se leen como lista. Sin
+ * animación continua: solo transiciones al interactuar.
  */
 export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
   const { imagen, alt } = OBRA_GLENN;
@@ -46,6 +48,7 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
   // El techo del zoom depende del ancho del visor y de la resolución del archivo (sin archivo, el esquema es vectorial)
   const [zoomMax, setZoomMax] = useState(PASOS_ZOOM[PASOS_ZOOM.length - 1]);
   const [calibrar, setCalibrar] = useState<string | null>(null);
+  const copiadora = useCopiadora(modo === "fotocopiar" && !conImagen);
 
   const visor = useRef<HTMLDivElement>(null);
   const lienzo = useRef<HTMLDivElement>(null);
@@ -241,7 +244,7 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
           >
             <div ref={lienzo} className="gl-visor__lienzo">
               <div className="gl-visor__obra" data-valores={valores && modo === "capas" ? "" : undefined}>
-                {conImagen ? <Image src={imagen.src} width={imagen.width} height={imagen.height} alt={alt} sizes={sizes} quality={80} /> : <EsquemaGlenn />}
+                {conImagen ? <Image src={imagen.src} width={imagen.width} height={imagen.height} alt={alt} sizes={sizes} quality={80} /> : <MuroHojas />}
               </div>
 
               {copiando ? (
@@ -250,6 +253,7 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
                 </div>
               ) : null}
               {copiando ? <div className="gl-copia__luz" style={{ left: `${corte}%` }} aria-hidden="true" /> : null}
+              {modo === "fotocopiar" && !conImagen ? <CopiaLienzo c={copiadora} /> : null}
 
               {modo === "capas" ? (
                 <>
@@ -335,7 +339,7 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
             {modo === "fotocopiar"
               ? conImagen
                 ? "A la izquierda de la luz, un filtro de MANIFESTO en pantalla: blanco y negro con mucho contraste. No es una fotocopia real ni altera el archivo."
-                : "La fotocopiadora necesita la reproducción de la obra; con el esquema no hay nada que copiar."
+                : "La fotocopiadora copia el muro de MANIFESTO, no la pintura: arrastra la luz o pulsa «Hacer una copia». Cada pasada parte de la anterior. Es una simulación en pantalla."
               : modo === "ampliar"
                 ? `Ampliación de la misma reproducción, hasta ×${zoomMax}: el límite lo marca la resolución del archivo.`
                 : "Puntos y zonas situados a mano, de forma aproximada. Son una guía para mirar, no medidas."}
@@ -468,7 +472,9 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
                       Ver el original
                     </button>
                   </div>
-                ) : null}
+                ) : (
+                  <CopiaMandos c={copiadora} />
+                )}
               </div>
             ) : null}
 

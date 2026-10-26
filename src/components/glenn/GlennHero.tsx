@@ -4,7 +4,7 @@ import { KindTag } from "@/components/concepts/ConceptChrome";
 import { CARTELA_GLENN, DERECHOS_GLENN, GLENN, HERO_GLENN, LIENZO_GLENN, OBRA_GLENN } from "@/content/glenn";
 import { Contemplar } from "./Contemplar";
 import { EscanerEntrada } from "./EscanerEntrada";
-import { EsquemaGlenn } from "./EsquemaGlenn";
+import { MuroHojas } from "./MuroHojas";
 
 /**
  * La lámina ocupa algo más de la mitad del ancho en escritorio y todo el ancho en móvil.
@@ -15,7 +15,8 @@ export const SIZES_GLENN = "(min-width: 64rem) 60vw, 100vw";
 /**
  * Hero de «La máscara y la copia»: título de cartel a un lado y la obra apaisada como
  * una hoja sobre el cristal de una fotocopiadora (rótulo y cotas fuera de la imagen).
- * Sin reproducción, la lámina muestra el esquema propio de MANIFESTO y lo dice.
+ * Sin reproducción, la lámina muestra el muro de hojas propio de MANIFESTO (MuroHojas),
+ * que se inclina con el ratón, y lo dice.
  */
 export function GlennHero({ conImagen }: { conImagen: boolean }) {
   const { imagen, alt, credito } = OBRA_GLENN;
@@ -49,7 +50,7 @@ export function GlennHero({ conImagen }: { conImagen: boolean }) {
           {conImagen ? (
             <Image src={imagen.src} width={imagen.width} height={imagen.height} alt={alt} sizes={SIZES_GLENN} quality={80} loading="eager" fetchPriority="high" />
           ) : (
-            <EsquemaGlenn />
+            <MuroHojas inclinar />
           )}
           <EscanerEntrada medida={`${GLENN.ancho} × ${GLENN.alto}`} />
         </div>

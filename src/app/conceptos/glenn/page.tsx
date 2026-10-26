@@ -10,6 +10,7 @@ import { RevelarSecciones } from "@/components/glenn/RevelarSecciones";
 import { plexMono } from "@/lib/fonts/plexmono";
 import { hayImagenGlenn } from "@/lib/obraGlenn";
 import "./glenn.css";
+import "./glenn-muro.css";
 
 export const metadata: Metadata = {
   title: "Glenn (1984–1985), de Jean-Michel Basquiat — MANIFESTO",
