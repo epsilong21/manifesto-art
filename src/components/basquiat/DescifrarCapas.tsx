@@ -1,11 +1,16 @@
 import { OBRA_BASQUIAT } from "@/content/basquiat";
 import { CapasObra } from "./CapasObra";
 import { CapasTexto } from "./CapasTexto";
+import { LaboratorioAcetatos } from "./LaboratorioAcetatos";
 
 /** El mismo `sizes` que la lámina del hero: el navegador reutiliza la variante ya descargada. */
 const SIZES = "(min-width: 64rem) 50vw, (orientation: landscape) 70vh, 100vw";
 
-/** Sección 01 · Descifrar capas. Sin reproducción, solo la versión de texto. */
+/**
+ * Sección 01 · Descifrar capas. Con reproducción, las capas sobre la pintura (CapasObra);
+ * sin ella, el laboratorio de acetatos sobre el esquema propio de MANIFESTO.
+ * Sin JavaScript, en los dos casos, la versión de texto.
+ */
 export function DescifrarCapas({ conImagen }: { conImagen: boolean }) {
   const { imagen, alt } = OBRA_BASQUIAT;
   return (
@@ -32,7 +37,14 @@ export function DescifrarCapas({ conImagen }: { conImagen: boolean }) {
           </noscript>
         </>
       ) : (
-        <CapasTexto sinObra />
+        <>
+          <LaboratorioAcetatos />
+          <noscript>
+            <style>{".bq-lab__mandos{display:none}"}</style>
+            <CapasTexto sinObra partes="capas" />
+          </noscript>
+          <CapasTexto partes="hallazgos" />
+        </>
       )}
     </section>
   );

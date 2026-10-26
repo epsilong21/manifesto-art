@@ -11,6 +11,7 @@ import "./basquiat.css";
 import "./basquiat-capas.css";
 import "./basquiat-lecturas.css";
 import "./basquiat-p5.css";
+import "./basquiat-lab.css";
 
 export const metadata: Metadata = {
   title: "Untitled (1981), de Jean-Michel Basquiat — MANIFESTO",
