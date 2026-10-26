@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef, type PointerEvent, type ReactNode } from "react";
+import { useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 
 /**
- * Tira horizontal que se arrastra con el ratón; en táctil y con el teclado es el
- * desplazamiento nativo (la región es enfocable y las flechas la mueven). Con
- * `scroll-snap`, cada hoja queda alineada al soltar.
+ * Tira horizontal que se arrastra con el ratón; en táctil, el desplazamiento nativo.
+ * Con el teclado (la región es enfocable), las flechas pasan de hoja en hoja e Inicio
+ * y Fin van a los extremos. Con `scroll-snap`, cada hoja queda alineada al soltar.
  */
 export function CronologiaArrastrable({ children, etiqueta }: { children: ReactNode; etiqueta: string }) {
   const tira = useRef<HTMLDivElement>(null);
@@ -33,6 +33,23 @@ export function CronologiaArrastrable({ children, etiqueta }: { children: ReactN
     tira.current?.removeAttribute("data-arrastrando");
   };
 
+  const teclas = (e: KeyboardEvent<HTMLDivElement>) => {
+    const t = tira.current;
+    const hoja = t?.querySelector("li");
+    if (!t || !hoja) return;
+    const paso = hoja.getBoundingClientRect().width;
+    const destino: Record<string, number> = {
+      ArrowRight: t.scrollLeft + paso,
+      ArrowLeft: t.scrollLeft - paso,
+      Home: 0,
+      End: t.scrollWidth,
+    };
+    if (!(e.key in destino)) return;
+    e.preventDefault();
+    const suave = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    t.scrollTo({ left: destino[e.key], behavior: suave ? "smooth" : "auto" });
+  };
+
   return (
     <div
       ref={tira}
@@ -44,6 +61,7 @@ export function CronologiaArrastrable({ children, etiqueta }: { children: ReactN
       onPointerMove={mover}
       onPointerUp={arriba}
       onPointerCancel={arriba}
+      onKeyDown={teclas}
     >
       {children}
     </div>
