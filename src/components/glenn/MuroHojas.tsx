@@ -124,9 +124,20 @@ function Contenido({ hoja }: { hoja: Hoja }) {
  * hueco rotulado, no una figura. Las hojas cercanas al puntero se levantan.
  *
  * - `inclinar`: el muro se inclina con el ratón (hero).
+ * - `profundidad`: las capas de la mesa de luz se separan en el espacio: el fondo
+ *   (las hojas) atrás, la figura (el hueco) en medio y el gesto (la boca) delante.
+ *   `capas` dice cuáles se ven.
  * - Con movimiento reducido, ni inclinación ni hojas que se levantan.
  */
-export function MuroHojas({ inclinar = false }: { inclinar?: boolean }) {
+export function MuroHojas({
+  inclinar = false,
+  profundidad = false,
+  capas,
+}: {
+  inclinar?: boolean;
+  profundidad?: boolean;
+  capas?: ReadonlySet<string>;
+}) {
   const raiz = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -183,11 +194,17 @@ export function MuroHojas({ inclinar = false }: { inclinar?: boolean }) {
   }, [inclinar]);
 
   const m = ZONAS_GLENN.mascara;
+  const b = ZONAS_GLENN.boca;
+  const sin = (id: string) => (profundidad && capas && !capas.has(id) ? "" : undefined);
   return (
     <div
       ref={raiz}
       className="gl-muro"
       data-inclinar={inclinar ? "" : undefined}
+      data-profundidad={profundidad ? "" : undefined}
+      data-sin-fondo={sin("fondo")}
+      data-sin-figura={sin("figura")}
+      data-sin-gesto={sin("gesto")}
       role="img"
       aria-label="Esquema de MANIFESTO, no la pintura: un muro de hojas fotocopiadas con datos de la obra, hundido en la zona aproximada de la máscara."
     >
@@ -207,10 +224,10 @@ export function MuroHojas({ inclinar = false }: { inclinar?: boolean }) {
             data-cy={(h.y + h.h / 2).toFixed(3)}
             style={
               {
-                left: `${h.x * 100}%`,
-                top: `${h.y * 100}%`,
-                width: `${h.w * 100}%`,
-                height: `${h.h * 100}%`,
+                left: `${(h.x * 100).toFixed(3)}%`,
+                top: `${(h.y * 100).toFixed(3)}%`,
+                width: `${(h.w * 100).toFixed(3)}%`,
+                height: `${(h.h * 100).toFixed(3)}%`,
                 "--giro": `${h.giro.toFixed(2)}deg`,
                 "--z": `${h.z}px`,
                 "--tono": h.tono.toFixed(3),
@@ -226,6 +243,23 @@ export function MuroHojas({ inclinar = false }: { inclinar?: boolean }) {
         >
           Máscara · zona aprox.
         </p>
+        {profundidad ? (
+          <>
+            <div
+              className="gl-muro__figura"
+              style={{ left: `${(m.cx - m.rx) * 100}%`, top: `${(m.cy - m.ry) * 100}%`, width: `${m.rx * 200}%`, height: `${m.ry * 200}%` }}
+            >
+              <span>Figura · a mano</span>
+            </div>
+            <div
+              className="gl-muro__gesto"
+              style={{ left: `${(b.cx - b.rx) * 100}%`, top: `${(b.cy - b.ry) * 100}%`, width: `${b.rx * 200}%`, height: `${b.ry * 200}%` }}
+            >
+              <span>Gesto · boca, zona aprox.</span>
+            </div>
+            <p className="gl-muro__capa-fondo">Fondo · a máquina</p>
+          </>
+        ) : null}
       </div>
       <p className="gl-muro__aviso">Esquema de MANIFESTO — no es la pintura</p>
     </div>

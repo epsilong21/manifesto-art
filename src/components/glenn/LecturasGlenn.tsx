@@ -4,6 +4,7 @@ import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { KindTag } from "@/components/concepts/ConceptChrome";
 import { LECTURAS_GLENN, type Lectura } from "@/content/glenn";
 import { gsap, useGSAP } from "@/lib/gsap";
+import { MuroLecturas } from "./MuroLecturas";
 
 /**
  * Tres lecturas de Glenn: retrato, máscara y archivo. Cada una con su tesis, sus
@@ -11,6 +12,7 @@ import { gsap, useGSAP } from "@/lib/gsap";
  * quedarse con una; el veredicto se anuncia (aria-live) y recuerda que ninguna está
  * demostrada. Sin JavaScript se leen las tres seguidas: solo con la clase `js` del
  * documento se ocultan las inactivas (glenn.css), y sin JS no hay pestañas ni botón.
+ * Encima, el muro de las lecturas (MuroLecturas) reordena sus hojas con cada una.
  */
 export function LecturasGlenn() {
   const base = useId();
@@ -75,6 +77,8 @@ export function LecturasGlenn() {
           </button>
         ))}
       </div>
+
+      <MuroLecturas lectura={actual} />
 
       {LECTURAS_GLENN.map((l) => (
         <div

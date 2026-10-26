@@ -43,6 +43,8 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
   const [activo, setActivo] = useState<string | null>(null);
   const [capas, setCapas] = useState<Set<CapaId>>(() => new Set<CapaId>(["figura"]));
   const [valores, setValores] = useState(false);
+  // Sin reproducción: las capas del muro separadas en profundidad
+  const [profundo, setProfundo] = useState(false);
   const [corte, setCorte] = useState(38);
   const [zoom, setZoom] = useState(1);
   // El techo del zoom depende del ancho del visor y de la resolución del archivo (sin archivo, el esquema es vectorial)
@@ -244,7 +246,7 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
           >
             <div ref={lienzo} className="gl-visor__lienzo">
               <div className="gl-visor__obra" data-valores={valores && modo === "capas" ? "" : undefined}>
-                {conImagen ? <Image src={imagen.src} width={imagen.width} height={imagen.height} alt={alt} sizes={sizes} quality={80} /> : <MuroHojas />}
+                {conImagen ? <Image src={imagen.src} width={imagen.width} height={imagen.height} alt={alt} sizes={sizes} quality={80} /> : <MuroHojas profundidad={profundo && modo === "capas"} capas={capas} />}
               </div>
 
               {copiando ? (
@@ -255,7 +257,7 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
               {copiando ? <div className="gl-copia__luz" style={{ left: `${corte}%` }} aria-hidden="true" /> : null}
               {modo === "fotocopiar" && !conImagen ? <CopiaLienzo c={copiadora} /> : null}
 
-              {modo === "capas" ? (
+              {modo === "capas" && !(profundo && !conImagen) ? (
                 <>
                   <svg className="gl-capas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                     {capas.has("figura") ? (
@@ -422,9 +424,15 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
                       {c.nombre}
                     </button>
                   ))}
-                  <button type="button" data-capa="valores" aria-pressed={valores} onClick={() => setValores(!valores)} disabled={!conImagen}>
-                    Solo claro y oscuro
-                  </button>
+                  {conImagen ? (
+                    <button type="button" data-capa="valores" aria-pressed={valores} onClick={() => setValores(!valores)}>
+                      Solo claro y oscuro
+                    </button>
+                  ) : (
+                    <button type="button" data-capa="profundidad" aria-pressed={profundo} onClick={() => setProfundo(!profundo)}>
+                      Separar en profundidad
+                    </button>
+                  )}
                 </div>
                 <ul className="gl-capas-texto" aria-live="polite">
                   {CAPAS_GLENN.filter((c) => capas.has(c.id)).map((c) => (
