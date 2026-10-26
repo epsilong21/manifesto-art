@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { LIENZO_GLENN, ZONAS_GLENN } from "@/content/glenn";
+import { generarGL, type Pasada } from "./copiaGL";
 import { hojasMuro } from "./MuroHojas";
 
 /**
@@ -9,7 +10,8 @@ import { hojasMuro } from "./MuroHojas";
  * (MuroHojas), no la obra. Cada pasada parte de la copia anterior y la degrada
  * como una fotocopiadora: un poco de escala y giro, el tóner que se corre, el
  * contraste que se come los grises, motas, la sombra de la tapa y una raya del
- * tambor. Es una simulación en pantalla (Canvas 2D), calculada en el navegador.
+ * tambor. Es una simulación en pantalla, calculada en el navegador: en la GPU
+ * (copiaGL.ts, WebGL2) y, si no hay WebGL2, en Canvas 2D (`generar`).
  */
 
 const W = 720;
@@ -158,17 +160,25 @@ function dibujarOriginal(fuente: string): Float32Array {
   return gris;
 }
 
-/** Una pasada por la fotocopiadora: la copia `k` hecha a partir de `prev`. */
-function generar(prev: Float32Array, k: number): Float32Array {
+/** Cómo queda el original en el cristal en la pasada `k` (igual en la GPU y en Canvas 2D). */
+function pasada(k: number): Pasada & { r: () => number } {
   const r = azar(7919 * k + 13);
+  // El original nunca queda recto sobre el cristal: escala, giro y desplazamiento
+  return { s: 1.005, a: (r() - 0.5) * 0.005, ox: 0.5 + r() * 1.2, oy: (r() - 0.5) * 1.4, semilla: r(), r };
+}
+
+/** Una pasada por la fotocopiadora: la copia `k` hecha a partir de `prev`, en la GPU si se puede. */
+function fotocopiar(prev: Float32Array, k: number): Float32Array {
+  return generarGL(prev, W, H, pasada(k)) ?? generar(prev, k);
+}
+
+/** La misma pasada en Canvas 2D (CPU), si no hay WebGL2. */
+function generar(prev: Float32Array, k: number): Float32Array {
+  const { s, a, ox, oy, r } = pasada(k);
   const out = new Float32Array(W * H);
-  // 1. El original nunca queda recto sobre el cristal: escala, giro y desplazamiento
-  const s = 1.005;
-  const a = (r() - 0.5) * 0.005;
+  // 1. Escala, giro y desplazamiento
   const cos = Math.cos(a);
   const sin = Math.sin(a);
-  const ox = 0.5 + r() * 1.2;
-  const oy = (r() - 0.5) * 1.4;
   const cx = W / 2;
   const cy = H / 2;
   for (let y = 0; y < H; y++) {
@@ -301,7 +311,7 @@ export function useCopiadora(activa: boolean) {
   const preparar = useCallback((): Float32Array | null => {
     const ultima = gens.at(-1);
     if (!ultima || gens.length > MAX_COPIAS) return null;
-    const g = siguiente ?? generar(ultima.gris, gens.length);
+    const g = siguiente ?? fotocopiar(ultima.gris, gens.length);
     setSiguiente(g);
     setVista(gens.length - 1);
     return g;
