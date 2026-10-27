@@ -140,6 +140,8 @@
 .hm-mirilla {
   --h: 1;
   min-width: 0;
+  /* El pie se adapta al ancho de su columna (más abajo) */
+  container-type: inline-size;
 }
 /* Medusa, la más intensa, no es la más alta: el peso visual se reparte */
 .hm-mirilla[data-obra="medusa"] { --h: 0.84; --acento: #e5636d; }
@@ -223,6 +225,36 @@
 .hm-mirilla__a {
   font-size: 0.875rem;
   color: var(--c-muted);
+}
+.hm-mirilla__t,
+.hm-mirilla__a {
+  /* Último recurso: una palabra más ancha que su columna se parte dentro de ella */
+  overflow-wrap: anywhere;
+}
+/* Columnas estrechas (móvil vertical y apaisado, escritorio por debajo de ~1400 px): el
+   ancho condensado del titular, para que «estrellada» o «Caravaggio» no pisen la mirilla
+   vecina */
+@container (max-width: 5rem) {
+  .hm-mirilla__t {
+    font-size: 0.9375rem;
+    font-variation-settings: "wdth" 62;
+  }
+  .hm-mirilla__a {
+    font-variation-settings: "wdth" 62;
+  }
+}
+/* Las más estrechas (móvil apaisado pequeño): mejor partir con guion que a mitad de sílaba */
+@container (max-width: 2.75rem) {
+  .hm-mirilla__t,
+  .hm-mirilla__a {
+    hyphens: auto;
+  }
+}
+@media (orientation: landscape) and (max-height: 32rem) and (max-width: 63.99rem),
+  (min-width: 64rem) and (max-width: 79.99rem) {
+  .hm-mirillas {
+    gap: 0.5rem;
+  }
 }
 .hm-mirilla__link:focus-visible {
   outline: none;

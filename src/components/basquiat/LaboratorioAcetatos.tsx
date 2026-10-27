@@ -167,12 +167,23 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
     e.preventDefault();
   };
 
+  // En una columna los mandos van bajo la escena: al elegir, la escena vuelve a la vista
+  // si se ha salido por arriba, para ver el cambio (con el desplazamiento del sitio:
+  // suave, o inmediato con movimiento reducido). El foco se queda en el botón
+  const verEscena = () =>
+    requestAnimationFrame(() => {
+      if (hero || !matchMedia("(max-width: 63.99rem)").matches) return;
+      const r = escena.current?.getBoundingClientRect();
+      if (r && r.top < 0) escena.current?.scrollIntoView({ block: "start" });
+    });
+
   const elegir = (id: CapaId) => {
     if (rayos) salirRayos();
     setSel(sel === id ? null : id);
     setElemento(null);
     setHallazgo(null);
     if (sel !== id && (sep < 0.35 || rayos)) setSep(0.6);
+    if (sel !== id) verEscena();
   };
 
   const salirRayos = () => {
@@ -193,6 +204,7 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
     setSep(0);
     setGiro({ x: 0, y: 0 });
     moverLente(50, 42);
+    verEscena();
   };
 
   /** Cada hallazgo coloca la pila donde se ve mejor y abre su ficha. */
@@ -214,6 +226,7 @@ export function LaboratorioAcetatos({ hero = false }: { hero?: boolean }) {
       setSep(0.6);
       setGiro(GIRO_INICIAL);
     }
+    verEscena();
   };
   const ficha = HALLAZGOS.find((h) => h.n === hallazgo) ?? null;
   const ruido = !hero && (rayos || sel === "anatomia" || hallazgo === 4);

@@ -293,6 +293,28 @@ html:has(.theme-basquiat) { background: #121110; }
   color: var(--c-ink);
 }
 
+/* ── Móvil apaisado: la lámina al lado del título, dentro de la primera pantalla ── */
+
+@media (orientation: landscape) and (max-height: 32rem) and (max-width: 63.99rem) {
+  .theme-basquiat { --bq-reserva: 8rem; }
+  .bq-hero {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "cabeza obra"
+      "pie obra";
+    column-gap: clamp(1.5rem, 4vw, 2.5rem);
+    padding-top: 0.75rem;
+  }
+  /* El mismo cuerpo, salvo que no quepa a lo alto */
+  .bq-t { font-size: clamp(3rem, 21svh, 5.5rem); }
+  .bq-lamina { justify-self: end; }
+}
+/* Móviles más bajos (667 × 375, 812 × 375): el título entero en la primera pantalla */
+@media (orientation: landscape) and (max-height: 24rem) and (max-width: 63.99rem) {
+  .bq-t { font-size: clamp(2.5rem, 18svh, 5.5rem); }
+}
+
 /* ── Escritorio: título y cartela a la izquierda, la lámina domina la derecha ── */
 
 @media (min-width: 64rem) {

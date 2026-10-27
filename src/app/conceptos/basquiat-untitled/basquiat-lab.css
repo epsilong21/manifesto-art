@@ -50,6 +50,9 @@
 }
 @media (min-width: 64rem) {
   .bq-lab__escena { aspect-ratio: 1 / 1.02; }
+  /* Bajo las pestañas, la escena deja sitio al encabezado de la sección: título,
+     pestañas y laboratorio caben juntos en la pantalla (1440 × 900 incluido) */
+  .bq-modos__panel .bq-lab__escena { max-height: calc(100svh - 14rem); }
 }
 .bq-lab__escena[data-girando] { cursor: grabbing; }
 .bq-lab__escena:focus-visible { outline: 2px solid var(--bq-amarillo); outline-offset: 3px; }

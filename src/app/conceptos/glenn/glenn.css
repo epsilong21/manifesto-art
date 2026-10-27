@@ -364,6 +364,22 @@ html:has(.theme-glenn) { background: #0f0f0e; }
 @media (orientation: landscape) and (max-height: 32rem) {
   .gl-lamina { width: min(100%, calc((100svh - 4rem) * var(--gl-ratio))); }
 }
+/* …y va al lado del título, dentro de la primera pantalla */
+@media (orientation: landscape) and (max-height: 32rem) and (max-width: 63.99rem) {
+  .gl-hero {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "cabeza obra" "pie obra";
+    column-gap: clamp(1.5rem, 4vw, 2.5rem);
+    align-items: start;
+    padding-top: 0.75rem;
+  }
+  .gl-lamina { justify-self: end; }
+}
+/* Móviles más bajos (667 × 375, 812 × 375): el título entero, sin partir «Fotocopias» */
+@media (orientation: landscape) and (max-height: 24rem) and (max-width: 63.99rem) {
+  .gl-t { font-size: clamp(2.5rem, 19svh, 5.25rem); }
+}
 
 /* ── Secciones ── */
 
@@ -560,9 +576,11 @@ html:has(.theme-glenn) { background: #0f0f0e; }
 @media (hover: hover) {
   .gl-punto:hover { transform: translate(-50%, -50%) scale(1.08); }
 }
-/* En pantallas estrechas los puntos se reducen al mínimo de WCAG 2.5.8 y la lista del panel queda como objetivo principal */
+/* En pantallas estrechas los puntos se ven más pequeños, pero el área que responde al
+   dedo sigue siendo de 44 px (un anillo transparente alrededor) */
 @media (max-width: 30rem) {
   .gl-punto { width: 32px; height: 32px; font-size: 0.75rem; }
+  .gl-punto::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; }
 }
 
 .gl-escena__pie {

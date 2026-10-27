@@ -341,7 +341,11 @@ export function MesaDeLuz({ conImagen }: { conImagen: boolean }) {
             {modo === "fotocopiar"
               ? conImagen
                 ? "A la izquierda de la luz, un filtro de MANIFESTO en pantalla: blanco y negro con mucho contraste. No es una fotocopia real ni altera el archivo."
-                : "La fotocopiadora copia el muro de MANIFESTO, no la pintura: arrastra la luz o pulsa «Hacer una copia». Cada pasada parte de la anterior. Es una simulación en pantalla."
+                : `La fotocopiadora copia el muro de MANIFESTO, no la pintura: ${
+                    copiadora.lleno
+                      ? "ya está en la última copia; pulsa «Volver al original» para empezar de nuevo"
+                      : `arrastra la luz o pulsa «${copiadora.gens.length <= 1 ? "Hacer una copia" : "Copiar la copia"}»`
+                  }. Cada pasada parte de la anterior. Es una simulación en pantalla.`
               : modo === "ampliar"
                 ? `Ampliación de la misma reproducción, hasta ×${zoomMax}: el límite lo marca la resolución del archivo.`
                 : "Puntos y zonas situados a mano, de forma aproximada. Son una guía para mirar, no medidas."}
