@@ -1,0 +1,602 @@
+/* ─────────────────────────────────────────────────────────────
+   04 · BASQUIAT — Laboratorio de acetatos (F2)
+   Con o sin la pintura: el esquema de MANIFESTO en cuatro acetatos apilados en
+   CSS 3D. Trazo fino de lámina anatómica, cada capa con su color y su patrón
+   de discontinuidad (doble código). La luz sigue al puntero.
+   ───────────────────────────────────────────────────────────── */
+
+/* Lo que cambia con el puntero (luz, giro, lente) no se hereda: LaboratorioAcetatos
+   lo escribe en cada elemento que lo usa, y el SVG de los acetatos no recalcula
+   estilos en cada movimiento. Prefijo propio: Medusa usa --lx y --rx como números. */
+@property --bq-lx { syntax: "<length-percentage>"; inherits: false; initial-value: 35%; }
+@property --bq-ly { syntax: "<length-percentage>"; inherits: false; initial-value: 25%; }
+@property --bq-mx { syntax: "<length-percentage>"; inherits: false; initial-value: 50%; }
+@property --bq-my { syntax: "<length-percentage>"; inherits: false; initial-value: 42%; }
+@property --bq-rx { syntax: "<angle>"; inherits: false; initial-value: -16deg; }
+@property --bq-ry { syntax: "<angle>"; inherits: false; initial-value: -30deg; }
+
+.bq-lab {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+}
+@media (min-width: 64rem) {
+  .bq-lab { grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 1fr); }
+}
+
+/* ── Escena ── */
+
+.bq-lab__escena {
+  --paso: clamp(3.5rem, 11vmin, 7.5rem);
+  --bq-lx: 35%;
+  --bq-ly: 25%;
+  position: relative;
+  aspect-ratio: 1;
+  max-height: calc(100svh - 7rem);
+  width: 100%;
+  margin-inline: auto;
+  perspective: 1700px;
+  perspective-origin: 50% 40%;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 50% at var(--bq-lx) var(--bq-ly), rgb(240 197 58 / 0.07), transparent 70%),
+    radial-gradient(90% 70% at 50% 110%, rgb(59 164 225 / 0.08), transparent 70%),
+    #0d0c0b;
+  outline: 1px solid var(--c-line);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+@media (min-width: 64rem) {
+  .bq-lab__escena { aspect-ratio: 1 / 1.02; }
+}
+.bq-lab__escena[data-girando] { cursor: grabbing; }
+.bq-lab__escena:focus-visible { outline: 2px solid var(--bq-amarillo); outline-offset: 3px; }
+.bq-lab__escena[data-hero] {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+  max-height: none;
+  outline: 0;
+  cursor: default;
+  touch-action: auto;
+  --paso: clamp(2.5rem, 8vmin, 5.5rem);
+}
+
+.bq-lab__pila {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 72%;
+  aspect-ratio: 600 / 700;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%) rotateX(var(--bq-rx)) rotateY(var(--bq-ry));
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.bq-lab__escena[data-girando] .bq-lab__pila { transition: none; }
+.bq-lab__escena[data-hero] .bq-lab__pila { height: 76%; transition-duration: 1.2s; }
+
+/* Sombra en la mesa, bajo el último acetato */
+.bq-lab__mesa {
+  position: absolute;
+  inset: 8% 4%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.75), transparent);
+  filter: blur(18px);
+  transform: translateZ(calc(-2 * var(--sep) * var(--paso) - 30px));
+  transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  pointer-events: none;
+}
+
+/* ── Acetato ── */
+
+.bq-acetato {
+  --alza: 0px;
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  border-radius: 3px;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--c) 9%, transparent), color-mix(in srgb, var(--c) 3%, transparent)),
+    rgb(255 255 255 / 0.015);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.03),
+    0 24px 50px -28px rgb(0 0 0 / 0.9);
+  color: var(--c);
+  font: inherit;
+  cursor: pointer;
+  transform: translateZ(calc(var(--i) * (var(--sep) * var(--paso) + 3px) + var(--alza)));
+  transition:
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.4s,
+    border-color 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+div.bq-acetato { cursor: inherit; }
+.bq-acetato:focus-visible { outline: 2px solid var(--c); outline-offset: 4px; }
+@media (hover: hover) {
+  .bq-lab__pila[data-separada] button.bq-acetato:hover { --alza: 14px; border-color: var(--c); }
+}
+.bq-lab__pila[data-sel] .bq-acetato { opacity: 0.22; }
+.bq-lab__pila[data-sel] .bq-acetato[data-on] {
+  --alza: calc(var(--paso) * 0.6);
+  opacity: 1;
+  border-color: var(--c);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--c) 14%, transparent), color-mix(in srgb, var(--c) 5%, transparent)),
+    rgb(13 12 11 / 0.55);
+}
+
+.bq-acetato__brillo {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(45% 35% at var(--bq-lx) var(--bq-ly), rgb(255 255 255 / 0.07), transparent 70%),
+    linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 0.04) 48%, transparent 58%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.bq-acetato__pestana {
+  position: absolute;
+  top: 0;
+  /* Pestañas escalonadas: se leen las cuatro aunque los acetatos estén juntos */
+  left: calc(3% + (var(--i) + 1.5) * 24%);
+  transform: translateY(-100%);
+  padding: 0.2rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  background: color-mix(in srgb, var(--c) 14%, #0d0c0b);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: clamp(0.5625rem, 1.4vmin, 0.6875rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.bq-lab__pila[data-separada] .bq-acetato__pestana { opacity: 1; }
+.bq-lab__pila[data-sel] .bq-acetato:not([data-on]) .bq-acetato__pestana { opacity: 0; }
+
+.bq-lab__aviso {
+  position: absolute;
+  left: 0.9rem;
+  bottom: 0.7rem;
+  margin: 0;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(237 230 214 / 0.45);
+  pointer-events: none;
+}
+
+/* ── Dibujo del esquema ── */
+
+.bq-esq {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bq-esq[data-capa="rostro"] .bq-esq__el > :not(.bq-esq__fino):not(.bq-esq__lleno) { stroke-dasharray: 10 6; }
+.bq-esq[data-capa="mascara"] .bq-esq__el > :not(.bq-esq__fino):not(.bq-esq__lleno) { stroke-dasharray: 14 5 3 5; }
+.bq-esq[data-capa="marcas"] .bq-esq__el > :not(.bq-esq__fino) { stroke-dasharray: 2 5; }
+.bq-esq__fino { stroke-width: 1.1; opacity: 0.65; }
+.bq-esq__lleno { fill: var(--c); stroke: none; }
+.bq-esq__orbita { stroke-width: 1; stroke-dasharray: 3 6; opacity: 0.5; }
+.bq-esq__contorno { stroke-width: 1.4; opacity: 0.5; }
+.bq-esq__contorno--tenue { opacity: 0.22; stroke-dasharray: 4 8; }
+.bq-esq__dientes rect { fill: color-mix(in srgb, var(--c) 18%, transparent); }
+.bq-esq__zona rect { fill: color-mix(in srgb, var(--c) 7%, transparent); }
+.bq-esq__regla { stroke-width: 1; opacity: 0.5; }
+.bq-esq__registro { stroke-width: 1; opacity: 0.55; }
+.bq-esq__el { transition: opacity 0.3s; }
+
+/* Un elemento elegido: el resto de su acetato se apaga */
+.bq-esq[data-activo] .bq-esq__el { opacity: 0.25; }
+.bq-esq[data-activo="1"] .bq-esq__el[data-n="1"],
+.bq-esq[data-activo="2"] .bq-esq__el[data-n="2"],
+.bq-esq[data-activo="3"] .bq-esq__el[data-n="3"],
+.bq-esq[data-activo="4"] .bq-esq__el[data-n="4"],
+.bq-esq[data-activo="5"] .bq-esq__el[data-n="5"],
+.bq-esq[data-activo="6"] .bq-esq__el[data-n="6"],
+.bq-esq[data-activo="7"] .bq-esq__el[data-n="7"],
+.bq-esq[data-activo="8"] .bq-esq__el[data-n="8"],
+.bq-esq[data-activo="9"] .bq-esq__el[data-n="9"],
+.bq-esq[data-activo="10"] .bq-esq__el[data-n="10"],
+.bq-esq[data-activo="11"] .bq-esq__el[data-n="11"],
+.bq-esq[data-activo="12"] .bq-esq__el[data-n="12"],
+.bq-esq[data-activo="13"] .bq-esq__el[data-n="13"],
+.bq-esq[data-activo="14"] .bq-esq__el[data-n="14"] {
+  opacity: 1;
+  stroke-width: 3.4;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c) 70%, transparent));
+}
+
+.bq-esq__num circle { fill: #121110; stroke-width: 1.5; }
+.bq-esq__num text {
+  fill: var(--c);
+  stroke: none;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+.bq-esq__num[data-on] circle { fill: var(--c); }
+.bq-esq__num[data-on] text { fill: #121110; }
+.bq-lab__escena[data-hero] .bq-esq__num { display: none; }
+
+/* ── Mandos ── */
+
+.bq-lab__mandos { display: grid; gap: 1.25rem; min-width: 0; }
+
+.bq-lab__capas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.bq-lab__capas button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--c-line);
+  border-left: 3px solid var(--c);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 80%;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+}
+.bq-lab__capas button[aria-pressed="true"] {
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+}
+.bq-lab__capas button:focus-visible,
+.bq-lab__boton:focus-visible,
+.bq-lab__elementos button:focus-visible { outline: 2px solid var(--bq-amarillo); outline-offset: 2px; }
+.bq-lab__letra {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--c);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: var(--c);
+}
+
+.bq-lab__sep {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.bq-lab__sep label { flex: 1 1 8rem; display: flex; }
+.bq-lab__sep input[type="range"] { width: 100%; min-height: 2.75rem; accent-color: var(--bq-amarillo); }
+.bq-lab__boton {
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--bq-amarillo);
+  background: var(--bq-amarillo);
+  color: #121110;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.bq-lab__boton--tenue { background: transparent; border-color: var(--c-line); color: var(--c-ink); }
+
+.bq-lab__ficha {
+  min-height: 9rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--c-line);
+  background: rgb(255 255 255 / 0.02);
+}
+.bq-lab__ficha h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: 1.75rem;
+  text-transform: uppercase;
+  color: var(--c);
+}
+.bq-lab__ficha > p { margin: 0; line-height: 1.5; text-wrap: pretty; }
+.bq-lab__vacio { color: var(--c-muted); }
+.bq-lab__elementos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bq-lab__elementos button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.75rem 0.35rem 0.4rem;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--c-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.bq-lab__elementos button[aria-pressed="true"] { border-color: var(--bq-amarillo); background: rgb(240 197 58 / 0.12); }
+.bq-lab__n {
+  display: grid;
+  place-items: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.08);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.bq-lab__nota {
+  margin: 0.9rem 0 0 !important;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--bq-amarillo);
+}
+
+/* Hero sin reproducción: la pila ocupa la lámina */
+.bq-lamina__obra:has(.bq-lab__escena) { background: #0d0c0b; }
+.bq-lamina__credito a { color: inherit; text-decoration-color: var(--bq-azul); text-underline-offset: 0.2em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bq-lab__pila,
+  .bq-lab__mesa,
+  .bq-acetato,
+  .bq-acetato__pestana { transition: none; }
+}
+
+/* ── Rayos X: la pila de frente; la lente deja ver la Anatomía ── */
+
+.bq-lab__escena[data-rayos] { cursor: none; touch-action: none; }
+.bq-lab__pila[data-rayos] {
+  --rr: clamp(52px, 13vmin, 110px);
+  --c-rx: #bfe6ff;
+}
+.bq-lab__pila[data-rayos] .bq-acetato:not([data-capa="anatomia"]) {
+  -webkit-mask-image: radial-gradient(circle var(--rr) at var(--bq-mx) var(--bq-my), transparent 97%, #000 100%);
+  mask-image: radial-gradient(circle var(--rr) at var(--bq-mx) var(--bq-my), transparent 97%, #000 100%);
+}
+.bq-lab__pila[data-rayos] .bq-acetato[data-capa="anatomia"] {
+  --c: var(--c-rx);
+  background: rgb(120 190 255 / 0.1);
+  -webkit-mask-image: radial-gradient(circle var(--rr) at var(--bq-mx) var(--bq-my), #000 97%, transparent 100%);
+  mask-image: radial-gradient(circle var(--rr) at var(--bq-mx) var(--bq-my), #000 97%, transparent 100%);
+}
+.bq-lab__pila[data-rayos] .bq-acetato[data-capa="anatomia"] .bq-esq { filter: drop-shadow(0 0 5px rgb(150 210 255 / 0.9)); }
+.bq-lab__pila[data-rayos] .bq-esq__num,
+.bq-lab__pila[data-rayos] .bq-acetato__pestana { visibility: hidden; }
+.bq-lab__lente {
+  position: absolute;
+  left: var(--bq-mx);
+  top: var(--bq-my);
+  width: calc(var(--rr) * 2);
+  aspect-ratio: 1;
+  border: 1.5px solid var(--c-rx);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.6), 0 0 30px rgb(150 210 255 / 0.35), inset 0 0 30px rgb(150 210 255 / 0.25);
+  transform: translate(-50%, -50%) translateZ(12px);
+  pointer-events: none;
+}
+.bq-lab__lente::before,
+.bq-lab__lente::after {
+  content: "";
+  position: absolute;
+  background: var(--c-rx);
+  opacity: 0.7;
+}
+.bq-lab__lente::before { left: 50%; top: -10px; width: 1px; height: 18px; }
+.bq-lab__lente::after { top: 50%; left: -10px; height: 1px; width: 18px; }
+.bq-lab__boton--rayos { background: transparent; border-color: #8fcfff; color: #bfe6ff; }
+.bq-lab__boton--rayos[aria-pressed="true"] { background: #bfe6ff; color: #0d0c0b; }
+.bq-lab__boton:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Ruido interior: dentro de la bóveda del acetato de Anatomía ── */
+
+.bq-ruido {
+  position: absolute;
+  left: 28%;
+  top: 16%;
+  width: 44%;
+  height: 32%;
+  clip-path: ellipse(50% 50% at 50% 55%);
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 0.6s;
+  pointer-events: none;
+}
+.bq-ruido[data-activo] { opacity: 1; }
+
+/* ── Cinco hallazgos ── */
+
+.bq-lab__k {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bq-lab__hallazgos ol { display: grid; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.bq-lab__hallazgos button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.6rem 0.35rem 0.35rem;
+  border: 1px solid transparent;
+  border-bottom-color: var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+}
+.bq-lab__hallazgos button[aria-pressed="true"] { border-color: var(--bq-salmon); background: rgb(243 166 143 / 0.1); }
+.bq-lab__hallazgos button:focus-visible { outline: 2px solid var(--bq-amarillo); outline-offset: 2px; }
+.bq-lab__mas {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1.5px solid var(--bq-salmon);
+  color: var(--bq-salmon);
+  font-weight: 700;
+  transition: background 0.3s, color 0.3s;
+}
+.bq-lab__hallazgos button[aria-pressed="true"] .bq-lab__mas { background: var(--bq-salmon); color: #121110; }
+.bq-lab__pregunta { font-family: var(--font-bodoni), Georgia, serif; font-style: italic; font-size: 1.05rem; color: var(--bq-salmon); }
+.bq-lab__fpregunta {
+  margin: 0 0 0.25rem !important;
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  color: var(--bq-salmon);
+}
+.bq-lab__entradas { display: grid; gap: 0.75rem; margin: 0.9rem 0 0; padding: 0; list-style: none; }
+.bq-lab__entradas li { padding-left: 0.75rem; border-left: 2px solid var(--c-line); }
+.bq-lab__entradas p { margin: 0; line-height: 1.5; }
+.bq-lab__rayos-dato { margin-top: 0.75rem; padding-left: 0.75rem; border-left: 2px solid #bfe6ff; }
+.bq-lab__rayos-dato p { margin: 0; line-height: 1.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bq-ruido,
+  .bq-lab__mas { transition: none; }
+}
+
+/* ── 02 · Tres lecturas: el contorno que se transforma ── */
+
+.bq-lecturas__cuerpo[data-figura] { display: grid; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+@media (min-width: 64rem) {
+  .bq-lecturas__cuerpo[data-figura] { grid-template-columns: minmax(16rem, 0.75fr) minmax(0, 1.25fr); }
+  .bq-lecturas__cuerpo[data-figura] .bq-contorno { position: sticky; top: 5.5rem; }
+}
+.bq-contorno {
+  position: relative;
+  width: min(100%, 26rem);
+  margin-inline: auto;
+  padding: 1rem 1rem 2.5rem;
+  border: 1px solid var(--c-line);
+  background:
+    radial-gradient(70% 60% at 50% 40%, rgb(240 197 58 / 0.06), transparent 70%),
+    #0d0c0b;
+}
+@media (max-width: 63.99rem) {
+  .bq-contorno { width: min(100%, 20rem); }
+}
+.bq-contorno svg { display: block; width: 100%; height: auto; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.bq-contorno__principal path { stroke: #8f887a; stroke-width: 4; }
+.bq-contorno__principal [data-parte="boca"],
+.bq-contorno__principal [data-parte^="ojo"] { stroke-width: 3; }
+.bq-contorno__fantasma { visibility: hidden; opacity: 0; stroke-width: 2; stroke-dasharray: 6 6; }
+.bq-contorno[data-vista="tres"] .bq-contorno__principal { opacity: 0; }
+.bq-contorno__nombre {
+  margin: 0.5rem 0 0;
+  text-align: center;
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  text-transform: uppercase;
+}
+.bq-contorno__nombre span { display: none; }
+.bq-contorno[data-vista="craneo"] [data-de="craneo"],
+.bq-contorno[data-vista="rostro"] [data-de="rostro"],
+.bq-contorno[data-vista="mascara"] [data-de="mascara"],
+.bq-contorno[data-vista="tres"] [data-de="tres"],
+.bq-contorno[data-vista="neutra"] [data-de="neutra"] { display: inline; }
+.bq-contorno[data-vista="neutra"] .bq-contorno__nombre { color: var(--c-muted); font-size: 1.25rem; }
+.bq-contorno__aviso {
+  position: absolute;
+  left: 0.9rem;
+  bottom: 0.7rem;
+  margin: 0;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(237 230 214 / 0.45);
+}
+/* Sin recortes de la pintura, el texto de cada lectura ocupa toda su columna */
+.bq-lecturas__cuerpo[data-figura] .bq-vista { grid-template-columns: minmax(0, 1fr); max-width: 46rem; }
+/* Con recortes de la pintura, detalle y texto comparten la columna junto al contorno */
+@media (min-width: 64rem) {
+  .bq-lecturas__cuerpo[data-recortes] .bq-vista:not(.bq-sintesis) { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); max-width: none; }
+}
+
+/* ── 01 · Con reproducción: modelo de MANIFESTO o capas sobre la pintura (ModosCapas) ── */
+
+.bq-modos__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  max-width: 40rem;
+  margin: 0 0 clamp(1rem, 3vw, 1.75rem);
+}
+.bq-modos__tab {
+  display: grid;
+  align-content: center;
+  gap: 0.2rem;
+  min-height: 3.5rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--c-line);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bq-modos__n {
+  font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.bq-modos__d {
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-style: italic;
+  font-size: 0.875rem;
+  color: var(--bq-salmon);
+}
+.bq-modos__tab[aria-selected="true"] {
+  border-color: var(--bq-amarillo);
+  background: rgb(240 197 58 / 0.08);
+  box-shadow: inset 0 -4px 0 var(--bq-amarillo);
+}
+.bq-modos__tab:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+@media (hover: hover) {
+  .bq-modos__tab:hover { border-color: var(--c-ink); }
+}

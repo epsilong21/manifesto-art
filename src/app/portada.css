@@ -188,6 +188,16 @@
   transform: scale(1.5);
   transform-origin: 48% 40%;
 }
+/* Obras protegidas con su reproducción (src/lib/miniaturas.ts): la pintura entera, sin
+   ampliar, apoyada abajo para que el arco de la ventana no le corte las esquinas. La
+   deriva (±2 %) cabe en el margen */
+.hm-mirilla[data-integra] .hm-mirilla__ventana img {
+  inset: 0 7% 5%;
+  width: 86%;
+  height: 95%;
+  object-fit: contain;
+  object-position: 50% 100%;
+}
 .hm-mirilla__pie {
   display: grid;
   gap: 0.1rem;
@@ -230,6 +240,9 @@
   }
   .hm-mirilla__link:hover img {
     scale: 1.06;
+  }
+  .hm-mirilla[data-integra] .hm-mirilla__link:hover img {
+    scale: none;
   }
 }
 .hm-nota {

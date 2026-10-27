@@ -8,6 +8,7 @@ import { GlennGrafico } from "@/components/concepts/GlennGrafico";
 import { CONCEPTOS } from "@/content/conceptos";
 import { bricolage } from "@/lib/fonts/bricolage";
 import { plexMono } from "@/lib/fonts/plexmono";
+import { miniaturaProtegida } from "@/lib/miniaturas";
 import ConceptosPage, { metadata as metadataSelector } from "./conceptos/page";
 import "./conceptos/conceptos.css";
 import "./portada.css";
@@ -25,11 +26,15 @@ export const metadata: Metadata = entradaSelector ? { ...metadataSelector, alter
 const FRAGMENTO: Record<string, { src: string; width: number; height: number } | null> = {
   medusa: { src: "/obras/medusa.jpg", width: 2400, height: 2350 },
   "noche-estrellada": { src: "/obras/noche-estrellada.jpg", width: 3000, height: 2376 },
-  // Dalí y Basquiat: obras protegidas. La mirilla muestra la composición propia de MANIFESTO.
-  "los-elefantes": null,
-  "basquiat-untitled": null,
-  glenn: null,
+  // Dalí y Basquiat: obras protegidas. La pintura entera, la misma que su hero, si este build
+  // la tiene (src/lib/miniaturas.ts); si no, la composición propia de MANIFESTO.
+  "los-elefantes": miniaturaProtegida("los-elefantes"),
+  "basquiat-untitled": miniaturaProtegida("basquiat-untitled"),
+  glenn: miniaturaProtegida("glenn"),
 };
+
+const PROTEGIDAS = ["los-elefantes", "basquiat-untitled", "glenn"];
+const conPintura = PROTEGIDAS.filter((s) => FRAGMENTO[s]).length;
 
 const PASOS = [
   {
@@ -78,7 +83,13 @@ export default function Portada() {
             {CONCEPTOS.map((c, i) => {
               const img = FRAGMENTO[c.slug];
               return (
-                <li key={c.slug} className="hm-mirilla" data-obra={c.slug} style={{ "--i": i } as React.CSSProperties}>
+                <li
+                  key={c.slug}
+                  className="hm-mirilla"
+                  data-obra={c.slug}
+                  data-integra={img && PROTEGIDAS.includes(c.slug) ? "" : undefined}
+                  style={{ "--i": i } as React.CSSProperties}
+                >
                   <Link href={`/conceptos/${c.slug}`} className="hm-mirilla__link">
                     <span className="hm-mirilla__ventana" aria-hidden="true">
                       {img ? (
@@ -110,8 +121,11 @@ export default function Portada() {
             })}
           </ul>
           <p className="hm-nota">
-            Fragmentos de Medusa y La noche estrellada. Las otras tres mirillas son composiciones de
-            MANIFESTO sobre Los elefantes, Untitled y Glenn, no las pinturas de Dalí y Basquiat.
+            {conPintura === PROTEGIDAS.length
+              ? "Fragmentos de Medusa y La noche estrellada. Los elefantes, Untitled y Glenn se ven enteras: reproducciones sin licencia de reproducción, como en sus páginas."
+              : conPintura === 0
+                ? "Fragmentos de Medusa y La noche estrellada. Las otras tres mirillas son composiciones de MANIFESTO sobre Los elefantes, Untitled y Glenn, no las pinturas de Dalí y Basquiat."
+                : "Fragmentos de Medusa y La noche estrellada. Las obras de Dalí y Basquiat se ven enteras cuando hay reproducción; si no, con una composición de MANIFESTO."}
           </p>
         </section>
 

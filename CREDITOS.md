@@ -38,14 +38,14 @@ Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fun
 
 ### Untitled · Jean-Michel Basquiat, 1981 · The Broad, Los Ángeles (B-BASQ-2P82.32)
 
-Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Jean-Michel Basquiat. Licensed by Artestar, New York.
+Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Jean-Michel Basquiat. Licencias de reproducción: Artestar, Nueva York. MANIFESTO no dispone de ninguna.
 
 - **Sin reproducción:** la página no muestra la pintura porque no hay licencia de reproducción. Enlaza a la ficha de la obra en The Broad.
 - **Lámina vacía:** el marco del hero conserva la proporción real del lienzo (205,74 × 175,9 cm); no contiene ninguna imagen sustitutiva.
 
 ### Glenn · Jean-Michel Basquiat, 1984–1985 · Colección particular
 
-Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Jean-Michel Basquiat. Licensed by Artestar, New York.
+Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Jean-Michel Basquiat. Licencias de reproducción: Artestar, Nueva York. MANIFESTO no dispone de ninguna.
 
 - **Sin reproducción:** la página no muestra la pintura porque no hay licencia de reproducción.
 - **Esquema de MANIFESTO:** en su lugar se ve un esquema propio, rotulado como tal, con la proporción real del lienzo (254 × 289,6 cm) y las zonas de los hallazgos. No reproduce ni imita la pintura.

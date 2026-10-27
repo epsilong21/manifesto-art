@@ -29,7 +29,8 @@ export const DERECHOS_BASQUIAT = {
   hasta: "1 de enero de 2059",
   titular: "The Estate of Jean-Michel Basquiat",
   gestion: "Artestar, Nueva York",
-  credito: "© The Estate of Jean-Michel Basquiat. Licensed by Artestar, New York.",
+  // Aviso de derechos de la obra, no una licencia de MANIFESTO: se dice expresamente
+  credito: "© The Estate of Jean-Michel Basquiat. Licencias de reproducción: Artestar, Nueva York. MANIFESTO no dispone de ninguna.",
   texto:
     "La obra de Jean-Michel Basquiat está protegida por derechos de autor. Reproducirla, incluso en una web, requiere la autorización de The Estate of Jean-Michel Basquiat, que la licencia a través de Artestar.",
 };

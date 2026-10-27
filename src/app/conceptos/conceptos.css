@@ -629,6 +629,17 @@ body:has(.mf-theme) { background: transparent; }
 .sel-art img {
   object-fit: cover;
 }
+/* Obras protegidas con su reproducción (src/lib/miniaturas.ts): la pintura entera, sin
+   recorte, ampliación ni sombra encima. El desplazamiento (±4 %) cabe en el margen */
+.sel-art[data-integra] {
+  inset: 6%;
+}
+.sel-art[data-integra] img {
+  object-fit: contain;
+}
+.sel-item[data-integra] .sel-shade {
+  background: none;
+}
 .sel-shade {
   position: absolute;
   inset: 0;

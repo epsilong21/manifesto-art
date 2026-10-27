@@ -2,7 +2,8 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import { KindTag } from "@/components/concepts/ConceptChrome";
 import { BASQUIAT, CARTELA_BASQUIAT, DERECHOS_BASQUIAT, HERO_BASQUIAT, LIENZO_BASQUIAT, OBRA_BASQUIAT } from "@/content/basquiat";
-import { RevelacionObra } from "./RevelacionObra";
+import { EntradaLamina } from "./EntradaLamina";
+import { LaboratorioAcetatos } from "./LaboratorioAcetatos";
 import { VerSoloLaObra } from "./VerSoloLaObra";
 
 /**
@@ -17,11 +18,13 @@ const SIZES = "(min-width: 64rem) 50vw, (orientation: landscape) 70vh, 100vw";
 /**
  * Hero de «Dentro de la cabeza»: la pintura como lámina, con el título y la
  * pregunta a un lado. La gráfica de lámina anatómica (rótulo, cotas del lienzo)
- * queda fuera de la imagen, que nunca se tapa ni se altera.
+ * queda fuera de la imagen, que nunca se altera: a la entrada solo se levanta la
+ * hoja protectora que la cubre (EntradaLamina).
  *
- * Sin reproducción autorizada (`conImagen` falso), la lámina queda vacía con la
- * proporción real del lienzo y una cartela que explica por qué: no hay pintura
- * sustitutiva ni nada que la imite.
+ * Sin reproducción autorizada (`conImagen` falso), la lámina conserva la proporción
+ * real del lienzo y muestra el esquema de MANIFESTO en acetatos (LaboratorioAcetatos),
+ * rotulado como tal: no hay pintura sustitutiva ni nada que la imite. El pie de la
+ * lámina explica por qué y enlaza la ficha del museo.
  */
 export function BasquiatHero({ conImagen }: { conImagen: boolean }) {
   const { imagen, alt, credito } = OBRA_BASQUIAT;
@@ -65,20 +68,9 @@ export function BasquiatHero({ conImagen }: { conImagen: boolean }) {
             />
           ) : null}
           {conImagen ? (
-            <RevelacionObra src={imagen.src} width={imagen.width} height={imagen.height} sizes={SIZES} />
+            <EntradaLamina />
           ) : (
-            <div className="bq-pendiente">
-              <p className="bq-pendiente__t">Reproducción pendiente de autorización</p>
-              <p>
-                {BASQUIAT.titulo}, de {BASQUIAT.autor}, está protegida por derechos de autor. La pintura se
-                mostrará aquí cuando su reproducción esté autorizada. Este marco vacío tiene la proporción
-                real del lienzo.
-              </p>
-              <a href={BASQUIAT.ficha} target="_blank" rel="noopener noreferrer" className="bq-pendiente__enlace">
-                Ver la obra en la ficha de The Broad
-                <span className="sr-only"> (se abre en otra pestaña)</span>
-              </a>
-            </div>
+            <LaboratorioAcetatos hero />
           )}
         </div>
         {/* Cotas del lienzo, como en una lámina: el dato está también en la cartela */}
@@ -88,7 +80,19 @@ export function BasquiatHero({ conImagen }: { conImagen: boolean }) {
         <span className="bq-cota bq-cota--ancho" aria-hidden="true">
           <span>{BASQUIAT.ancho}</span>
         </span>
-        <p className="bq-lamina__credito">{conImagen ? DERECHOS_BASQUIAT.credito : `Obra: ${DERECHOS_BASQUIAT.credito}`}</p>
+        {conImagen ? (
+          <p className="bq-lamina__credito">{DERECHOS_BASQUIAT.credito}</p>
+        ) : (
+          <p className="bq-lamina__credito">
+            Esquema de MANIFESTO, no la pintura. {BASQUIAT.titulo}, de {BASQUIAT.autor}, está protegida por derechos de
+            autor y su reproducción está pendiente de autorización.{" "}
+            <a href={BASQUIAT.ficha} target="_blank" rel="noopener noreferrer">
+              Ver la obra en la ficha de The Broad
+              <span className="sr-only"> (se abre en otra pestaña)</span>
+            </a>
+            . Obra: {DERECHOS_BASQUIAT.credito}
+          </p>
+        )}
       </figure>
 
       <div className="bq-hero__pie">

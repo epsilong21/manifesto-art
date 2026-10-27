@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { elegirReproduccion as elegirReproduccionBasquiat } from "./scripts/basquiat/reproduccion.mjs";
+import { elegirReproduccion as elegirReproduccionBasquiat, esPublicacion } from "./scripts/basquiat/reproduccion.mjs";
 import { elegirReproduccion } from "./scripts/elefantes/reproduccion.mjs";
 import { elegirReproduccion as elegirReproduccionGlenn } from "./scripts/glenn/reproduccion.mjs";
 
@@ -39,6 +39,8 @@ const nextConfig: NextConfig = {
     MANIFESTO_BASQUIAT_REPRODUCCION: reproduccionBasquiat ? JSON.stringify(reproduccionBasquiat) : "",
     // Ídem para Glenn (ver src/content/glenn.ts)
     MANIFESTO_GLENN_REPRODUCCION: reproduccionGlenn ? JSON.stringify(reproduccionGlenn) : "",
+    // «1» al publicar: catálogo y portada no muestran la pintura de las obras protegidas (src/lib/miniaturas.ts)
+    MANIFESTO_PUBLICACION: esPublicacion() ? "1" : "",
   },
   ...(pages
     ? {

@@ -156,7 +156,7 @@ export const FICHA_EXPEDIENTE: [string, string][] = [
   ["Colección", "The Broad, Los Ángeles"],
   ["Inventario", "B-BASQ-2P82.32"],
   ["Ingreso", "1982 (la ficha indica 12/09/82)"],
-  ["Derechos", "© The Estate of Jean-Michel Basquiat. Licensed by Artestar, New York. Protegida hasta el 1 de enero de 2059"],
+  ["Derechos", "© The Estate of Jean-Michel Basquiat (licencias de reproducción: Artestar, Nueva York; MANIFESTO no dispone de ninguna). Protegida hasta el 1 de enero de 2059"],
 ];
 
 export type Hito = { cuando: string; texto: string; tipo: Tipo; fuente: string; pendiente?: boolean };

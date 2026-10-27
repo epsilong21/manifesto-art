@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { KindTag } from "@/components/concepts/ConceptChrome";
 import { CONTEXTO_GLENN, OBRIEN, RELACION_GLENN } from "@/content/glenn";
+import { CronologiaArrastrable } from "./CronologiaArrastrable";
 
 /**
  * «1985»: los hitos documentados alrededor de Glenn, quién era Glenn O'Brien y la
- * relación con la otra cabeza de Basquiat en MANIFESTO (Untitled, 1981).
+ * relación con la otra cabeza de Basquiat en MANIFESTO (Untitled, 1981). Los hitos son
+ * una tira de fotocopias que se arrastra (CronologiaArrastrable).
  */
 export function ContextoGlenn() {
   return (
@@ -20,17 +22,19 @@ export function ContextoGlenn() {
         </p>
       </header>
 
-      <ol className="gl-hitos">
-        {CONTEXTO_GLENN.map((h) => (
-          <li key={h.id} className="gl-hito">
-            <p className="gl-hito__fecha">{h.fecha}</p>
-            <p>{h.texto}</p>
-            <p className="gl-meta">
-              <KindTag tipo="hecho" /> <span>Fuente: {h.fuente}</span>
-            </p>
-          </li>
-        ))}
-      </ol>
+      <CronologiaArrastrable etiqueta="Cronología 1984–1985: desliza o arrastra las hojas">
+        <ol className="gl-hitos gl-hitos--tira">
+          {CONTEXTO_GLENN.map((h, i) => (
+            <li key={h.id} className="gl-hito" data-n={String(i + 1).padStart(2, "0")}>
+              <p className="gl-hito__fecha">{h.fecha}</p>
+              <p>{h.texto}</p>
+              <p className="gl-meta">
+                <KindTag tipo="hecho" /> <span>Fuente: {h.fuente}</span>
+              </p>
+            </li>
+          ))}
+        </ol>
+      </CronologiaArrastrable>
 
       <div className="gl-contexto__pie">
         <div className="gl-obrien">

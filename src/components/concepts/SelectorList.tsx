@@ -7,16 +7,25 @@ import { BasquiatGrafico } from "@/components/concepts/BasquiatGrafico";
 import { ElefantesGrafico } from "@/components/concepts/ElefantesGrafico";
 import { GlennGrafico } from "@/components/concepts/GlennGrafico";
 import { CONCEPTOS } from "@/content/conceptos";
+import { miniaturaProtegida } from "@/lib/miniaturas";
 
-const ART: Record<string, { src: string; width: number; height: number } | null> = {
+const ART: Record<string, { src: string; width: number; height: number; pie?: string } | null> = {
   medusa: { src: "/obras/medusa.jpg", width: 2400, height: 2350 },
   "noche-estrellada": { src: "/obras/noche-estrellada.jpg", width: 3000, height: 2376 },
-  // Dalí: sin reproducción (obra protegida). El arte del panel es propio.
-  "los-elefantes": null,
-  // Basquiat: obra protegida y sin licencia. Composición tipográfica propia, sin la pintura.
-  "basquiat-untitled": null,
-  // Glenn: también protegida. Composición propia (retícula de copias y tres lecturas)
-  glenn: null,
+  // Dalí y Basquiat: obras protegidas. La misma reproducción que su hero, si este build
+  // la tiene (src/lib/miniaturas.ts); si no, la composición propia de MANIFESTO.
+  "los-elefantes": miniaturaProtegida("los-elefantes"),
+  "basquiat-untitled": miniaturaProtegida("basquiat-untitled"),
+  glenn: miniaturaProtegida("glenn"),
+};
+
+/** Las obras protegidas se ven enteras en la tarjeta: sin recorte ni ampliación. */
+const INTEGRA = new Set(["los-elefantes", "basquiat-untitled", "glenn"]);
+
+const NOTA_PROPIA: Record<string, string> = {
+  "los-elefantes": "Imagen: composición gráfica de MANIFESTO, no la pintura de Dalí.",
+  "basquiat-untitled": "Imagen: composición tipográfica de MANIFESTO, no la pintura de Basquiat.",
+  glenn: "Imagen: composición gráfica de MANIFESTO, no la pintura de Basquiat.",
 };
 
 const MOD: Record<string, string> = {
@@ -48,11 +57,12 @@ export function SelectorList() {
           <li
             key={c.slug}
             className={`sel-item ${MOD[c.slug]}`}
+            data-integra={art && INTEGRA.has(c.slug) ? "" : undefined}
             onPointerMove={track}
             onPointerLeave={reset}
           >
             <div className="sel-plate" aria-hidden="true">
-            <div className="sel-art">
+            <div className="sel-art" data-integra={art && INTEGRA.has(c.slug) ? "" : undefined}>
               {art ? (
                 <Image
                   src={art.src}
@@ -92,12 +102,8 @@ export function SelectorList() {
               <p className="sel-quote">{c.pregunta}</p>
               <p className="sel-desc">{c.descripcion}</p>
               <p className="sel-gesto">{c.interaccion}</p>
-              {c.slug === "los-elefantes" ? (
-                <p className="sel-nota">Imagen: composición gráfica de MANIFESTO, no la pintura de Dalí.</p>
-              ) : c.slug === "basquiat-untitled" ? (
-                <p className="sel-nota">Imagen: composición tipográfica de MANIFESTO, no la pintura de Basquiat.</p>
-              ) : c.slug === "glenn" ? (
-                <p className="sel-nota">Imagen: composición gráfica de MANIFESTO, no la pintura de Basquiat.</p>
+              {INTEGRA.has(c.slug) ? (
+                <p className="sel-nota">{art?.pie ? `Imagen: la pintura. ${art.pie}` : NOTA_PROPIA[c.slug]}</p>
               ) : null}
               <Link href={`/conceptos/${c.slug}`} className="sel-link">
                 Entrar en {c.titulo}

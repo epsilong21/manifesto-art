@@ -29,7 +29,8 @@ export const GLENN = {
 
 export const DERECHOS_GLENN = {
   hasta: "1 de enero de 2059",
-  credito: "© The Estate of Jean-Michel Basquiat. Licensed by Artestar, New York.",
+  // Aviso de derechos de la obra, no una licencia de MANIFESTO: se dice expresamente
+  credito: "© The Estate of Jean-Michel Basquiat. Licencias de reproducción: Artestar, Nueva York. MANIFESTO no dispone de ninguna.",
 };
 
 export const HERO_GLENN = {

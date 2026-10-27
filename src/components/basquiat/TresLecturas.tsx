@@ -2,6 +2,7 @@ import Image from "next/image";
 import { KindTag } from "@/components/concepts/ConceptChrome";
 import { OBRA_BASQUIAT } from "@/content/basquiat";
 import { LECTURAS, SINTESIS, type LecturaId } from "@/content/basquiat-lecturas";
+import { ContornoLecturas } from "./ContornoLecturas";
 
 const nombre = (id: LecturaId) => LECTURAS.find((l) => l.id === id)!.nombre;
 
@@ -33,8 +34,10 @@ function Recorte({ zona: [x, y, w, h], pie }: { zona: [number, number, number, n
 /**
  * Sección 02 · «¿Qué estamos mirando?». Tres lecturas que se eligen con radios
  * nativos y CSS (:has): funciona sin JavaScript y sin otro sistema de marcas sobre
- * la obra. Sin :has, todas las lecturas se muestran seguidas. Sin reproducción
- * autorizada, solo el texto.
+ * la obra. Sin :has, todas las lecturas se muestran seguidas. El contorno de
+ * MANIFESTO que se transforma con cada lectura (ContornoLecturas) acompaña
+ * siempre al texto; con reproducción, cada lectura suma además su detalle de la
+ * pintura (Recorte).
  */
 export function TresLecturas({ conImagen }: { conImagen: boolean }) {
   return (
@@ -47,8 +50,8 @@ export function TresLecturas({ conImagen }: { conImagen: boolean }) {
           ¿Qué estamos mirando?
         </h2>
         <p className="bq-capas__intro">
-          Un cráneo, un rostro o una máscara. Ninguna respuesta es la correcta: elige una mirada, cámbiala por otra o
-          mira las tres a la vez.
+          Un cráneo, un rostro o una máscara. Ninguna respuesta es la correcta: elige una mirada, cámbiala por otra o mira las tres a la
+          vez.
         </p>
       </header>
 
@@ -72,71 +75,73 @@ export function TresLecturas({ conImagen }: { conImagen: boolean }) {
         </div>
       </fieldset>
 
-      <div className="bq-vistas">
-        <p className="bq-vistas__inicio">
-          Elige una mirada para empezar. Cada una separa lo que se ve, lo que puede significar y lo que está
-          documentado.
-        </p>
+      <div className="bq-lecturas__cuerpo" data-figura="" data-recortes={conImagen ? "" : undefined}>
+        <ContornoLecturas />
+        <div className="bq-vistas">
+          <p className="bq-vistas__inicio">
+            Elige una mirada para empezar. Cada una separa lo que se ve, lo que puede significar y lo que está documentado.
+          </p>
 
-        {LECTURAS.map((l) => (
-          <article key={l.id} className="bq-vista" data-vista={l.id} aria-labelledby={`bq-v-${l.id}`}>
-            {conImagen ? <Recorte zona={l.recorte} pie={l.pieRecorte} /> : null}
-            <div className="bq-vista__texto">
-              <p className="bq-vista__k">{l.pregunta}</p>
-              <h3 id={`bq-v-${l.id}`} className="bq-vista__t">
-                {l.nombre} <span className="bq-vista__lema">{l.lema}</span>
+          {LECTURAS.map((l) => (
+            <article key={l.id} className="bq-vista" data-vista={l.id} aria-labelledby={`bq-v-${l.id}`}>
+              {conImagen ? <Recorte zona={l.recorte} pie={l.pieRecorte} /> : null}
+              <div className="bq-vista__texto">
+                <p className="bq-vista__k">{l.pregunta}</p>
+                <h3 id={`bq-v-${l.id}`} className="bq-vista__t">
+                  {l.nombre} <span className="bq-vista__lema">{l.lema}</span>
+                </h3>
+                <ul className="bq-bloques">
+                  {l.bloques.map((b) => (
+                    <li key={b.texto} data-tipo={b.tipo}>
+                      <p>{b.texto}</p>
+                      <p className="bq-meta">
+                        <KindTag tipo={b.tipo} /> <span>Fuente: {b.fuente}</span>
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                <p className="bq-limite">
+                  <span className="bq-limite__k">Lo que esta lectura no explica</span> {l.limite}
+                </p>
+              </div>
+            </article>
+          ))}
+
+          <article className="bq-vista bq-sintesis" data-vista="tres" aria-labelledby="bq-v-tres">
+            <div className="bq-sintesis__cabeza">
+              <p className="bq-vista__k">Las tres a la vez</p>
+              <h3 id="bq-v-tres" className="bq-vista__t">
+                {SINTESIS.titulo}
               </h3>
-              <ul className="bq-bloques">
-                {l.bloques.map((b) => (
-                  <li key={b.texto} data-tipo={b.tipo}>
-                    <p>{b.texto}</p>
-                    <p className="bq-meta">
-                      <KindTag tipo={b.tipo} /> <span>Fuente: {b.fuente}</span>
+              <p className="bq-sintesis__entrada">{SINTESIS.entrada}</p>
+            </div>
+            <ol className="bq-ciclo">
+              {SINTESIS.ciclo.map((c) => {
+                const l = LECTURAS.find((x) => x.id === c.de)!;
+                return (
+                  <li key={c.de}>
+                    {conImagen ? <Recorte zona={l.recorte} pie={l.pieRecorte} /> : null}
+                    <p className="bq-ciclo__k">
+                      {l.nombre} · {l.pregunta}
+                    </p>
+                    <p className="bq-ciclo__tropieza">{c.tropieza}</p>
+                    <p className="bq-ciclo__explica">
+                      Lo explica: <strong>{nombre(c.explica)}</strong>
+                      {c.explica === "craneo" ? <span className="bq-ciclo__vuelta">, y el círculo vuelve a empezar</span> : null}
                     </p>
                   </li>
-                ))}
-              </ul>
-              <p className="bq-limite">
-                <span className="bq-limite__k">Lo que esta lectura no explica</span> {l.limite}
+                );
+              })}
+            </ol>
+            <div className="bq-sintesis__cierre">
+              <p className="bq-conclusion">{SINTESIS.conclusion}</p>
+              <p className="bq-titulo2">{SINTESIS.titulo2}</p>
+              <p className="bq-meta">
+                <KindTag tipo="lectura" /> <span>Síntesis de MANIFESTO a partir de las tres lecturas</span>
               </p>
             </div>
           </article>
-        ))}
-
-        <article className="bq-vista bq-sintesis" data-vista="tres" aria-labelledby="bq-v-tres">
-          <div className="bq-sintesis__cabeza">
-            <p className="bq-vista__k">Las tres a la vez</p>
-            <h3 id="bq-v-tres" className="bq-vista__t">
-              {SINTESIS.titulo}
-            </h3>
-            <p className="bq-sintesis__entrada">{SINTESIS.entrada}</p>
-          </div>
-          <ol className="bq-ciclo">
-            {SINTESIS.ciclo.map((c) => {
-              const l = LECTURAS.find((x) => x.id === c.de)!;
-              return (
-                <li key={c.de}>
-                  {conImagen ? <Recorte zona={l.recorte} pie={l.pieRecorte} /> : null}
-                  <p className="bq-ciclo__k">
-                    {l.nombre} · {l.pregunta}
-                  </p>
-                  <p className="bq-ciclo__tropieza">{c.tropieza}</p>
-                  <p className="bq-ciclo__explica">
-                    Lo explica: <strong>{nombre(c.explica)}</strong>
-                    {c.explica === "craneo" ? <span className="bq-ciclo__vuelta">, y el círculo vuelve a empezar</span> : null}
-                  </p>
-                </li>
-              );
-            })}
-          </ol>
-          <div className="bq-sintesis__cierre">
-            <p className="bq-conclusion">{SINTESIS.conclusion}</p>
-            <p className="bq-titulo2">{SINTESIS.titulo2}</p>
-            <p className="bq-meta">
-              <KindTag tipo="lectura" /> <span>Síntesis de MANIFESTO a partir de las tres lecturas</span>
-            </p>
-          </div>
-        </article>
+        </div>
       </div>
     </section>
   );
