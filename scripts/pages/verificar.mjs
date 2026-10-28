@@ -35,6 +35,10 @@ recorre(out);
 // 1. Las nueve rutas públicas (entrada, catálogo, las cinco obras, el aviso legal y la política de datos) y la página 404
 const RUTAS = ["", "conceptos/", "conceptos/medusa/", "conceptos/noche-estrellada/", "conceptos/los-elefantes/", "conceptos/basquiat-untitled/", "conceptos/glenn/", "aviso-legal/", "politica-de-privacidad/"];
 for (const r of RUTAS) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
+// 1b. Las cuatro páginas del sprint 06–09: funcionan por URL directa. Aún no están en la entrada ni en el catálogo,
+// así que no se exige que las enlacen (la comprobación de enlaces de abajo sigue usando solo RUTAS).
+const RUTAS_SPRINT = ["conceptos/ascension-al-empireo/", "conceptos/el-descendimiento-de-la-cruz/", "conceptos/la-loca-meg/", "conceptos/los-siete-pecados-capitales/"];
+for (const r of RUTAS_SPRINT) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
 if (!existsSync(join(out, "404.html"))) errores.push("Falta 404.html");
 // La entrada y el catálogo enlazan las cinco obras, el aviso legal y la política de datos
 for (const r of ["", "conceptos/"]) {

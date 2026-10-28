@@ -1,0 +1,108 @@
+.theme-empireo {
+  --c-bg: #07080b;
+  --c-deep: #111620;
+  --c-accent: #f1d7a0;
+  --c-ink: #ece7da;
+  --c-muted: #aab0ba;
+  --c-line: rgb(236 231 218 / 0.16);
+  --f-display: var(--font-cormorant), Georgia, serif;
+}
+html:has(.theme-empireo) { background: #07080b; }
+.theme-empireo :where(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; }
+
+/* ── Hero: la tabla completa primero ── */
+.emp-hero {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 4vw, 3rem) var(--mf-gutter) clamp(2rem, 6vw, 4rem);
+}
+.emp-hero__fig { margin: 0; justify-self: center; display: grid; gap: 0.6rem; order: -1; max-width: 100%; }
+.emp-hero__img {
+  display: block;
+  width: auto;
+  height: min(72svh, 60rem);
+  max-width: 100%;
+  aspect-ratio: 1200 / 2668;
+  object-fit: contain;
+  box-shadow: 0 0 6rem rgb(241 215 160 / 0.12);
+}
+.emp-hero figcaption { font-size: 0.8125rem; color: var(--c-muted); text-align: center; }
+.emp-hero__texto { display: grid; gap: 1rem; align-content: center; justify-items: start; }
+.emp-kicker { margin: 0; font-size: 0.8125rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-accent); }
+.emp-hero h1 { margin: 0; font-size: clamp(2.5rem, 1.2rem + 6vw, 6rem); line-height: 0.95; font-weight: 600; text-wrap: balance; }
+.emp-lede { margin: 0; max-width: 28rem; font-size: clamp(1.05rem, 1rem + 0.5vw, 1.3rem); color: var(--c-muted); font-family: var(--f-display); font-style: italic; }
+@media (min-width: 56rem) {
+  .emp-hero { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4rem; min-height: calc(100svh - 5rem); }
+  .emp-hero__fig { order: 0; }
+  .emp-hero__img { height: min(84svh, 62rem); }
+}
+
+/* ── Explorador ── */
+.emp-explora { padding: clamp(2rem, 6vw, 4rem) var(--mf-gutter); border-top: 1px solid var(--c-line); scroll-margin-top: 1rem; }
+.emp-explora__cab { max-width: 36rem; }
+.emp-explora__cab p { margin: 0 0 1.5rem; color: var(--c-muted); }
+.emp-explora__cuerpo { display: grid; gap: 1.5rem; }
+@media (min-width: 56rem) {
+  .emp-explora__cuerpo { grid-template-columns: auto 26rem; justify-content: start; gap: 3.5rem; align-items: start; }
+}
+.emp-explora { --alto: clamp(15rem, 48svh, 26rem); }
+@media (min-width: 56rem) { .emp-explora { --alto: min(70svh, 40rem); } }
+.emp-ventana-col { display: flex; gap: 0.6rem; justify-content: center; }
+.emp-ventana {
+  --brillo: 0.3;
+  position: relative;
+  overflow: hidden;
+  width: min(calc(100vw - 2 * var(--mf-gutter) - 1.5rem), calc(var(--alto) * 0.82));
+  height: var(--alto);
+  background: #000;
+  outline: 1px solid var(--c-line);
+  box-shadow: 0 0 calc(1rem + 5rem * var(--brillo)) rgb(241 215 160 / calc(0.05 + 0.4 * var(--brillo)));
+  touch-action: pan-y;
+}
+.emp-hoja { position: absolute; left: 0; top: 0; width: 100%; will-change: transform; }
+.emp-hoja img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 2668; user-select: none; }
+.emp-marca {
+  position: absolute; width: 2.2rem; aspect-ratio: 1; translate: -50% -50%;
+  border: 1px solid rgb(241 215 160 / 0.45); border-radius: 50%; pointer-events: none; opacity: 0.55;
+}
+.emp-marca[data-on="true"] { opacity: 1; border-width: 2px; border-color: var(--c-accent); }
+/* Viñeta de interfaz (no es la pintura): se abre a medida que sube la luz medida */
+.emp-vela { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 50%, transparent calc(30% + 50% * var(--brillo)), rgb(0 0 0 / 0.55) 100%); }
+.emp-regla { width: 0.9rem; height: var(--alto); position: relative; flex: none; outline: 1px solid var(--c-line); }
+.emp-regla__marca { position: absolute; left: -0.3rem; right: -0.3rem; height: 2px; background: var(--c-accent); translate: 0 -1px; }
+
+.emp-mandos { display: grid; gap: 1.1rem; max-width: 26rem; }
+.emp-luz { margin: 0; display: flex; align-items: baseline; gap: 0.6rem; }
+.emp-luz__n { font-family: var(--f-display); font-size: 3.5rem; line-height: 1; color: var(--c-accent); min-width: 2ch; }
+.emp-luz__u { color: var(--c-muted); font-size: 0.875rem; }
+.emp-estacion { min-height: 9.5rem; }
+.emp-estacion__n { margin: 0; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted); }
+.emp-estacion h3 { margin: 0.2rem 0 0.4rem; font-size: 1.6rem; }
+.emp-estacion p:last-child { margin: 0; color: var(--c-muted); line-height: 1.5; font-size: 0.975rem; }
+.emp-rango { display: grid; gap: 0.3rem; font-size: 0.875rem; color: var(--c-muted); }
+.emp-rango input { width: 100%; min-height: 44px; accent-color: var(--c-accent); cursor: pointer; }
+.emp-botones { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.emp-botones .mf-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+.emp-lista { margin: 0; padding: 0; list-style: none; display: grid; }
+.emp-lista button {
+  display: flex; align-items: center; gap: 0.7rem; width: 100%; min-height: 44px; padding: 0.4rem 0;
+  background: none; border: 0; border-top: 1px solid var(--c-line); color: var(--c-muted); font: inherit; text-align: left; cursor: pointer;
+}
+.emp-lista button span { display: inline-grid; place-items: center; width: 1.6rem; aspect-ratio: 1; border: 1px solid var(--c-line); border-radius: 50%; font-size: 0.75rem; }
+.emp-lista button[aria-current="step"] { color: var(--c-accent); }
+.emp-lista button[aria-current="step"] span { border-color: var(--c-accent); }
+@media (hover: hover) { .emp-lista button:hover { color: var(--c-ink); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-empireo * { transition: none !important; }
+}
+
+/* Móvil: los mandos de movimiento quedan justo bajo la ventana, antes de las explicaciones */
+@media (max-width: 55.99rem) {
+  .emp-mandos { grid-template-areas: "botones" "rango" "luz" "estacion" "lista"; }
+  .emp-botones { grid-area: botones; }
+  .emp-rango { grid-area: rango; }
+  .emp-luz { grid-area: luz; }
+  .emp-estacion { grid-area: estacion; min-height: 0; }
+  .emp-lista { grid-area: lista; }
+}

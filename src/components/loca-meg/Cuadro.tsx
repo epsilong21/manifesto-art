@@ -1,0 +1,22 @@
+import { MEG_IMG as I } from "@/content/loca-meg";
+
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+/** La tabla completa, sin recortes ni filtros (primera pantalla). */
+export function Cuadro({ className }: { className?: string }) {
+  const a = I.anchos;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      className={className}
+      src={`${BASE}${I.base}-${a[1]}.webp`}
+      srcSet={`${BASE}${I.base}-${a[0]}.webp ${a[0]}w, ${BASE}${I.base}-${a[1]}.webp ${a[1]}w`}
+      sizes="(min-width: 56rem) 80vw, 94vw"
+      width={I.width}
+      height={I.height}
+      alt={I.alt}
+      fetchPriority="high"
+      decoding="async"
+    />
+  );
+}

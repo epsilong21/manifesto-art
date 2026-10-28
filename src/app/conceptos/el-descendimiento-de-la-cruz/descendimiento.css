@@ -1,0 +1,99 @@
+.theme-descendimiento {
+  --c-bg: #0d0a09;
+  --c-deep: #2a1512;
+  --c-accent: #d6483a;
+  --c-ink: #f0e6d8;
+  --c-muted: #b7aa9b;
+  --c-line: rgb(240 230 216 / 0.16);
+  --f-display: var(--font-gloock), Georgia, serif;
+}
+html:has(.theme-descendimiento) { background: #0d0a09; }
+.theme-descendimiento :where(h1, h2, h3) { font-family: var(--f-display); font-weight: 400; }
+
+/* ── Primera pantalla: el panel completo ── */
+.dsc-hero { display: grid; gap: 1.5rem; padding: clamp(1.25rem, 4vw, 3rem) var(--mf-gutter) clamp(2rem, 6vw, 4rem); }
+.dsc-hero__fig { margin: 0; justify-self: center; display: grid; gap: 0.6rem; max-width: 100%; }
+.dsc-hero__img {
+  display: block;
+  width: min(100%, calc(min(76svh, 62rem) * 1400 / 1904));
+  height: auto;
+  box-shadow: 0 0 5rem rgb(214 72 58 / 0.14);
+}
+.dsc-hero figcaption { font-size: 0.8125rem; color: var(--c-muted); text-align: center; max-width: 34rem; margin-inline: auto; }
+.dsc-hero__texto { display: grid; gap: 1rem; align-content: center; justify-items: start; }
+.dsc-kicker { margin: 0; font-size: 0.8125rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-accent); }
+.dsc-hero h1 { margin: 0; font-size: clamp(2.3rem, 1.1rem + 5vw, 5.2rem); line-height: 1; text-wrap: balance; }
+.dsc-lede { margin: 0; max-width: 28rem; font-size: clamp(1.05rem, 1rem + 0.4vw, 1.25rem); color: var(--c-muted); line-height: 1.5; }
+@media (min-width: 56rem) {
+  .dsc-hero { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: clamp(2rem, 5vw, 5rem); min-height: calc(100svh - 5rem); }
+  .dsc-hero__img { width: calc(min(84svh, 62rem) * 1400 / 1904); }
+}
+
+/* ── Explorador ── */
+.dsc-explora { --alto: clamp(15rem, 52svh, 30rem); padding: clamp(2rem, 6vw, 4rem) var(--mf-gutter); border-top: 1px solid var(--c-line); scroll-margin-top: 1rem; }
+@media (min-width: 56rem) { .dsc-explora { --alto: min(70svh, 44rem); } }
+.dsc-explora__cab { max-width: 36rem; }
+.dsc-explora__cab p { margin: 0 0 1.5rem; color: var(--c-muted); }
+.dsc-explora__cuerpo { display: grid; gap: 1.5rem; }
+@media (min-width: 56rem) { .dsc-explora__cuerpo { grid-template-columns: auto 26rem; justify-content: start; gap: 3.5rem; align-items: start; } }
+.dsc-escena { display: flex; justify-content: center; }
+.dsc-marco {
+  position: relative;
+  overflow: hidden;
+  height: var(--alto);
+  aspect-ratio: 1400 / 1904;
+  max-width: 100%;
+  background: #000;
+  outline: 1px solid var(--c-line);
+}
+.dsc-lienzo { position: absolute; inset: 0; transform-origin: 0 0; transition: transform 0.7s cubic-bezier(0.3, 0.7, 0.2, 1); will-change: transform; }
+.dsc-img { display: block; width: 100%; height: 100%; user-select: none; transition: filter 0.5s; }
+.dsc-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.dsc-ruta { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.dsc-ruta--base { stroke: rgb(240 230 216 / 0.25); stroke-width: 0.35; stroke-dasharray: 0.8 1.6; }
+.dsc-ruta--vivo { stroke: var(--c-accent); stroke-width: 0.9; stroke-dasharray: 1 1; transition: stroke-dashoffset 0.7s ease; filter: drop-shadow(0 0 0.6px rgb(0 0 0 / 0.9)); }
+.dsc-marco[data-modo="luz"] .dsc-ruta { opacity: 0.35; }
+.dsc-marca {
+  position: absolute; width: 2rem; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
+  border: 2px solid rgb(240 230 216 / 0.55); background: rgb(0 0 0 / 0.25); pointer-events: none; opacity: 0;
+  transition: opacity 0.3s, border-color 0.3s;
+}
+.dsc-marca[data-vis="true"] { opacity: 1; }
+.dsc-marca[data-on="true"] { border-color: var(--c-accent); background: rgb(214 72 58 / 0.25); }
+.dsc-marco[data-modo="manos"] .dsc-marca { width: 1.2rem; }
+
+.dsc-mandos { display: grid; gap: 1.1rem; max-width: 26rem; }
+.dsc-modos { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--c-line); }
+.dsc-modo { min-height: 44px; padding: 0.5rem 0.4rem; background: none; border: 0; color: var(--c-muted); font: inherit; font-size: 0.9rem; cursor: pointer; }
+.dsc-modo + .dsc-modo { border-left: 1px solid var(--c-line); }
+.dsc-modo[aria-pressed="true"] { background: var(--c-ink); color: var(--c-bg); font-weight: 600; }
+@media (hover: hover) { .dsc-modo:not([aria-pressed="true"]):hover { color: var(--c-ink); } }
+.dsc-punto { min-height: 11rem; }
+.dsc-punto__n { margin: 0; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted); }
+.dsc-punto h3 { margin: 0.2rem 0 0.4rem; font-size: 1.5rem; line-height: 1.15; }
+.dsc-punto p:not(.dsc-punto__n) { margin: 0 0 0.5rem; color: var(--c-muted); line-height: 1.5; font-size: 0.975rem; }
+.dsc-punto .dsc-dato { color: var(--c-ink); font-size: 0.875rem; }
+.dsc-botones { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.dsc-botones .mf-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+.dsc-lista { margin: 0; padding: 0; list-style: none; display: grid; }
+.dsc-lista button {
+  display: flex; align-items: center; gap: 0.7rem; width: 100%; min-height: 44px; padding: 0.4rem 0;
+  background: none; border: 0; border-top: 1px solid var(--c-line); color: var(--c-muted); font: inherit; text-align: left; cursor: pointer;
+}
+.dsc-lista button span { display: inline-grid; place-items: center; width: 1.6rem; aspect-ratio: 1; border: 1px solid var(--c-line); border-radius: 50%; font-size: 0.75rem; flex: none; }
+.dsc-lista button[aria-current="step"] { color: var(--c-accent); }
+.dsc-lista button[aria-current="step"] span { border-color: var(--c-accent); }
+@media (hover: hover) { .dsc-lista button:hover { color: var(--c-ink); } }
+
+/* Móvil: botones justo bajo la escena, antes de las explicaciones largas */
+@media (max-width: 55.99rem) {
+  .dsc-mandos { grid-template-areas: "modos" "botones" "punto" "lista"; }
+  .dsc-modos { grid-area: modos; }
+  .dsc-botones { grid-area: botones; }
+  .dsc-punto { grid-area: punto; min-height: 0; }
+  .dsc-lista { grid-area: lista; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-descendimiento *, .theme-descendimiento *::before { transition: none !important; }
+}

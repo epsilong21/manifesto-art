@@ -1,0 +1,9 @@
+/* Sistema mínimo común de las páginas 06–09 (hero documental, ficha, estaciones). */
+.sp-h2 { margin: 0 0 1.25rem; font-size: clamp(1.4rem, 1rem + 1.6vw, 2rem); font-weight: 700; }
+.sp-ficha { padding: clamp(2.5rem, 7vw, 5rem) var(--mf-gutter); border-top: 1px solid var(--c-line); }
+.sp-ficha__cols { display: grid; gap: 2rem; max-width: 64rem; }
+@media (min-width: 48rem) { .sp-ficha__cols { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+.sp-ficha ul { margin: 0; padding: 0 0 0 1.1rem; display: grid; gap: 0.7rem; color: var(--c-muted); font-size: 0.975rem; line-height: 1.5; }
+.sp-tag { margin: 0 0 0.9rem; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.sp-tag--doc { color: var(--c-accent); }
+.sp-tag--int { color: var(--c-ink); font-style: italic; }

@@ -27,6 +27,37 @@ El aviso legal del sitio (`/aviso-legal/`, «Aviso legal y derechos de reproducc
 - **Reproducción:** [«Van Gogh - Starry Night - Google Art Project.jpg»](https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg) (Wikimedia Commons; fuente: Google Arts & Culture). Commons la describe como reproducción fiel de una obra bidimensional en dominio público, con Public Domain Mark 1.0.
 - **Archivo:** `public/obras/noche-estrellada.jpg`. Las partículas son una capa visual de MANIFESTO y no modifican la imagen.
 
+### La ascensión al Empíreo · Hieronymus Bosch, hacia 1505–1515 · Palazzo Ducale, Venecia
+
+- **Pintura:** de dominio público.
+- **Reproducción:** [«Visions of the Hereafter - Ascent of the Blessed.jpg»](https://commons.wikimedia.org/wiki/File:Visions_of_the_Hereafter_-_Ascent_of_the_Blessed.jpg) (Wikimedia Commons, marcada como dominio público; fuente: Bosch Research and Conservation Project, [boschproject.org](http://boschproject.org/bosch_in_venice.html)).
+- **Archivo en el repositorio:** `public/empireo/ascension-640.webp` y `ascension-1200.webp`, redimensionados y convertidos a WebP, sin retoques.
+- **Condiciones del archivo:** la marca de Wikimedia Commons describe el estado del archivo en esa plataforma; no es una autorización del museo ni del titular de la fotografía, y no se han comprobado condiciones adicionales del proveedor.
+- **Capas de MANIFESTO:** el perfil de luz y las estaciones se miden y se dibujan sobre la imagen, sin alterarla.
+
+### El descendimiento de la cruz · Peter Paul Rubens, 1611–1614 · Catedral de Nuestra Señora, Amberes
+
+- **Pintura:** de dominio público.
+- **Reproducción:** [«Peter Paul Rubens - The Descent from the Cross (Antwerp Cathedral).jpg»](https://commons.wikimedia.org/wiki/File:Peter_Paul_Rubens_-_The_Descent_from_the_Cross_(Antwerp_Cathedral).jpg) (Wikimedia Commons, marcada como dominio público; fuente: [BALAT, KIK-IRPA](https://balat.kikirpa.be/object/7598)).
+- **Archivo en el repositorio:** `public/descendimiento/descendimiento-700.webp` y `descendimiento-1400.webp`, redimensionados y convertidos a WebP.
+- **Condiciones del archivo:** la marca de Commons no es una autorización de KIK-IRPA ni de la catedral; no se han comprobado condiciones adicionales.
+- **Capas de MANIFESTO:** la diagonal, los puntos de las manos y las lecturas de luz (filtros CSS) se aplican al mostrarla y no alteran el archivo.
+
+### La loca Meg (Dulle Griet) · Pieter Bruegel el Viejo, 1563 · Museum Mayer van den Bergh, Amberes (MMB.0045)
+
+- **Pintura:** de dominio público.
+- **Reproducción:** fotografía de Cedric Verhelst posterior a la restauración, publicada por [Art in Flanders](https://artinflanders.be/en/artwork/0750026000) (Vlaamse Kunstcollectie) con la licencia «public domain»; el mismo archivo figura en [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dulle_Griet_-_Pieter_Bruegel_de_Oude_-_Museum_Mayer_Van_Den_Bergh_-_1.jpg) como dominio público.
+- **Archivo en el repositorio:** `public/dulle-griet/dulle-griet-1000.webp` y `dulle-griet-2000.webp` (2000 × 1442 px), redimensionados y convertidos a WebP.
+- **Capas de MANIFESTO:** los territorios, las pistas y los anillos son capas propias que se dibujan encima. La página no simula ningún «antes» de la restauración: no hay imágenes documentadas de ese estado.
+
+### Los siete pecados capitales (Mesa de los pecados capitales) · atribuida a El Bosco, hacia 1505–1510 · Museo Nacional del Prado, Madrid
+
+- **Pintura:** de dominio público; la atribución a El Bosco se discute y la página lo indica.
+- **Reproducción:** [«Hieronymus Bosch- The Seven Deadly Sins and the Four Last Things.JPG»](https://commons.wikimedia.org/wiki/File:Hieronymus_Bosch-_The_Seven_Deadly_Sins_and_the_Four_Last_Things.JPG) (Wikimedia Commons, marcada como dominio público; crédito del archivo: Museo Nacional del Prado, [ficha de la obra](https://www.museodelprado.es/coleccion/obra-de-arte/mesa-de-los-pecados-capitales/3fc0a84e-d77d-4217-b960-8a34b8873b70)).
+- **Archivo en el repositorio:** `public/pecados/pecados-1000.webp` y `pecados-2000.webp`, redimensionados y convertidos a WebP.
+- **Condiciones del archivo:** la marca de Commons no equivale a una autorización del Museo del Prado; las condiciones de reutilización de sus imágenes están pendientes de confirmar.
+- **Capas de MANIFESTO:** los sectores, los medallones y el ojo son zonas dibujadas sobre la imagen, medidas sobre esta reproducción, y no la alteran.
+
 ## Obras protegidas reproducidas sin licencia
 
 ### Los elefantes · Salvador Dalí, 1948
@@ -67,6 +98,8 @@ En *Medusa*, el laboratorio «La sombra que miente» y la escena «El reflejo» 
 En *Untitled* (Basquiat), la lámina anatómica (rótulos y cotas), las cuatro capas («Anatomía», «Rostro», «Máscara», «Marcas»), los cinco hallazgos, las tres lecturas con su síntesis, el expediente, la composición tipográfica del catálogo y la imagen para redes sociales son creaciones de MANIFESTO. La tipografía y los trazos no reproducen ni imitan la escritura ni los signos de Basquiat. Las lecturas marcadas como Interpretación son propuestas de MANIFESTO o del museo, y así se indica en cada caso.
 
 En *Glenn* (Basquiat), el esquema de la obra, la entrada de escáner, la mesa de luz (los cinco hallazgos, las capas «Figura», «Fondo» y «Gesto», la fotocopiadora y la ampliación), la instalación «Archivo vivo» de las tres lecturas («Retrato», «Máscara», «Archivo»: documentos, letras, pestañas, sellos ficticios, índices y marcas), el expediente y la composición tipográfica del catálogo son creaciones de MANIFESTO. Las piezas de «Archivo vivo» no contienen datos propios: los textos de sus fichas son los de la página, con su fuente. Las descripciones de lo que se ve proceden de textos de terceros y se marcan como Observación; las lecturas marcadas como Interpretación son propuestas de MANIFESTO.
+
+En las páginas 06–09 (*La ascensión al Empíreo*, *El descendimiento de la cruz*, *La loca Meg* y *Los siete pecados capitales*), los recorridos, las zonas, los anillos, las pistas, los filtros de luz y las mediciones son creaciones de MANIFESTO, dibujadas o calculadas sobre la reproducción sin alterar el archivo.
 
 ## Tipografías
 
