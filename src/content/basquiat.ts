@@ -3,8 +3,9 @@
  *
  * DERECHOS: obra protegida hasta el 1 de enero de 2059 (70 años desde la muerte
  * del autor, 1988). Los derechos son de The Estate of Jean-Michel Basquiat, que los
- * licencia a través de Artestar (Nueva York). La reproducción de referencia es solo
- * para desarrollo local (ver basquiat-reproducciones.json): no se publica.
+ * licencia a través de Artestar (Nueva York). La reproducción de referencia no tiene
+ * licencia y se publica por decisión editorial de MANIFESTO S.A.S. (ver
+ * basquiat-reproducciones.json).
  *
  * Datos de catálogo: ficha de The Broad (consultada el 22/10/2026).
  */
@@ -80,7 +81,7 @@ type Reproduccion = { clave: string; archivo: string; width: number; height: num
 /**
  * La reproducción elegida al compilar (scripts/basquiat/reproduccion.mjs, datos en
  * basquiat-reproducciones.json): la autorizada si existe; si no, la REFERENCIA local,
- * que nunca se publica.
+ * publicable por decisión editorial.
  * null: no hay ninguna y la página usa la lámina pendiente. Solo sus datos llegan al bundle.
  */
 export const REPRODUCCION_BASQUIAT: Reproduccion | null = process.env.MANIFESTO_BASQUIAT_REPRODUCCION

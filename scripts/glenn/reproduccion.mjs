@@ -7,7 +7,7 @@
 // está en public/obras y su SHA-256 coincide con el registrado en
 // src/content/glenn-reproducciones.json (`npm run glenn:registrar` lo calcula).
 // Al publicar (GitHub Actions o MANIFESTO_PUBLICACION=1) solo se usan las entradas con
-// `publicable: true`: la referencia no lo está.
+// `publicable: true` (la referencia lo está desde el 28/10/2026, por decisión editorial).
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";

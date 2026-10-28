@@ -4,8 +4,8 @@
 // de la pintura de Dalí; sin él, no puede quedar ningún rastro de ninguna.
 // La reproducción de referencia (sin licencia) solo se admite sin --publicacion,
 // y con cualquier otra no puede quedar ningún rastro de ella.
-// --basquiat funciona igual para Untitled (Basquiat), cuya referencia nunca es publicable,
-// y --glenn, para Glenn (Basquiat), ídem.
+// --basquiat funciona igual para Untitled (Basquiat) y --glenn, para Glenn (Basquiat):
+// su referencia solo se admite con --publicacion si su entrada dice `publicable: true`.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { REPRODUCCIONES as REPRODUCCIONES_BASQUIAT } from "../basquiat/reproduccion.mjs";

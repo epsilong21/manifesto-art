@@ -98,7 +98,9 @@ export default function AvisoLegalPage() {
         ? `${OBRA_BASQUIAT.credito.imagen} ${OBRA_BASQUIAT.credito.pie}`
         : "La pintura no se muestra. En su lugar, una pila de acetatos de MANIFESTO rotulada como tal, y un enlace a la ficha de The Broad.",
       derechos: `${DERECHOS_BASQUIAT.credito} Protegida hasta el ${DERECHOS_BASQUIAT.hasta}.`,
-      situacion: basquiat ? `${OBRA_BASQUIAT.credito.autorizacion} Solo en esta versión local; no se publica.` : "Sin reproducción: no hay licencia.",
+      situacion: basquiat
+        ? `${OBRA_BASQUIAT.credito.autorizacion} Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y se retirará si lo pide el titular de los derechos.`
+        : "Sin reproducción: no hay licencia.",
     },
     {
       slug: "glenn",
@@ -110,7 +112,9 @@ export default function AvisoLegalPage() {
         ? `${OBRA_GLENN.credito.imagen} ${OBRA_GLENN.credito.pie}`
         : "La pintura no se muestra. En su lugar, un muro de hojas de MANIFESTO rotulado como tal.",
       derechos: `${DERECHOS_GLENN.credito} Protegida hasta el ${DERECHOS_GLENN.hasta}.`,
-      situacion: glenn ? `${OBRA_GLENN.credito.autorizacion} Solo en esta versión local; no se publica.` : "Sin reproducción: no hay licencia.",
+      situacion: glenn
+        ? `${OBRA_GLENN.credito.autorizacion} Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y se retirará si lo pide el titular de los derechos.`
+        : "Sin reproducción: no hay licencia.",
     },
   ];
 

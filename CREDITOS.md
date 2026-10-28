@@ -27,7 +27,7 @@ El aviso legal del sitio (`/aviso-legal/`, «Aviso legal y derechos de reproducc
 - **Reproducción:** [«Van Gogh - Starry Night - Google Art Project.jpg»](https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg) (Wikimedia Commons; fuente: Google Arts & Culture). Commons la describe como reproducción fiel de una obra bidimensional en dominio público, con Public Domain Mark 1.0.
 - **Archivo:** `public/obras/noche-estrellada.jpg`. Las partículas son una capa visual de MANIFESTO y no modifican la imagen.
 
-## Obra protegida reproducida sin licencia
+## Obras protegidas reproducidas sin licencia
 
 ### Los elefantes · Salvador Dalí, 1948
 
@@ -38,21 +38,23 @@ Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fun
 - **Sin licencia:** **no hay autorización de la Fundació Gala-Salvador Dalí ni de VEGAP.** Se muestra por decisión del titular del sitio, que asume el riesgo, y así se indica en la página. Se retirará si lo pide el titular de los derechos, o se sustituirá por un archivo con licencia si se obtiene.
 - **Capas de MANIFESTO:** las guías de los cinco capítulos se dibujan encima y no alteran la imagen.
 
-## Obras presentadas sin reproducción
-
 ### Untitled · Jean-Michel Basquiat, 1981 · The Broad, Los Ángeles (B-BASQ-2P82.32)
 
 Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Jean-Michel Basquiat. Licencias de reproducción: Artestar, Nueva York. MANIFESTO no dispone de ninguna.
 
-- **Sin reproducción:** la página no muestra la pintura porque no hay licencia de reproducción. Enlaza a la ficha de la obra en The Broad.
-- **Acetatos de MANIFESTO:** en el lugar de la pintura, el hero muestra una pila de acetatos propia, rotulada «Esquema de MANIFESTO · no es la pintura», con la proporción real del lienzo (205,74 × 175,9 cm). No reproduce ni imita la pintura.
+- **Reproducción:** imagen de la [ficha de la obra en The Broad](https://www.thebroad.org/art/jean-michel-basquiat/untitled); crédito fotográfico de la ficha: Douglas M. Parker Studio, Los Ángeles.
+- **Archivo en el repositorio:** `public/obras/basquiat-untitled-referencia.jpg` (921 × 1080 px), sin retoques. El sitio sirve variantes WebP.
+- **Sin licencia:** **no hay autorización de The Estate of Jean-Michel Basquiat ni de Artestar**, ni de The Broad para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y así se indica en la página. Se retirará si lo pide el titular de los derechos, o se sustituirá por un archivo con licencia si se obtiene.
+- **Capas de MANIFESTO:** la lámina, las capas, los acetatos, los rayos X y el inspector se dibujan encima o se aplican al mostrarla, y no alteran el archivo.
 
 ### Glenn · Jean-Michel Basquiat, 1984–1985 · Colección particular
 
 Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Jean-Michel Basquiat. Licencias de reproducción: Artestar, Nueva York. MANIFESTO no dispone de ninguna.
 
-- **Sin reproducción:** la página no muestra la pintura porque no hay licencia de reproducción.
-- **Muro de hojas de MANIFESTO:** en su lugar se ve un muro de hojas propio, rotulado como tal, con la proporción real del lienzo (254 × 289,6 cm). No reproduce ni imita la pintura.
+- **Reproducción:** imagen del sitio web de The Museum of Modern Art (moma.org), página de audio de la obra.
+- **Archivo en el repositorio:** `public/obras/glenn-referencia.jpg` (800 × 705 px), sin retoques. El sitio sirve variantes WebP.
+- **Sin licencia:** **no hay autorización de The Estate of Jean-Michel Basquiat ni de Artestar**, ni del MoMA para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y así se indica en la página. Se retirará si lo pide el titular de los derechos, o se sustituirá por un archivo con licencia si se obtiene.
+- **Capas de MANIFESTO:** la mesa de luz, la fotocopiadora, la ampliación y el Archivo vivo se superponen o se aplican al mostrarla, y no alteran el archivo.
 
 ## Creaciones de MANIFESTO
 

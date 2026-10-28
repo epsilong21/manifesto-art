@@ -7,8 +7,9 @@
 //   Al publicar (GitHub Actions o MANIFESTO_PUBLICACION=1) la referencia solo entra si
 //   su entrada dice `publicable: true` (decisión del titular del sitio, 19/10/2026).
 // - Untitled (Basquiat) muestra la pintura solo con una reproducción válida
-//   (scripts/basquiat/reproduccion.mjs). Al publicar nunca entra la de referencia,
-//   que es solo para desarrollo local; sin ninguna, la página usa su alternativa.
+//   (scripts/basquiat/reproduccion.mjs), con la misma regla: al publicar, la referencia
+//   solo entra si dice `publicable: true` (decisión editorial, 28/10/2026); sin
+//   ninguna, la página usa su alternativa.
 // - Glenn (Basquiat) funciona igual (scripts/glenn/reproduccion.mjs): sin reproducción
 //   válida, la página usa el esquema propio de MANIFESTO.
 // - Genera las variantes WebP de las obras que usa src/lib/imagenEstatica.ts.
@@ -176,9 +177,17 @@ if (elegida?.clave === "referencia") {
   );
 }
 if (basquiat.elegida?.clave === "referencia") {
-  console.warn("\n⚠ out/ contiene la reproducción de REFERENCIA de Basquiat (sin licencia): solo para revisión local. NO publicar.");
+  console.warn(
+    REPRODUCCIONES_BASQUIAT.referencia.publicable
+      ? "\n⚠ out/ contiene la reproducción de REFERENCIA de Untitled (Basquiat), SIN LICENCIA, publicable por decisión editorial de MANIFESTO S.A.S. (ver basquiat-reproducciones.json)."
+      : "\n⚠ out/ contiene la reproducción de REFERENCIA de Basquiat (sin licencia): solo para revisión local. NO publicar.",
+  );
 }
 if (glenn.elegida?.clave === "referencia") {
-  console.warn("\n⚠ out/ contiene la reproducción de REFERENCIA de Glenn (sin licencia): solo para revisión local. NO publicar.");
+  console.warn(
+    REPRODUCCIONES_GLENN.referencia.publicable
+      ? "\n⚠ out/ contiene la reproducción de REFERENCIA de Glenn (Basquiat), SIN LICENCIA, publicable por decisión editorial de MANIFESTO S.A.S. (ver glenn-reproducciones.json)."
+      : "\n⚠ out/ contiene la reproducción de REFERENCIA de Glenn (sin licencia): solo para revisión local. NO publicar.",
+  );
 }
 process.exit(verificacion.status ?? 1);

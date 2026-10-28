@@ -121,8 +121,8 @@ export function SiteFooter() {
       <p>
         Las reproducciones de Caravaggio y Van Gogh son de obras en dominio público.{" "}
         {PUBLICACION
-          ? "Las imágenes de Los elefantes, Untitled y Glenn son composiciones gráficas de MANIFESTO, no las pinturas de Dalí y Basquiat."
-          : "En esta versión local, las imágenes de Los elefantes, Untitled y Glenn son reproducciones de referencia sin licencia; en la versión publicada son composiciones gráficas de MANIFESTO."}
+          ? "La imagen de Los elefantes es una composición gráfica de MANIFESTO, no la pintura de Dalí. Las de Untitled y Glenn reproducen las pinturas de Basquiat sin licencia de reproducción."
+          : "En esta versión local, las imágenes de Los elefantes, Untitled y Glenn son reproducciones sin licencia; en la versión publicada, la de Los elefantes es una composición gráfica de MANIFESTO."}
       </p>
       <p className="mf-sitefoot__legal">
         <Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link>

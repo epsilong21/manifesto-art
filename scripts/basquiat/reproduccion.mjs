@@ -6,8 +6,8 @@
 // (sin licencia, solo para desarrollo local). Cada una se usa únicamente si su archivo
 // está en public/obras y su SHA-256 coincide con el registrado en
 // src/content/basquiat-reproducciones.json. Al publicar (GitHub Actions o
-// MANIFESTO_PUBLICACION=1) solo se usan las entradas con `publicable: true`: la
-// referencia no lo está.
+// MANIFESTO_PUBLICACION=1) solo se usan las entradas con `publicable: true` (la
+// referencia lo está desde el 28/10/2026, por decisión editorial).
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";

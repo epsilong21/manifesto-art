@@ -3,9 +3,10 @@
  * portada: la misma reproducción que muestra el hero de cada obra, elegida por
  * next.config.ts al compilar. Fuera de una publicación incluye la de referencia local.
  *
- * Al publicar (`MANIFESTO_PUBLICACION`), catálogo y portada siguen con la composición
- * propia de cada obra: mostrar ahí la pintura en el sitio público necesita autorización
- * aparte, aunque el hero ya la muestre (Los elefantes).
+ * Al publicar (`MANIFESTO_PUBLICACION`), solo Untitled y Glenn muestran la pintura en el
+ * catálogo y la portada (decisión editorial de MANIFESTO S.A.S., 28/10/2026). Los elefantes
+ * sigue con su composición propia: mostrar ahí la pintura necesita una decisión aparte,
+ * aunque el hero ya la muestre.
  *
  * Solo lee las variables de entorno, no los textos de cada obra: sirve en componentes
  * de cliente sin cargar su contenido.
@@ -22,8 +23,11 @@ const REPRODUCCIONES: Record<string, Reproduccion | null> = {
   glenn: leer(process.env.MANIFESTO_GLENN_REPRODUCCION),
 };
 
+/** Obras cuya pintura también se muestra en el catálogo publicado */
+const EN_CATALOGO_PUBLICO = new Set(["basquiat-untitled", "glenn"]);
+
 export function miniaturaProtegida(slug: string): Miniatura | null {
-  if (process.env.MANIFESTO_PUBLICACION === "1") return null;
+  if (process.env.MANIFESTO_PUBLICACION === "1" && !EN_CATALOGO_PUBLICO.has(slug)) return null;
   const r = REPRODUCCIONES[slug];
   return r ? { src: `/obras/${r.archivo}`, width: r.width, height: r.height, pie: r.pie } : null;
 }

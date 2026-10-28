@@ -17,14 +17,14 @@
     "pie": ""
   },
   "referencia": {
-    "nota": "Sin licencia. Solo para desarrollo local: no se publica y el archivo no entra en Git.",
+    "nota": "Sin licencia de The Estate of Jean-Michel Basquiat (Artestar). Se publica por decisión editorial expresa de MANIFESTO S.A.S. (28/10/2026), con finalidad educativa. Si llega una reproducción con licencia, la entrada publica tiene prioridad.",
     "archivo": "glenn-referencia.jpg",
-    "publicable": false,
+    "publicable": true,
     "width": 800,
     "height": 705,
     "sha256": "f9c1f93b40a229f17d85b877312b35e30c89d8be488d3ca06b0cc5337ee9822c",
     "imagen": "Imagen: The Museum of Modern Art, Nueva York (moma.org), página de audio de la obra.",
     "autorizacion": "Sin licencia de reproducción de The Estate of Jean-Michel Basquiat (Artestar).",
-    "pie": "Reproducción de referencia para desarrollo local, sin licencia de reproducción: no se publica."
+    "pie": "La imagen procede del sitio web del MoMA y se muestra sin licencia de reproducción."
   }
 }

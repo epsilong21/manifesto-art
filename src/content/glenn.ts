@@ -3,8 +3,9 @@
  *
  * DERECHOS: obra protegida hasta el 1 de enero de 2059 (70 años desde la muerte
  * del autor, 1988). Los derechos son de The Estate of Jean-Michel Basquiat, que los
- * licencia a través de Artestar (Nueva York). La reproducción de referencia es solo
- * para desarrollo local (ver glenn-reproducciones.json): no se publica.
+ * licencia a través de Artestar (Nueva York). La reproducción de referencia no tiene
+ * licencia y se publica por decisión editorial de MANIFESTO S.A.S. (ver
+ * glenn-reproducciones.json).
  *
  * Datos de catálogo: lista de objetos prestados a «Basquiat: Boom for Real»
  * (Barbican, 2017), consultada el 24/10/2026. La fecha no es unívoca: esa lista
@@ -307,7 +308,7 @@ type Reproduccion = { clave: string; archivo: string; width: number; height: num
 /**
  * La reproducción elegida al compilar (scripts/glenn/reproduccion.mjs, datos en
  * glenn-reproducciones.json): la autorizada si existe; si no, la REFERENCIA local,
- * que nunca se publica. null: no hay ninguna y la página usa el esquema propio.
+ * publicable por decisión editorial. null: no hay ninguna y la página usa el esquema propio.
  */
 export const REPRODUCCION_GLENN: Reproduccion | null = process.env.MANIFESTO_GLENN_REPRODUCCION
   ? JSON.parse(process.env.MANIFESTO_GLENN_REPRODUCCION)

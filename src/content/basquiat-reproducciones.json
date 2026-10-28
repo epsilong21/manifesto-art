@@ -16,14 +16,14 @@
     "pie": ""
   },
   "referencia": {
-    "nota": "Sin licencia. Solo para desarrollo local: no se publica y el archivo no entra en Git.",
+    "nota": "Sin licencia de The Estate of Jean-Michel Basquiat (Artestar). Se publica por decisión editorial expresa de MANIFESTO S.A.S. (28/10/2026), con finalidad educativa. Si llega una reproducción con licencia, la entrada publica tiene prioridad.",
     "archivo": "basquiat-untitled-referencia.jpg",
-    "publicable": false,
+    "publicable": true,
     "width": 921,
     "height": 1080,
     "sha256": "b44809b105d56bcacd3d18ae1c168888afd1b41990e09134308bd7f7d4dd01c2",
     "imagen": "Imagen: ficha de la obra en The Broad (thebroad.org); crédito fotográfico de la ficha: Douglas M. Parker Studio, Los Ángeles.",
     "autorizacion": "Sin licencia de reproducción de The Estate of Jean-Michel Basquiat (Artestar).",
-    "pie": "Reproducción de referencia para desarrollo local, sin licencia de reproducción: no se publica."
+    "pie": "La imagen procede de la ficha de la obra en The Broad y se muestra sin licencia de reproducción."
   }
 }
