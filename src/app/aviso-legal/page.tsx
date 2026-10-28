@@ -116,6 +116,17 @@ export default function AvisoLegalPage() {
         ? `${OBRA_GLENN.credito.autorizacion} Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y se retirará si lo pide el titular de los derechos.`
         : "Sin reproducción: no hay licencia.",
     },
+    {
+      slug: "cristo-de-san-juan-de-la-cruz",
+      titulo: "Cristo de San Juan de la Cruz",
+      autor: "Salvador Dalí",
+      fecha: "1951",
+      coleccion: "Kelvingrove Art Gallery and Museum, Glasgow",
+      imagen: "Imagen publicada en la ficha del catálogo razonado en línea de la Fundació Gala-Salvador Dalí (800 × 1426 px); la ficha atribuye el crédito de la imagen a Glasgow City Council.",
+      derechos: `Obra © Salvador Dalí, Fundació Gala-Salvador Dalí / VEGAP. Protegida hasta el ${DERECHOS_DALI.hasta}.`,
+      situacion:
+        "No hay autorización de VEGAP ni de la Fundació Gala-Salvador Dalí, ni de Glasgow Life para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y se retirará si lo pide el titular de los derechos. Este aviso no concede ni sustituye ninguna autorización.",
+    },
   ];
 
   return (
@@ -317,7 +328,7 @@ export default function AvisoLegalPage() {
 
             <section id="obras" aria-labelledby="obras-t" className="al-obras">
               <h2 id="obras-t">
-                <span className="al-n">Anexo</span> Las cinco obras: créditos y situación
+                <span className="al-n">Anexo</span> Las obras: créditos y situación
               </h2>
               <p>
                 Cómo se presenta cada obra en esta versión del sitio. Un crédito identifica al autor y al titular de los
@@ -356,7 +367,7 @@ export default function AvisoLegalPage() {
             </section>
 
             <p className="al-volver">
-              <Link href={catalogo}>Volver a las cinco obras</Link>
+              <Link href={catalogo}>Volver a las obras</Link>
             </p>
           </div>
         </div>

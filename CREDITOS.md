@@ -87,6 +87,15 @@ Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Je
 - **Sin licencia:** **no hay autorización de The Estate of Jean-Michel Basquiat ni de Artestar**, ni del MoMA para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y así se indica en la página. Se retirará si lo pide el titular de los derechos, o se sustituirá por un archivo con licencia si se obtiene.
 - **Capas de MANIFESTO:** la mesa de luz, la fotocopiadora, la ampliación y el Archivo vivo se superponen o se aplican al mostrarla, y no alteran el archivo.
 
+### Cristo de San Juan de la Cruz · Salvador Dalí, 1951 · Kelvingrove Art Gallery and Museum, Glasgow
+
+Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fundació Gala-Salvador Dalí a través de VEGAP.
+
+- **Reproducción:** imagen publicada en la [ficha de «El Cristo» del catálogo razonado en línea de la Fundació Gala-Salvador Dalí](https://catalogues.salvador-dali.org/catalogues/es/heritageobject/706/) (800 × 1426 px); la ficha atribuye el crédito de la imagen a Glasgow City Council. Datos y relato de la obra: Fundació y [Glasgow Life](https://www.glasgowlife.org.uk/museums/digital-welcome-pack/kelvingrove-art-gallery-and-museum/salvador-dalis-christ-of-st-john-of-the-cross).
+- **Archivo en el repositorio:** `public/cristo-dali/cristo-400.webp` y `cristo-800.webp`, redimensionados y convertidos a WebP, sin ampliar ni retocar.
+- **Sin licencia:** **no hay autorización de VEGAP ni de la Fundació Gala-Salvador Dalí**, ni de Glasgow Life para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y así se indica en la página. Se retirará si lo pide su titular.
+- **Capas de MANIFESTO:** el modelo de las dos miradas, la franja de luz y las guías de triángulo, círculo y ejes se dibujan o se calculan aparte y no alteran el archivo.
+
 ## Creaciones de MANIFESTO
 
 El código, el diseño, los shaders, las composiciones gráficas (incluidos «El desierto imposible» y la composición de *Los elefantes*) y la textura mineral (generada por `scripts/textura-mineral.mjs`) son creaciones de MANIFESTO.
@@ -100,6 +109,8 @@ En *Untitled* (Basquiat), la lámina anatómica (rótulos y cotas), las cuatro c
 En *Glenn* (Basquiat), el esquema de la obra, la entrada de escáner, la mesa de luz (los cinco hallazgos, las capas «Figura», «Fondo» y «Gesto», la fotocopiadora y la ampliación), la instalación «Archivo vivo» de las tres lecturas («Retrato», «Máscara», «Archivo»: documentos, letras, pestañas, sellos ficticios, índices y marcas), el expediente y la composición tipográfica del catálogo son creaciones de MANIFESTO. Las piezas de «Archivo vivo» no contienen datos propios: los textos de sus fichas son los de la página, con su fuente. Las descripciones de lo que se ve proceden de textos de terceros y se marcan como Observación; las lecturas marcadas como Interpretación son propuestas de MANIFESTO.
 
 En las páginas 06–09 (*La ascensión al Empíreo*, *El descendimiento de la cruz*, *La loca Meg* y *Los siete pecados capitales*), los recorridos, las zonas, los anillos, las pistas, los filtros de luz y las mediciones son creaciones de MANIFESTO, dibujadas o calculadas sobre la reproducción sin alterar el archivo.
+
+En *Cristo de San Juan de la Cruz* (Dalí), el modelo de las dos miradas, la franja de luz entre la sombra y la bahía, la regla de luminosidad y las guías de triángulo, círculo y ejes son creaciones de MANIFESTO, generadas con código y dibujadas aparte, sin alterar el archivo.
 
 ## Tipografías
 

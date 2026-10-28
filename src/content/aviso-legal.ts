@@ -31,7 +31,7 @@ export const RESPONSABLE: Record<"razonSocial" | "nit" | "direccion" | "telefono
 /** Enlace `tel:` del teléfono del responsable (sin espacios), o null si falta */
 export const TELEFONO_HREF = RESPONSABLE.telefono.valor ? `tel:${RESPONSABLE.telefono.valor.replace(/\s/g, "")}` : null;
 
-export const ACTUALIZACION = "27 de octubre de 2026";
+export const ACTUALIZACION = "28 de octubre de 2026";
 
 /** Créditos completos, fuentes y procedencia de cada imagen (copia pública del repositorio) */
 export const CREDITOS_URL = "https://github.com/epsilong21/manifesto-art/blob/main/CREDITOS.md";
@@ -47,5 +47,5 @@ export const SECCIONES_AVISO = [
   { id: "reclamaciones", n: "6", titulo: "Consultas y reclamaciones de derechos" },
   { id: "responsable", n: "7", titulo: "Responsable editorial" },
   { id: "actualizacion", n: "8", titulo: "Actualización" },
-  { id: "obras", n: "Anexo", titulo: "Las cinco obras: créditos y situación" },
+  { id: "obras", n: "Anexo", titulo: "Las obras: créditos y situación" },
 ] as const;
