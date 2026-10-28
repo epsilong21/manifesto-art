@@ -579,6 +579,7 @@ div.bq-acetato { cursor: inherit; }
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 .bq-modos__n {
   font-family: var(--font-bricolage), "Arial Narrow", sans-serif;
@@ -593,6 +594,7 @@ div.bq-acetato { cursor: inherit; }
   font-style: italic;
   font-size: 0.875rem;
   color: var(--bq-salmon);
+  text-wrap: balance;
 }
 .bq-modos__tab[aria-selected="true"] {
   border-color: var(--bq-amarillo);
@@ -602,4 +604,11 @@ div.bq-acetato { cursor: inherit; }
 .bq-modos__tab:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
 @media (hover: hover) {
   .bq-modos__tab:hover { border-color: var(--c-ink); }
+}
+/* Al cambiar de modo, el panel nuevo entra con un fundido breve en lugar de sustituirse de golpe */
+@media (prefers-reduced-motion: no-preference) {
+  .bq-modos__panel:not([hidden]) { animation: bq-modos-entra 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+}
+@keyframes bq-modos-entra {
+  from { opacity: 0; translate: 0 6px; }
 }

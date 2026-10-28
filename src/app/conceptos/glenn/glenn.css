@@ -748,6 +748,10 @@ html:has(.theme-glenn) { background: #0f0f0e; }
 @media (max-width: 30rem) {
   .gl-mesa .gl-tabs { flex-wrap: nowrap; gap: 0.25rem; }
   .gl-mesa .gl-tabs [role="tab"] { flex: 1 1 auto; padding: 0.5rem 0.4rem; font-size: 0.6875rem; letter-spacing: 0.02em; }
+  /* Las tres lecturas, también en una fila: sin «C · Archivo» sola debajo */
+  .gl-tabs--lecturas { flex-wrap: nowrap; gap: 0.25rem; }
+  .gl-tabs--lecturas [role="tab"] { flex: 1 1 0; padding: 0.5rem 0.4rem; font-size: 0.6875rem; letter-spacing: 0.02em; }
+  .gl-tabs--lecturas .gl-tabs__n { margin-right: 0.3rem; }
 }
 @media (max-width: 63.99rem) {
   /* La ficha va antes que la lista: al pulsar un punto, la explicación queda a la vista */
