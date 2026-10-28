@@ -1,0 +1,527 @@
+/* ─────────────────────────────────────────────────────────────
+   03 · Tres lecturas — «Archivo vivo»
+   Una instalación de documentos en CSS 3D: papel de copia, fichas, sellos ficticios,
+   índices y marcas de MANIFESTO. Nada copia ni reconstruye la obra. Sin animación
+   continua: las piezas solo se mueven al cambiar de lectura o al tocarlas.
+   Medidas de las piezas en cqmin del escenario; posiciones en cqw/cqh.
+   ───────────────────────────────────────────────────────────── */
+
+/* Factor de tamaño del documento elegido: registrado para que se interpole (caja y texto crecen de verdad,
+   sin escalar una textura pequeña) */
+@property --k { syntax: "<number>"; inherits: true; initial-value: 1; }
+/* Giro de la escena y desplazamiento de la lente: no se heredan, así cambiarlos en cada
+   fotograma no recalcula el estilo de todas las piezas */
+@property --gx { syntax: "<angle>"; inherits: false; initial-value: -6deg; }
+@property --gy { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@property --ax { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --ay { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --ag { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+.gl-av {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+}
+@media (min-width: 64rem) {
+  .gl-av { grid-template-columns: minmax(0, 1fr) 26rem; }
+}
+
+.gl-av__obra {
+  display: grid;
+  grid-template-areas: "esc" "ficha" "pie";
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+/* ── Escenario ── */
+
+.gl-av__escenario {
+  grid-area: esc;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 0.86;
+  max-height: calc(100svh - 6rem);
+  container-type: size;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 60% at 50% 42%, rgb(168 245 208 / 0.05), transparent 70%),
+    radial-gradient(110% 90% at 50% 40%, #22221f, #111110 72%);
+  outline: 1px solid var(--c-line);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.gl-av__escenario[data-lectura="mascara"] { cursor: crosshair; }
+.gl-av__escenario[data-arrastrando] { cursor: grabbing; }
+.gl-av__escenario:focus-visible { outline: 2px solid var(--gl-luz); outline-offset: 3px; }
+@media (min-width: 48rem) {
+  .gl-av__escenario { aspect-ratio: 1.3; }
+}
+@media (min-width: 64rem) {
+  .gl-av__escenario { aspect-ratio: 1.42; max-height: calc(100svh - 9rem); }
+}
+
+.gl-av__camara {
+  position: absolute;
+  inset: 0;
+  perspective: 170cqmin;
+  perspective-origin: 50% 44%;
+  /* El plano de la escena (z = 0) no debe tapar a las piezas que quedan detrás: solo las hojas reciben toques */
+  pointer-events: none;
+}
+.gl-av__escena {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--gx, -6deg)) rotateY(var(--gy, 0deg));
+  transition: transform 0.6s var(--ease-cine);
+  pointer-events: none;
+}
+[data-arrastrando] .gl-av__escena { transition-duration: 0.08s; }
+
+/* Cada pieza: su pose (posición, profundidad, giro) cambia con la lectura */
+.gl-av__pieza {
+  --w: 17;
+  --h: 23;
+  position: absolute;
+  left: 0;
+  top: 0;
+  --k: 1;
+  width: calc(var(--w) * var(--k) * 1cqmin);
+  height: calc(var(--h) * var(--k) * 1cqmin);
+  transform-style: preserve-3d;
+  transform:
+    translate3d(calc(var(--x) * 1cqw), calc(var(--y) * 1cqh), calc(var(--z) * 1cqmin))
+    translate(-50%, -50%) rotateZ(var(--rz)) rotateY(var(--ry)) rotateX(var(--rx)) scale(calc(var(--s) * var(--sf, 1)));
+  transition: transform 1.1s var(--ease-cine) var(--d), --k 0.8s var(--ease-cine);
+  pointer-events: none;
+}
+/* Medidas de cada forma: TAMANOS en ArchivoVivo.tsx (variables en línea, sin :has) */
+
+/* El documento elegido viene al frente, recto y grande */
+.gl-av__pieza[data-sel] {
+  --x: 50 !important;
+  --y: 44 !important;
+  --z: 46 !important;
+  --rx: 0deg !important;
+  --ry: 0deg !important;
+  --rz: 0deg !important;
+  --s: 1 !important;
+  --k: 1.75;
+  --d: 0ms !important;
+}
+@media (min-width: 64rem) {
+  .gl-av__pieza[data-sel] { --x: 66 !important; }
+}
+
+/* La hoja: el papel. Su desplazamiento propio es el de la lente (máscara) */
+.gl-av__hoja {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  gap: 0.52em;
+  padding: 0.96em 1.04em;
+  overflow: hidden;
+  background: var(--gl-papel);
+  color: var(--gl-toner);
+  font-family: var(--gl-mono);
+  font-size: calc(1.35cqmin * var(--k));
+  line-height: 1.25;
+  box-shadow: 0 1.4cqmin 3cqmin -1.2cqmin rgb(0 0 0 / 0.75);
+  outline: 0.3cqmin solid transparent;
+  outline-offset: 0.5cqmin;
+  transform: translate3d(calc(var(--ax, 0) * 1cqmin), calc(var(--ay, 0) * 1cqmin), 0) rotate(var(--ag, 0deg));
+  /* Sin transición de filter: animarlo repinta las hojas en cada fotograma, en el hilo principal */
+  transition: transform 0.45s var(--ease-cine), outline-color 0.2s;
+  pointer-events: auto;
+}
+.gl-av__pieza[data-fondo] .gl-av__hoja { filter: brightness(0.4) saturate(0.6); }
+[data-con-sel] .gl-av__pieza:not([data-sel]) .gl-av__hoja { filter: brightness(0.42) saturate(0.6); }
+.gl-av__pieza[data-otro-cajon] .gl-av__hoja { filter: brightness(0.62) saturate(0.8); }
+.gl-av__pieza[data-cajon] .gl-av__hoja { background: #e6d3a6; outline-color: var(--gl-luz); }
+.gl-av__pieza[data-activo] .gl-av__hoja { cursor: pointer; }
+/* Marca verde: el documento se puede tocar en esta lectura */
+.gl-av__pieza[data-activo] .gl-av__hoja::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 1.04em;
+  width: 1.78em;
+  height: 0.81em;
+  background: var(--gl-luz);
+}
+.gl-av__pieza[data-resalta] .gl-av__hoja,
+.gl-av__pieza[data-visto] .gl-av__hoja,
+.gl-av__pieza[data-sel] .gl-av__hoja { outline-color: var(--gl-luz); }
+@media (hover: hover) {
+  .gl-av__pieza[data-activo] .gl-av__hoja:hover { outline-color: var(--gl-luz); }
+}
+
+/* Documentos: código, clase, rótulo y renglones */
+.gl-av__cab {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.74em;
+  padding-bottom: 0.37em;
+  border-bottom: 0.15em solid currentColor;
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+}
+.gl-av__rot {
+  font-family: var(--font-archivo), sans-serif;
+  font-variation-settings: "wdth" 70;
+  font-weight: 800;
+  font-size: 1.56em;
+  line-height: 1.05;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.gl-av__hoja[data-forma="recorte"] .gl-av__rot { font-size: 1.3em; }
+.gl-av__renglones {
+  min-height: 2.96em;
+  background: repeating-linear-gradient(transparent 0 0.93em, rgb(15 15 14 / 0.28) 0.93em calc(0.93em + 1px));
+}
+.gl-av__hoja[data-forma="ficha"] {
+  background:
+    linear-gradient(var(--c-accent), var(--c-accent)) 0 2.3em / 100% 1px no-repeat,
+    repeating-linear-gradient(transparent 0 1.19em, rgb(80 110 160 / 0.22) 1.19em calc(1.19em + 1px)),
+    #f1eee4;
+}
+.gl-av__hoja[data-forma="hoja"] {
+  background: linear-gradient(90deg, transparent 1.78em, rgb(255 106 77 / 0.35) 1.78em calc(1.78em + 1px), transparent 0), #ebe7dc;
+  padding-left: 2.52em;
+}
+.gl-av__hoja[data-forma="tira"] {
+  background: linear-gradient(var(--gl-toner), var(--gl-toner)) 0 0 / 100% 1.78em no-repeat, #d5d1c5;
+  padding-top: 0.37em;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 1.04em;
+}
+.gl-av__hoja[data-forma="tira"] .gl-av__cab { grid-column: 1 / -1; color: var(--gl-papel); border: 0; }
+.gl-av__hoja[data-forma="tira"] .gl-av__renglones { min-height: 1.78em; }
+.gl-av__hoja[data-forma="recorte"] {
+  background: #e3dfd2;
+  outline-style: solid;
+  box-shadow:
+    inset 0 0 0 0.44em #e3dfd2,
+    inset 0 0 0 0.59em rgb(15 15 14 / 0.5),
+    0 1.4cqmin 3cqmin -1.2cqmin rgb(0 0 0 / 0.75);
+}
+.gl-av__hoja[data-clase="limite"] { background-color: #e9e2d2; }
+.gl-av__sello-no {
+  justify-self: end;
+  margin-top: -0.37em;
+  padding: 0.15em 0.59em;
+  border: 0.22em solid var(--c-accent);
+  color: var(--c-accent);
+  font-weight: 700;
+  font-size: 0.96em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: rotate(-9deg);
+}
+
+/* Piezas gráficas */
+.gl-av__hoja[data-pieza="letra"] { place-content: center; justify-items: center; background: #efebe1; }
+.gl-av__letra {
+  font-family: var(--font-archivo), sans-serif;
+  font-variation-settings: "wdth" 62;
+  font-weight: 900;
+  font-size: 12cqmin;
+  line-height: 0.85;
+}
+.gl-av__pie-hoja { font-size: 1cqmin; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.75; }
+.gl-av__hoja[data-pieza="pestana"] {
+  place-content: center;
+  padding: 0 1cqmin;
+  background: #cdb98f;
+  border-radius: 0.8cqmin 0.8cqmin 0 0;
+}
+.gl-av__pestana { font-size: 1.35cqmin; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; }
+.gl-av__hoja[data-pieza="sello"] { place-content: center; background: #ebe7dc; }
+.gl-av__sello {
+  display: grid;
+  place-items: center;
+  width: 10cqmin;
+  aspect-ratio: 1;
+  border: 0.45cqmin double var(--c-accent);
+  border-radius: 50%;
+  color: var(--c-accent);
+  font-weight: 700;
+  font-size: 1.45cqmin;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  align-content: center;
+  transform: rotate(-14deg);
+}
+.gl-av__hoja[data-pieza="contacto"] { background: #1b1b19; color: var(--c-ink); }
+.gl-av__contacto {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6cqmin;
+}
+.gl-av__contacto > span {
+  aspect-ratio: 1.2;
+  background: linear-gradient(135deg, #5d5b55, #2a2926 60%, #45433e);
+}
+.gl-av__contacto > span:nth-child(5),
+.gl-av__contacto > span:nth-child(8) { outline: 0.25cqmin solid var(--c-accent); }
+.gl-av__indice { display: grid; gap: 0.75cqmin; }
+.gl-av__indice > span {
+  display: grid;
+  grid-template-columns: 2.6cqmin 1fr;
+  padding-bottom: 0.3cqmin;
+  border-bottom: 1px dotted rgb(15 15 14 / 0.45);
+  font-size: 1.2cqmin;
+  text-transform: uppercase;
+}
+.gl-av__hoja[data-pieza="calco"] { place-content: center; background: #17171e; color: #9fa3c4; }
+.gl-av__calco { font-size: 1.3cqmin; letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
+.gl-av__hoja[data-pieza="ticket"] {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.8cqmin;
+  background: #dcc57e;
+  border-left: 0.5cqmin dashed var(--gl-toner);
+}
+.gl-av__ticket { display: contents; font-weight: 700; }
+.gl-av__ticket > span:last-child { font-size: 2.6cqmin; }
+.gl-av__hoja[data-pieza="marcas"] {
+  background:
+    linear-gradient(var(--gl-papel), var(--gl-papel)) 50% 50% / 3cqmin 1px no-repeat,
+    linear-gradient(var(--gl-papel), var(--gl-papel)) 50% 50% / 1px 3cqmin no-repeat,
+    linear-gradient(var(--gl-papel), var(--gl-papel)) 0 0 / 2.5cqmin 1px no-repeat,
+    linear-gradient(var(--gl-papel), var(--gl-papel)) 0 0 / 1px 2.5cqmin no-repeat,
+    linear-gradient(var(--gl-papel), var(--gl-papel)) 100% 100% / 2.5cqmin 1px no-repeat,
+    linear-gradient(var(--gl-papel), var(--gl-papel)) 100% 100% / 1px 2.5cqmin no-repeat,
+    rgb(233 229 218 / 0.08);
+  box-shadow: none;
+  outline: 1px dashed rgb(239 236 228 / 0.25);
+}
+
+/* Máscara: los documentos y pestañas que forman el escudo enseñan el dorso (papel de copia
+   con grano, sin texto ni marca): son parte de la estructura, no mandos */
+.gl-av__escenario[data-lectura="mascara"] .gl-av__pieza[data-escudo]:is([data-doc], [data-tipo="pestana"]) .gl-av__hoja {
+  background:
+    radial-gradient(circle, rgb(15 15 14 / 0.12) 0 0.12cqmin, transparent 0.2cqmin) 0 0 / 1.1cqmin 1.3cqmin,
+    linear-gradient(160deg, #d9d5c9, #c9c4b6);
+  border-radius: 0;
+}
+.gl-av__escenario[data-lectura="mascara"] .gl-av__pieza[data-escudo]:is([data-doc], [data-tipo="pestana"]) .gl-av__hoja > * { visibility: hidden; }
+
+/* Lente de la máscara: el círculo dentro del cual se apartan las hojas */
+.gl-av__lente {
+  position: absolute;
+  left: calc(var(--lx) * 1%);
+  top: calc(var(--ly) * 1%);
+  width: 48cqmin;
+  aspect-ratio: 1;
+  border: 1px dashed var(--gl-luz);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.gl-av__rotulo,
+.gl-av__aviso {
+  position: absolute;
+  margin: 0;
+  padding: 0.2rem 0.45rem;
+  background: rgb(15 15 14 / 0.75);
+  font-family: var(--gl-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.gl-av__rotulo { left: 0.6rem; top: 0.6rem; color: var(--gl-luz); }
+.gl-av__aviso { right: 0.6rem; bottom: 0.6rem; color: var(--c-muted); }
+
+/* ── Ficha del documento elegido ── */
+
+.gl-av__ficha {
+  grid-area: ficha;
+  min-height: 3rem;
+  font-size: 0.9375rem;
+}
+.gl-av__ficha article {
+  display: grid;
+  gap: 0.55rem;
+  justify-items: start;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--gl-luz);
+  background: rgb(15 15 14 / 0.94);
+}
+.gl-av__ficha p { margin: 0; }
+.gl-av__ficha-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.9rem; }
+.gl-av__ficha-cod { font-family: var(--gl-mono); font-size: 0.8125rem; color: var(--gl-luz); }
+.gl-av__ficha-t {
+  margin: 0;
+  font-family: var(--font-archivo), sans-serif;
+  font-variation-settings: "wdth" 75;
+  font-weight: 800;
+  font-size: 1.375rem;
+  line-height: 1.1;
+}
+.gl-av__ficha-txt { max-width: 36rem; line-height: 1.45; }
+.gl-av__ficha-fuente { font-size: 0.8125rem; color: var(--c-muted); }
+.gl-av__estado { margin: 0; font-family: var(--gl-mono); font-size: 0.8125rem; color: var(--c-muted); }
+@media (min-width: 64rem) {
+  /* En escritorio la ficha flota sobre el escenario, abajo a la izquierda; el documento va a la derecha.
+     Sin documento elegido, el estado queda debajo, sin tapar ninguna pieza */
+  .gl-av__ficha:has(article) {
+    grid-area: esc;
+    z-index: 2;
+    align-self: end;
+    justify-self: start;
+    width: min(23rem, 44%);
+    min-height: 0;
+    margin: 0 0 2.6rem 0.75rem;
+  }
+}
+
+.gl-av__limite {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-variation-settings: "wdth" 75;
+  font-size: 0.8125rem;
+  color: var(--c-accent);
+}
+.gl-av__limite::before { content: ""; width: 0.55rem; height: 0.55rem; border: 1px dashed var(--c-accent); }
+
+.gl-av__pie { grid-area: pie; margin: 0; max-width: 46rem; font-size: 0.875rem; color: var(--c-muted); }
+@media (hover: none) {
+  .gl-av__teclas { display: none; }
+}
+
+/* ── Panel: tesis, documentos y voto ── */
+
+.gl-av__panel { display: grid; gap: 1.1rem; align-content: start; min-width: 0; }
+.gl-av__panel .gl-tabs--lecturas { margin: 0; }
+.gl-av__panel .gl-lectura { display: grid; gap: 0.9rem; justify-items: start; align-content: start; }
+.gl-av__panel .gl-lectura__tesis { margin: 0; font-size: clamp(1.25rem, 1rem + 0.7vw, 1.6rem); }
+.gl-av__grupo { width: 100%; }
+.gl-av__grupo-t {
+  margin: 0 0 0.4rem;
+  font-family: var(--gl-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.gl-av__docs { display: grid; gap: 0.35rem; width: 100%; margin: 0; padding: 0; list-style: none; }
+.gl-av__doc {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.gl-av__doc[aria-pressed="true"] { border-color: var(--gl-luz); background: rgb(168 245 208 / 0.08); }
+@media (hover: hover) {
+  .gl-av__doc:hover { border-color: rgb(239 236 228 / 0.5); }
+}
+.gl-av__doc-cod { font-family: var(--gl-mono); font-size: 0.75rem; color: var(--gl-luz); }
+.gl-av__doc .mf-kind,
+.gl-av__doc .gl-av__limite { font-size: 0.75rem; white-space: nowrap; }
+.gl-av__paneles { display: grid; min-width: 0; }
+.js .gl-av__cajon:not([data-activa]) { display: none; }
+@media (min-width: 64rem) {
+  .gl-av__paneles > * { grid-area: 1 / 1; }
+  /* Solo cambia la visibilidad: sin layout al cambiar de lectura */
+  .js .gl-av__paneles > .gl-lectura:not([data-activa]) { display: grid; visibility: hidden; }
+}
+.gl-av__cajon { display: grid; align-content: start; }
+
+/* Cajones del archivo */
+.gl-av__archivo { display: grid; gap: 0.6rem; width: 100%; }
+.gl-av__cajones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
+.gl-av__cajones [role="tab"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-muted);
+  font-family: var(--gl-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.gl-av__cajones [role="tab"][aria-selected="true"] { border-color: #cdb98f; background: #cdb98f; color: var(--gl-toner); }
+.gl-av__cajon-n {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid currentColor;
+  font-size: 0.75rem;
+}
+.js .gl-av__cajon-t { display: none; }
+html:not(.js) .gl-av__cajones { display: none; }
+
+.gl-av__sinjs { margin: 0.35rem 0 0.9rem; }
+.js .gl-av__sinjs { display: none; }
+
+/* ── Sin JavaScript: las tres lecturas seguidas, con los textos; la instalación, quieta ── */
+html:not(.js) .gl-av__voto,
+html:not(.js) .gl-av__ficha,
+html:not(.js) .gl-av__pie { display: none; }
+html:not(.js) [data-repetido] .gl-av__sinjs { display: none; }
+html:not(.js) .gl-av__doc { pointer-events: none; padding-inline: 0; border-color: transparent; }
+html:not(.js) .gl-av__escenario { cursor: default; }
+
+/* ── Escenarios estrechos: menos densidad aparente, protagonismo de lo que informa ── */
+@container (max-width: 40rem) {
+  .gl-av__pieza[data-fondo] { --sf: 0.7; }
+  .gl-av__pieza[data-fondo] .gl-av__hoja { filter: brightness(0.3) saturate(0.5); }
+  .gl-av__escenario[data-lectura="retrato"] .gl-av__pieza[data-activo] { --sf: 1.1; }
+}
+@media (min-width: 64rem) and (max-width: 79.99rem) {
+  .gl-av__escenario { aspect-ratio: 1.12; }
+}
+
+/* ── Vertical estrecho: las pestañas, encima de la instalación ── */
+@media (max-width: 63.99rem) and (orientation: portrait) {
+  .gl-av__panel { display: contents; }
+  .gl-av__panel .gl-tabs--lecturas { order: -1; }
+}
+@media (max-width: 47.99rem) {
+  .gl-av__aviso { font-size: 0.5625rem; letter-spacing: 0.04em; white-space: nowrap; }
+}
+
+/* ── Móvil apaisado: escenario y panel lado a lado ── */
+@media (orientation: landscape) and (max-height: 32rem) and (max-width: 63.99rem) {
+  .gl-av { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  .gl-av__escenario { aspect-ratio: 1.35; max-height: calc(100svh - 4rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-av__escena,
+  .gl-av__pieza,
+  .gl-av__hoja { transition: none !important; }
+}
+.gl-av__panel .gl-veredicto { margin: 0; }
