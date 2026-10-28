@@ -5,7 +5,8 @@
  * ninguna excepción legal.
  *
  * Los datos del responsable NO se inventan: solo figuran los confirmados por el responsable
- * (27/10/2026). Un dato que valga `null` se muestra como pendiente de confirmar.
+ * (27/10/2026; dirección y teléfono, 28/10/2026). Un dato que valga `null` se muestra como
+ * pendiente de confirmar.
  */
 
 /**
@@ -18,11 +19,17 @@ export const CONTACTO_LEGAL = {
 
 type Dato = { valor: string | null; pendiente: string };
 
-export const RESPONSABLE: Record<"razonSocial" | "nit" | "pais", Dato> = {
+export const RESPONSABLE: Record<"razonSocial" | "nit" | "direccion" | "telefono" | "pais", Dato> = {
   razonSocial: { valor: "MANIFESTO S.A.S.", pendiente: "razón social" },
   nit: { valor: "901.853.982", pendiente: "NIT" },
+  // Dirección de contacto; no se afirma que sea el domicilio social inscrito
+  direccion: { valor: "Cl. 20 #101A-37, Cañasgordas, Cali, Valle del Cauca, Colombia", pendiente: "dirección de contacto" },
+  telefono: { valor: "+57 317 308 6100", pendiente: "teléfono" },
   pais: { valor: "República de Colombia", pendiente: "país" },
 };
+
+/** Enlace `tel:` del teléfono del responsable (sin espacios), o null si falta */
+export const TELEFONO_HREF = RESPONSABLE.telefono.valor ? `tel:${RESPONSABLE.telefono.valor.replace(/\s/g, "")}` : null;
 
 export const ACTUALIZACION = "27 de octubre de 2026";
 

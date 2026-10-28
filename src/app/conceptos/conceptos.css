@@ -273,6 +273,11 @@ body:has(.mf-theme) { background: transparent; }
   margin: 0;
   max-width: 44rem;
 }
+.mf-sitefoot__legal {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.5rem;
+}
 .mf-sitefoot__legal a {
   display: inline-flex;
   align-items: center;

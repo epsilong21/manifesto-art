@@ -1,0 +1,18 @@
+/* Política de datos: usa la maqueta del aviso legal (aviso-legal.css) y añade
+   subapartados y la lista numerada de los pasos del reclamo. */
+.al-texto h3 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.al-texto ol {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+  list-style: decimal;
+}
+.al-texto ol li::marker {
+  color: var(--c-accent);
+  font-variant-numeric: tabular-nums;
+}
+.al-texto .al-datos + p { margin-top: 1rem; }

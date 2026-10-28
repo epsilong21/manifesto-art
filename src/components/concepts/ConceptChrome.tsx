@@ -79,7 +79,14 @@ export function ConceptFooter({
         <div>
           <h2 className="mf-footer__h">Imagen y derechos</h2>
           <div className="mf-footer__rights">{rights}</div>
-          <Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link>
+          <ul>
+            <li>
+              <Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link>
+            </li>
+            <li>
+              <Link href="/politica-de-privacidad">Política de tratamiento de datos personales</Link>
+            </li>
+          </ul>
         </div>
         <div>
           <h2 className="mf-footer__h">MANIFESTO</h2>
@@ -119,6 +126,7 @@ export function SiteFooter() {
       </p>
       <p className="mf-sitefoot__legal">
         <Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link>
+        <Link href="/politica-de-privacidad">Política de tratamiento de datos personales</Link>
       </p>
     </footer>
   );

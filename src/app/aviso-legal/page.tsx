@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ConceptHeader, SiteFooter } from "@/components/concepts/ConceptChrome";
-import { ACTUALIZACION, CONTACTO_LEGAL, CREDITOS_URL, DATOS_PENDIENTES, RESPONSABLE, SECCIONES_AVISO } from "@/content/aviso-legal";
+import { ACTUALIZACION, CONTACTO_LEGAL, CREDITOS_URL, DATOS_PENDIENTES, RESPONSABLE, SECCIONES_AVISO, TELEFONO_HREF } from "@/content/aviso-legal";
 import { BASQUIAT, DERECHOS_BASQUIAT, OBRA_BASQUIAT } from "@/content/basquiat";
 import { DERECHOS_DALI, ELEFANTES, OBRA_ELEFANTES } from "@/content/elefantes";
 import { DERECHOS_GLENN, GLENN, OBRA_GLENN } from "@/content/glenn";
@@ -27,6 +27,12 @@ const ENTRADA_SELECTOR = process.env.NEXT_PUBLIC_MANIFESTO_ENTRADA === "selector
 function Dato({ d }: { d: { valor: string | null; pendiente: string } }) {
   if (d.valor === null) return <mark className="al-pendiente">[Pendiente de confirmar: {d.pendiente}]</mark>;
   return <>{d.valor}</>;
+}
+
+/** El teléfono del responsable, con su enlace tel (o el aviso de pendiente) */
+function Telefono() {
+  if (!TELEFONO_HREF) return <Dato d={RESPONSABLE.telefono} />;
+  return <a href={TELEFONO_HREF}>{RESPONSABLE.telefono.valor}</a>;
 }
 
 /** El correo de contacto legal (CONTACTO_LEGAL), con su enlace mailto */
@@ -266,9 +272,21 @@ export default function AvisoLegalPage() {
                   </dd>
                 </div>
                 <div>
+                  <dt>Dirección de contacto</dt>
+                  <dd>
+                    <Dato d={RESPONSABLE.direccion} />
+                  </dd>
+                </div>
+                <div>
                   <dt>País</dt>
                   <dd>
                     <Dato d={RESPONSABLE.pais} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>Teléfono</dt>
+                  <dd>
+                    <Telefono />
                   </dd>
                 </div>
                 <div>

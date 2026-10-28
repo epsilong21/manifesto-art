@@ -32,11 +32,11 @@ const recorre = (dir) => {
 };
 recorre(out);
 
-// 1. Las ocho rutas públicas (entrada, catálogo, las cinco obras y el aviso legal) y la página 404
-const RUTAS = ["", "conceptos/", "conceptos/medusa/", "conceptos/noche-estrellada/", "conceptos/los-elefantes/", "conceptos/basquiat-untitled/", "conceptos/glenn/", "aviso-legal/"];
+// 1. Las nueve rutas públicas (entrada, catálogo, las cinco obras, el aviso legal y la política de datos) y la página 404
+const RUTAS = ["", "conceptos/", "conceptos/medusa/", "conceptos/noche-estrellada/", "conceptos/los-elefantes/", "conceptos/basquiat-untitled/", "conceptos/glenn/", "aviso-legal/", "politica-de-privacidad/"];
 for (const r of RUTAS) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
 if (!existsSync(join(out, "404.html"))) errores.push("Falta 404.html");
-// La entrada y el catálogo enlazan las cinco obras y el aviso legal
+// La entrada y el catálogo enlazan las cinco obras, el aviso legal y la política de datos
 for (const r of ["", "conceptos/"]) {
   const p = join(out, r, "index.html");
   if (!existsSync(p)) continue;

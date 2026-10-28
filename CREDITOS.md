@@ -4,7 +4,7 @@ MANIFESTO es una enciclopedia digital de arte gratuita, sin publicidad, sin susc
 
 El aviso legal del sitio (`/aviso-legal/`, «Aviso legal y derechos de reproducción») explica la naturaleza del proyecto, la titularidad de las obras y el uso de las reproducciones. Ni ese aviso ni estos créditos son una licencia de reproducción.
 
-**Consultas, errores de atribución y reclamaciones de derechos:** [manifesto.msto@gmail.com](mailto:manifesto.msto@gmail.com) (correo oficial de MANIFESTO S.A.S., responsable editorial).
+**Consultas, errores de atribución y reclamaciones de derechos:** [manifesto.msto@gmail.com](mailto:manifesto.msto@gmail.com) (correo oficial de MANIFESTO S.A.S., responsable editorial; NIT 901.853.982; dirección de contacto: Cl. 20 #101A-37, Cañasgordas, Cali, Valle del Cauca, Colombia; teléfono +57 317 308 6100).
 
 ## Obras reproducidas
 
