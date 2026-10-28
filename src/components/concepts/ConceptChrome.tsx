@@ -79,6 +79,7 @@ export function ConceptFooter({
         <div>
           <h2 className="mf-footer__h">Imagen y derechos</h2>
           <div className="mf-footer__rights">{rights}</div>
+          <Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link>
         </div>
         <div>
           <h2 className="mf-footer__h">MANIFESTO</h2>
@@ -99,7 +100,10 @@ export function ConceptFooter({
   );
 }
 
-/** Pie breve de la portada y del catálogo. */
+/** Fuera de una publicación, el catálogo y la portada muestran la reproducción de referencia de las obras protegidas (src/lib/miniaturas.ts) */
+const PUBLICACION = process.env.MANIFESTO_PUBLICACION === "1";
+
+/** Pie breve de la portada, del catálogo y del aviso legal. */
 export function SiteFooter() {
   return (
     <footer className="mf-sitefoot">
@@ -108,9 +112,13 @@ export function SiteFooter() {
         arte. No es una tienda.
       </p>
       <p>
-        Las reproducciones de Caravaggio y Van Gogh son de obras en dominio público. Las imágenes de
-        Los elefantes, Untitled y Glenn son composiciones gráficas de MANIFESTO, no las pinturas de Dalí
-        y Basquiat.
+        Las reproducciones de Caravaggio y Van Gogh son de obras en dominio público.{" "}
+        {PUBLICACION
+          ? "Las imágenes de Los elefantes, Untitled y Glenn son composiciones gráficas de MANIFESTO, no las pinturas de Dalí y Basquiat."
+          : "En esta versión local, las imágenes de Los elefantes, Untitled y Glenn son reproducciones de referencia sin licencia; en la versión publicada son composiciones gráficas de MANIFESTO."}
+      </p>
+      <p className="mf-sitefoot__legal">
+        <Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link>
       </p>
     </footer>
   );

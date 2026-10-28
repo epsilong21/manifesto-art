@@ -273,6 +273,15 @@ body:has(.mf-theme) { background: transparent; }
   margin: 0;
   max-width: 44rem;
 }
+.mf-sitefoot__legal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--c-accent);
+  text-underline-offset: 0.25em;
+}
 .mf-sitefoot .mf-mark__word {
   margin-right: 0.6rem;
   color: var(--c-ink);

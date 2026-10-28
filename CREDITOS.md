@@ -2,6 +2,10 @@
 
 MANIFESTO es una enciclopedia digital de arte gratuita, sin publicidad, sin suscripciones, sin venta de contenido y sin finalidad comercial. No vende productos ni reproducciones.
 
+El aviso legal del sitio (`/aviso-legal/`, «Aviso legal y derechos de reproducción») explica la naturaleza del proyecto, la titularidad de las obras y el uso de las reproducciones. Ni ese aviso ni estos créditos son una licencia de reproducción.
+
+**Consultas, errores de atribución y reclamaciones de derechos:** [manifesto.msto@gmail.com](mailto:manifesto.msto@gmail.com) (correo oficial de MANIFESTO S.A.S., responsable editorial).
+
 ## Obras reproducidas
 
 ### Medusa · Caravaggio, hacia 1597–1598 · Gallerie degli Uffizi, Florencia
@@ -41,14 +45,14 @@ Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fun
 Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Jean-Michel Basquiat. Licencias de reproducción: Artestar, Nueva York. MANIFESTO no dispone de ninguna.
 
 - **Sin reproducción:** la página no muestra la pintura porque no hay licencia de reproducción. Enlaza a la ficha de la obra en The Broad.
-- **Lámina vacía:** el marco del hero conserva la proporción real del lienzo (205,74 × 175,9 cm); no contiene ninguna imagen sustitutiva.
+- **Acetatos de MANIFESTO:** en el lugar de la pintura, el hero muestra una pila de acetatos propia, rotulada «Esquema de MANIFESTO · no es la pintura», con la proporción real del lienzo (205,74 × 175,9 cm). No reproduce ni imita la pintura.
 
 ### Glenn · Jean-Michel Basquiat, 1984–1985 · Colección particular
 
 Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Jean-Michel Basquiat. Licencias de reproducción: Artestar, Nueva York. MANIFESTO no dispone de ninguna.
 
 - **Sin reproducción:** la página no muestra la pintura porque no hay licencia de reproducción.
-- **Esquema de MANIFESTO:** en su lugar se ve un esquema propio, rotulado como tal, con la proporción real del lienzo (254 × 289,6 cm) y las zonas de los hallazgos. No reproduce ni imita la pintura.
+- **Muro de hojas de MANIFESTO:** en su lugar se ve un muro de hojas propio, rotulado como tal, con la proporción real del lienzo (254 × 289,6 cm). No reproduce ni imita la pintura.
 
 ## Creaciones de MANIFESTO
 
@@ -60,7 +64,7 @@ En *Medusa*, el laboratorio «La sombra que miente» y la escena «El reflejo» 
 
 En *Untitled* (Basquiat), la lámina anatómica (rótulos y cotas), las cuatro capas («Anatomía», «Rostro», «Máscara», «Marcas»), los cinco hallazgos, las tres lecturas con su síntesis, el expediente, la composición tipográfica del catálogo y la imagen para redes sociales son creaciones de MANIFESTO. La tipografía y los trazos no reproducen ni imitan la escritura ni los signos de Basquiat. Las lecturas marcadas como Interpretación son propuestas de MANIFESTO o del museo, y así se indica en cada caso.
 
-En *Glenn* (Basquiat), el esquema de la obra, la entrada de escáner, la mesa de luz (los cinco hallazgos, las capas «Figura», «Fondo» y «Gesto», la fotocopiadora y la ampliación), las tres lecturas («Retrato», «Máscara», «Archivo»), el expediente y la composición tipográfica del catálogo son creaciones de MANIFESTO. Las descripciones de lo que se ve proceden de textos de terceros y se marcan como Observación; las lecturas marcadas como Interpretación son propuestas de MANIFESTO.
+En *Glenn* (Basquiat), el esquema de la obra, la entrada de escáner, la mesa de luz (los cinco hallazgos, las capas «Figura», «Fondo» y «Gesto», la fotocopiadora y la ampliación), la instalación «Archivo vivo» de las tres lecturas («Retrato», «Máscara», «Archivo»: documentos, letras, pestañas, sellos ficticios, índices y marcas), el expediente y la composición tipográfica del catálogo son creaciones de MANIFESTO. Las piezas de «Archivo vivo» no contienen datos propios: los textos de sus fichas son los de la página, con su fuente. Las descripciones de lo que se ve proceden de textos de terceros y se marcan como Observación; las lecturas marcadas como Interpretación son propuestas de MANIFESTO.
 
 ## Tipografías
 
