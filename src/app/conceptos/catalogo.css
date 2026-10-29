@@ -1,0 +1,208 @@
+/* ─────────────────────────────────────────────────────────────
+   Catálogo · «La exposición»
+   Diez placas en una sola sala: la pintura entera (sin recorte) en su proporción real, sobre un
+   halo de su color, y al lado su cartela. Cada título usa la tipografía de su obra.
+   La aparición al desplazarse usa animation-timeline (solo donde existe) y se apaga con
+   prefers-reduced-motion; sin ella, todo está visible.
+   ───────────────────────────────────────────────────────────── */
+
+.cat-intro {
+  display: grid;
+  gap: 1.1rem;
+  padding: clamp(2rem, 7vw, 5rem) var(--mf-gutter) clamp(1.5rem, 4vw, 2.5rem);
+}
+.cat-intro__k {
+  margin: 0;
+  font-variation-settings: "wdth" 80;
+  font-size: 0.8125rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.cat-title {
+  margin: 0;
+  font-weight: 900;
+  font-size: clamp(2.6rem, 1rem + 8.4vw, 8rem);
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+}
+.cat-title span { display: block; }
+.cat-title span:first-child { font-variation-settings: "wdth" 62; }
+.cat-title span:last-child {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--c-accent);
+}
+.cat-intro__sub { margin: 0; max-width: 36rem; color: var(--c-muted); font-size: clamp(1rem, 0.95rem + 0.3vw, 1.2rem); line-height: 1.5; text-wrap: pretty; }
+
+/* ── Cinta ── */
+.cat-cinta {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-block: 1px solid var(--c-line);
+  background: color-mix(in srgb, var(--c-bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+}
+.cat-cinta ol {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0 var(--mf-gutter);
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cat-cinta ol::-webkit-scrollbar { display: none; }
+.cat-cinta li { flex: 0 0 auto; }
+@media (min-width: 64rem) { .cat-cinta ol { justify-content: space-between; } .cat-cinta li { flex: 0 1 auto; } }
+.cat-cinta a {
+  position: relative;
+  display: inline-flex; align-items: baseline; gap: 0.45rem; min-height: 48px; padding: 0.7rem 0.55rem;
+  color: var(--c-muted); text-decoration: none; font-variation-settings: "wdth" 80; font-size: 0.8125rem; white-space: nowrap;
+  transition: color 0.3s;
+}
+.cat-cinta a::after {
+  content: ""; position: absolute; inset: auto 0.55rem 0; height: 2px; background: var(--ta);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.5s var(--ease-cine);
+}
+.cat-cinta a[aria-current="true"] { color: var(--c-ink); }
+.cat-cinta a[aria-current="true"]::after { transform: scaleX(1); }
+.cat-cinta__n { font-weight: 800; color: var(--ta); font-variant-numeric: tabular-nums; }
+.cat-cinta__t { display: none; }
+@media (min-width: 40rem) { .cat-cinta__t { display: inline; } }
+@media (hover: hover) { .cat-cinta a:hover { color: var(--c-ink); } }
+
+/* ── Sala ── */
+.cat-sala { margin: 0; padding: 0; list-style: none; }
+.cat-placa {
+  --cl: 7fr;
+  --cf: 5fr;
+  position: relative;
+  display: grid;
+  gap: clamp(1.25rem, 4vw, 2rem);
+  padding: clamp(2.5rem, 8vw, 5rem) var(--mf-gutter);
+  scroll-margin-top: 3rem;
+  isolation: isolate;
+}
+.cat-placa + .cat-placa { border-top: 1px solid var(--c-line); }
+.cat-placa[data-forma="alta"] { --cl: 5fr; --cf: 6fr; }
+.cat-placa[data-forma="ancha"] { --cl: 8fr; --cf: 4fr; }
+@media (min-width: 64rem) {
+  .cat-placa {
+    grid-template-columns: minmax(0, var(--cl)) minmax(18rem, var(--cf));
+    align-items: center;
+    column-gap: clamp(2rem, 6vw, 6rem);
+    min-height: min(92svh, 56rem);
+  }
+  .cat-placa[data-lado="d"] { grid-template-columns: minmax(18rem, var(--cf)) minmax(0, var(--cl)); }
+  .cat-placa[data-lado="d"] .cat-lamina { order: 2; }
+}
+
+.cat-lamina { position: relative; display: grid; place-items: center; min-width: 0; }
+/* El halo: la luz de la obra detrás de la pintura */
+.cat-lamina::before {
+  content: "";
+  position: absolute;
+  inset: -12% -8%;
+  z-index: -1;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--ta) 30%, transparent), transparent 100%);
+  pointer-events: none;
+}
+.cat-img {
+  --ih: min(72svh, 44rem);
+  display: block;
+  /* Ancho explícito (alto máximo × proporción): la pintura nunca se recorta ni se estira */
+  width: min(100%, calc(var(--ih) * var(--r)));
+  height: auto;
+  box-shadow: 0 2.5rem 5rem -1.75rem rgb(0 0 0 / 0.9), 0 0 0 1px rgb(255 255 255 / 0.08);
+  transition: transform 0.8s var(--ease-cine), box-shadow 0.8s var(--ease-cine);
+}
+.cat-placa[data-obra="medusa"] .cat-img { border-radius: 50%; }
+svg.cat-img { aspect-ratio: 800 / 640; width: min(100%, 44rem); }
+@media (max-width: 63.99rem) {
+  .cat-img { --ih: min(66svh, 40rem); }
+}
+
+/* ── Cartela ── */
+.cat-ficha { position: relative; display: grid; gap: 0.7rem; align-content: center; min-width: 0; }
+.cat-num {
+  margin: 0 0 0.15em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(5rem, 3rem + 9vw, 11rem);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--ta) 70%, transparent);
+  user-select: none;
+}
+.cat-idea {
+  margin: 0;
+  font-variation-settings: "wdth" 80;
+  font-size: 0.8125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ta);
+}
+.cat-titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 1.2rem + 3.4vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.cat-placa[data-obra="medusa"] .cat-titulo, .cat-placa[data-obra="el-descendimiento-de-la-cruz"] .cat-titulo { font-family: var(--font-gloock), Georgia, serif; }
+.cat-placa[data-obra="noche-estrellada"] .cat-titulo, .cat-placa[data-obra="la-loca-meg"] .cat-titulo, .cat-placa[data-obra="cristo-de-san-juan-de-la-cruz"] .cat-titulo { font-family: var(--font-instrument), Georgia, serif; }
+.cat-placa[data-obra="ascension-al-empireo"] .cat-titulo, .cat-placa[data-obra="los-siete-pecados-capitales"] .cat-titulo { font-family: var(--font-cormorant), Georgia, serif; font-weight: 500; }
+.cat-placa[data-obra="los-elefantes"] .cat-titulo { font-family: var(--font-shoulders), Georgia, serif; }
+.cat-placa[data-obra="basquiat-untitled"] .cat-titulo, .cat-placa[data-obra="glenn"] .cat-titulo {
+  font-family: var(--font-bricolage), system-ui, sans-serif; font-weight: 800; font-variation-settings: "wdth" 75; text-transform: uppercase; line-height: 0.92;
+}
+.cat-enlace { color: inherit; text-decoration: none; }
+/* Toda la placa es el enlace */
+.cat-enlace::after { content: ""; position: absolute; inset: calc(-1 * clamp(2.5rem, 8vw, 5rem)) calc(-1 * var(--mf-gutter)); z-index: 1; }
+.cat-enlace:focus-visible { outline: none; }
+.cat-enlace:focus-visible::after { outline: 2px solid var(--ta); outline-offset: -6px; }
+.cat-autor { margin: 0; font-variation-settings: "wdth" 85; color: var(--c-muted); font-size: 1rem; }
+.cat-pregunta { margin: 0.5rem 0 0; font-family: var(--font-display); font-style: italic; font-size: clamp(1.15rem, 1rem + 0.7vw, 1.5rem); line-height: 1.25; color: var(--c-ink); text-wrap: balance; }
+.cat-desc { margin: 0; max-width: 30rem; color: var(--c-muted); line-height: 1.55; font-size: 0.975rem; text-wrap: pretty; }
+.cat-gesto { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem 0.8rem; margin: 0.3rem 0 0; font-size: 0.9375rem; }
+.cat-gesto b {
+  padding: 0.15rem 0.6rem; border: 1px solid color-mix(in srgb, var(--ta) 70%, transparent); border-radius: 999px;
+  font-variation-settings: "wdth" 85; font-weight: 600; font-size: 0.8125rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ta);
+}
+.cat-gesto span { color: var(--c-ink); }
+.cat-nota { margin: 0; font-size: 0.75rem; color: var(--c-muted); font-style: italic; }
+.cat-entrar {
+  display: inline-flex; align-items: center; gap: 0.7rem; min-height: 44px; margin-top: 0.4rem;
+  font-variation-settings: "wdth" 90; font-weight: 700; color: var(--c-ink);
+}
+.cat-entrar svg { transition: transform 0.5s var(--ease-cine); }
+@media (hover: hover) {
+  .cat-placa:hover .cat-img { transform: translateY(-6px); box-shadow: 0 3.5rem 6rem -1.75rem rgb(0 0 0 / 0.95), 0 0 0 1px color-mix(in srgb, var(--ta) 60%, transparent); }
+  .cat-placa:hover .cat-entrar svg { transform: translateX(6px); }
+  .cat-placa:hover .cat-entrar { color: var(--ta); }
+}
+
+/* ── Aparición al desplazarse (solo con animation-timeline; con movimiento reducido, ninguna) ── */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cat-lamina, .cat-ficha {
+      animation: cat-entra linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+    .cat-ficha { animation-range: entry 10% entry 65%; }
+  }
+}
+@keyframes cat-entra {
+  from { opacity: 0; transform: translateY(2rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-img, .cat-cinta a::after, .cat-entrar svg { transition: none; }
+}

@@ -38,6 +38,8 @@ export function Cartografia() {
   } else if (P) {
     P.nodos.forEach((n, k) => marcas.push({ x: n.x, y: n.y, n: k + 1, on: s.nodo === k }));
   }
+  // Con el cuadro entero a la vista, los cinco territorios se dibujan como un mapa: contornos y rótulos numerados
+  const mapa = enTerritorios && s.terr === null;
   const unir = !enTerritorios && P && s.nodo === null;
   const zona = enTerritorios && T?.zona && s.desc === null ? T.zona : null;
   const ruta = P ? P.nodos.map((n, k) => `${k ? "L" : "M"}${(n.x * 100).toFixed(2)},${(n.y * VB_H).toFixed(2)}`).join(" ") : "";
@@ -77,8 +79,24 @@ export function Cartografia() {
                 style={{ left: `${(zona?.x ?? 0) * 100}%`, top: `${(zona?.y ?? 0) * 100}%`, width: `${(zona?.w ?? 1) * 100}%`, height: `${(zona?.h ?? 1) * 100}%` }}
               />
               <svg className="meg-svg" viewBox={`0 0 100 ${VB_H}`} aria-hidden="true" preserveAspectRatio="none">
+                {mapa
+                  ? TERRITORIOS.map((x) =>
+                      x.zona ? <rect key={x.id} className="meg-mapa" x={x.zona.x * 100} y={x.zona.y * VB_H} width={x.zona.w * 100} height={x.zona.h * VB_H} rx={0.4} /> : null,
+                    )
+                  : null}
                 {unir ? <path className="meg-union" d={ruta} /> : null}
               </svg>
+              {mapa
+                ? TERRITORIOS.map((x, k) => {
+                    const p = x.zona ? { left: x.zona.x, top: Math.max(x.zona.y, 0.05) } : x.anillos ? { left: x.anillos[0].x, top: x.anillos[0].y } : null;
+                    return p ? (
+                      <span key={x.id} className="meg-rotulo" style={{ left: `${p.left * 100}%`, top: `${p.top * 100}%` }} aria-hidden="true">
+                        <b>{k + 1}</b>
+                        <span>{x.nombre}</span>
+                      </span>
+                    ) : null;
+                  })
+                : null}
               {marcas.map((m, k) => (
                 <span key={`${s.modo}-${s.terr}-${s.pista}-${k}`} className="meg-marca" data-on={m.on ?? false} style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%` }} aria-hidden="true">
                   {m.n ?? ""}

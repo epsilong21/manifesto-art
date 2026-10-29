@@ -35,17 +35,16 @@ recorre(out);
 // 1. Las nueve rutas públicas (entrada, catálogo, las cinco obras, el aviso legal y la política de datos) y la página 404
 const RUTAS = ["", "conceptos/", "conceptos/medusa/", "conceptos/noche-estrellada/", "conceptos/los-elefantes/", "conceptos/basquiat-untitled/", "conceptos/glenn/", "aviso-legal/", "politica-de-privacidad/"];
 for (const r of RUTAS) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
-// 1b. Las páginas del sprint 06–09 y la 10 (Cristo de San Juan de la Cruz): funcionan por URL directa. Aún no están en la entrada ni en el catálogo,
-// así que no se exige que las enlacen (la comprobación de enlaces de abajo sigue usando solo RUTAS).
+// 1b. Las páginas 06–10: desde V5.1 también las enlazan la entrada y el catálogo (comprobación de abajo).
 const RUTAS_SPRINT = ["conceptos/ascension-al-empireo/", "conceptos/el-descendimiento-de-la-cruz/", "conceptos/la-loca-meg/", "conceptos/los-siete-pecados-capitales/", "conceptos/cristo-de-san-juan-de-la-cruz/"];
 for (const r of RUTAS_SPRINT) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
 if (!existsSync(join(out, "404.html"))) errores.push("Falta 404.html");
-// La entrada y el catálogo enlazan las cinco obras, el aviso legal y la política de datos
+// La entrada y el catálogo enlazan las diez obras, el aviso legal y la política de datos
 for (const r of ["", "conceptos/"]) {
   const p = join(out, r, "index.html");
   if (!existsSync(p)) continue;
   const t = readFileSync(p, "utf8");
-  for (const o of RUTAS.slice(2)) if (!t.includes(`href="${base}/${o}"`)) errores.push(`/${r} no enlaza /${o}`);
+  for (const o of [...RUTAS.slice(2), ...RUTAS_SPRINT]) if (!t.includes(`href="${base}/${o}"`)) errores.push(`/${r} no enlaza /${o}`);
 }
 
 // 2. Nada ajeno al sitio: ni originales (/obras), ni Dante, ni carpetas internas

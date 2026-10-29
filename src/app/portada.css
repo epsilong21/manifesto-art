@@ -1,405 +1,306 @@
 /* ─────────────────────────────────────────────────────────────
-   Portada MANIFESTO
-   Una sola idea visual: tres mirillas abiertas en la oscuridad, cada una
-   con un fragmento de su obra, sobre una misma línea de horizonte. El
-   resto, tipografía de la identidad madre (Archivo, contraste de anchuras).
+   Portada MANIFESTO · «La sala»
+   Una sola idea: la pintura entera, sobre un halo de su propio color, y el friso de las
+   diez debajo. El resto es tipografía de la identidad madre (Archivo, contraste de anchuras).
+   Solo se animan opacidad y transform; todo se apaga con prefers-reduced-motion.
    ───────────────────────────────────────────────────────────── */
 
+@property --a {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c98a4e;
+}
+
 .hm-hero {
-  --hm-alto: clamp(13rem, 32svh, 16rem);
   display: grid;
-  gap: clamp(2.25rem, 6vw, 3.5rem);
-  padding: clamp(1.75rem, 6vw, 3rem) var(--mf-gutter) clamp(3rem, 8vw, 5rem);
+  gap: 0;
+  padding-bottom: clamp(1rem, 4vw, 2rem);
 }
 @media (min-width: 64rem) {
   .hm-hero {
-    --hm-alto: clamp(18rem, 52svh, 34rem);
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    grid-template-rows: 1fr auto;
-    align-items: end;
-    column-gap: clamp(2.5rem, 5vw, 5rem);
-    row-gap: 1.5rem;
-    min-height: calc(100svh - 4.5rem);
-    padding-top: 1.5rem;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    min-height: calc(100svh - 4.75rem);
+    padding-inline: var(--mf-gutter);
+    column-gap: clamp(1.5rem, 3vw, 3.5rem);
+    align-items: stretch;
   }
 }
 
+/* ── Texto ── */
 .hm-copy {
-  /* El titular se mide contra su columna: la palabra ancha nunca la desborda */
   container-type: inline-size;
   display: grid;
-  gap: clamp(1.25rem, 3vw, 1.75rem);
+  gap: clamp(0.9rem, 2.4vw, 1.5rem);
+  align-content: center;
   min-width: 0;
+  padding: clamp(1.25rem, 4vw, 2rem) var(--mf-gutter) 0;
+}
+@media (min-width: 64rem) {
+  .hm-copy { padding: 0; }
+}
+.hm-kicker {
+  margin: 0;
+  font-variation-settings: "wdth" 80;
+  font-size: 0.8125rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-accent);
 }
 .hm-t {
   margin: 0;
   font-weight: 900;
-  /* «solamente.» en anchura 125 mide unas 7,2 veces el cuerpo */
-  font-size: clamp(2rem, min(13.4cqi, 13.5svh), 8rem);
-  line-height: 0.86;
+  font-size: clamp(2.1rem, min(13.2cqi, 10.5svh), 7rem);
+  line-height: 0.88;
   letter-spacing: -0.02em;
 }
-.hm-t span {
-  display: block;
-}
-/* Tres anchuras para tres tiempos: lo que se espera, la duda, la invitación */
-.hm-t__a {
-  font-variation-settings: "wdth" 62;
-  text-wrap: balance;
-}
+.hm-t span { display: block; }
+.hm-t__a { font-variation-settings: "wdth" 62; text-wrap: balance; }
 .hm-t__b {
   font-variation-settings: "wdth" 125;
   color: transparent;
   -webkit-text-stroke: 1.5px var(--c-ink);
 }
 .hm-t__c {
-  font-variation-settings: "wdth" 125;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--a, var(--c-accent));
 }
 .hm-intro {
   margin: 0;
-  max-width: 34rem;
-  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.3rem);
+  max-width: 30rem;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.2rem);
   line-height: 1.5;
   color: var(--c-muted);
   text-wrap: pretty;
 }
-.hm-acciones {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem 1.5rem;
-}
-.hm-cta {
-  min-height: 52px;
-  padding-inline: 1.5rem 1.35rem;
-  gap: 0.9rem;
-  font-size: 1.0625rem;
-  font-weight: 700;
-}
-.hm-cta svg {
-  transition: transform 0.4s var(--ease-cine);
+.hm-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.5rem; }
+.hm-cta { min-height: 52px; padding-inline: 1.5rem 1.35rem; gap: 0.9rem; font-size: 1.0625rem; font-weight: 700; }
+.hm-cta svg { transition: transform 0.4s var(--ease-cine); }
+.hm-enlace {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--c-ink); font-variation-settings: "wdth" 85;
+  text-decoration: underline; text-decoration-color: var(--c-line); text-underline-offset: 0.3em;
 }
 @media (hover: hover) {
-  .hm-cta:hover {
-    background: var(--c-accent);
-    border-color: var(--c-accent);
-  }
-  .hm-cta:hover svg {
-    transform: translateX(4px);
-  }
-}
-.hm-cuenta {
-  margin: 0;
-  max-width: 20rem;
-  font-variation-settings: "wdth" 80;
-  font-size: 0.9375rem;
-  line-height: 1.35;
-  color: var(--c-muted);
+  .hm-cta:hover { background: var(--c-accent); border-color: var(--c-accent); }
+  .hm-cta:hover svg { transform: translateX(4px); }
+  .hm-enlace:hover { text-decoration-color: var(--c-ink); }
 }
 
-/* Móvil apaisado: texto y mirillas lado a lado, el CTA dentro de la primera pantalla */
-@media (orientation: landscape) and (max-height: 32rem) and (max-width: 63.99rem) {
-  .hm-hero {
-    --hm-alto: 52svh;
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    /* Arriba: el CTA no debe quedar pegado al borde inferior */
-    align-items: start;
-    column-gap: 1.75rem;
-    row-gap: 1rem;
-    padding-top: 1rem;
-  }
-  .hm-copy {
-    gap: 0.85rem;
-  }
-  .hm-t {
-    font-size: clamp(2rem, min(10cqi, 10svh), 8rem);
-  }
-  .hm-intro {
-    font-size: 0.9375rem;
-  }
-  .hm-cuenta {
-    display: none;
-  }
-  .hm-nota {
-    grid-column: 1 / -1;
-  }
-}
-
-/* ── Mirillas ── */
-
-.hm-mirillas {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: clamp(0.6rem, 2.4vw, 1.5rem);
-  /* La línea de horizonte: todas las mirillas se apoyan en ella */
-  background: linear-gradient(var(--c-line), var(--c-line)) no-repeat 0 var(--hm-alto) / 100% 1px;
-}
-.hm-mirilla {
-  --h: 1;
-  min-width: 0;
-  /* El pie se adapta al ancho de su columna (más abajo) */
-  container-type: inline-size;
-}
-/* Medusa, la más intensa, no es la más alta: el peso visual se reparte */
-.hm-mirilla[data-obra="medusa"] { --h: 0.84; --acento: #e5636d; }
-.hm-mirilla[data-obra="noche-estrellada"] { --h: 1; --acento: #e0aa45; }
-.hm-mirilla[data-obra="los-elefantes"] { --h: 0.72; --acento: #dc9b65; }
-.hm-mirilla[data-obra="basquiat-untitled"] { --h: 0.9; --acento: #f0c53a; }
-.hm-mirilla[data-obra="glenn"] { --h: 0.78; --acento: #a8f5d0; }
-
-.hm-mirilla__link {
-  display: grid;
-  gap: 0.75rem;
-  color: var(--c-ink);
-  text-decoration: none;
-}
-.hm-mirilla__ventana {
+/* ── Escena ── */
+.hm-escena {
+  --alto: clamp(17rem, 46svh, 24rem);
   position: relative;
-  display: block;
-  overflow: clip;
-  height: calc(var(--hm-alto) * var(--h));
-  margin-top: calc(var(--hm-alto) * (1 - var(--h)));
-  /* Arco de hornacina: la ventana por la que se asoma cada obra */
-  border-radius: 999px 999px 0 0;
-  background: #050406;
-}
-.hm-mirilla__ventana img,
-.hm-grafico {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.hm-mirilla__ventana img {
-  object-fit: cover;
-  transition: scale 1.2s var(--ease-cine);
-}
-/* Encuadre abierto: el rostro con sus serpientes y el verde del escudo, no solo el grito.
-   Mismo tratamiento de color que en el catálogo */
-.hm-mirilla[data-obra="medusa"] img {
-  object-position: 52% 40%;
-  transform: scale(1.4);
-  transform-origin: 52% 38%;
-  filter: saturate(0.85) contrast(1.05) brightness(0.92);
-}
-.hm-mirilla[data-obra="noche-estrellada"] img {
-  object-position: 48% 40%;
-  transform: scale(1.5);
-  transform-origin: 48% 40%;
-}
-/* Obras protegidas con su reproducción (src/lib/miniaturas.ts): la pintura entera, sin
-   ampliar, apoyada abajo para que el arco de la ventana no le corte las esquinas. La
-   deriva (±2 %) cabe en el margen */
-.hm-mirilla[data-integra] .hm-mirilla__ventana img {
-  inset: 0 7% 5%;
-  width: 86%;
-  height: 95%;
-  object-fit: contain;
-  object-position: 50% 100%;
-}
-.hm-mirilla__pie {
   display: grid;
-  gap: 0.1rem;
+  grid-template-rows: auto auto;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
   min-width: 0;
-  font-variation-settings: "wdth" 80;
-  line-height: 1.25;
-}
-.hm-mirilla__n {
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: var(--acento);
-}
-.hm-mirilla__t {
-  font-variation-settings: "wdth" 100;
-  font-weight: 700;
-  font-size: clamp(0.9375rem, 0.85rem + 0.4vw, 1.125rem);
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.25em;
-  transition: text-decoration-color 0.3s;
-}
-.hm-mirilla__a {
-  font-size: 0.875rem;
-  color: var(--c-muted);
-}
-.hm-mirilla__t,
-.hm-mirilla__a {
-  /* Último recurso: una palabra más ancha que su columna se parte dentro de ella */
-  overflow-wrap: anywhere;
-}
-/* Columnas estrechas (móvil vertical y apaisado, escritorio por debajo de ~1400 px): el
-   ancho condensado del titular, para que «estrellada» o «Caravaggio» no pisen la mirilla
-   vecina */
-@container (max-width: 5rem) {
-  .hm-mirilla__t {
-    font-size: 0.9375rem;
-    font-variation-settings: "wdth" 62;
-  }
-  .hm-mirilla__a {
-    font-variation-settings: "wdth" 62;
-  }
-}
-/* Las más estrechas (móvil apaisado pequeño): mejor partir con guion que a mitad de sílaba */
-@container (max-width: 2.75rem) {
-  .hm-mirilla__t,
-  .hm-mirilla__a {
-    hyphens: auto;
-  }
-}
-@media (orientation: landscape) and (max-height: 32rem) and (max-width: 63.99rem),
-  (min-width: 64rem) and (max-width: 79.99rem) {
-  .hm-mirillas {
-    gap: 0.5rem;
-  }
-}
-.hm-mirilla__link:focus-visible {
-  outline: none;
-}
-.hm-mirilla__link:focus-visible .hm-mirilla__ventana {
-  outline: 2px solid var(--acento);
-  outline-offset: 3px;
-}
-.hm-mirilla__link:focus-visible .hm-mirilla__t {
-  text-decoration-color: var(--acento);
-}
-@media (hover: hover) {
-  .hm-mirilla__link:hover .hm-mirilla__t {
-    text-decoration-color: var(--acento);
-  }
-  .hm-mirilla__link:hover img {
-    scale: 1.06;
-  }
-  .hm-mirilla[data-integra] .hm-mirilla__link:hover img {
-    scale: none;
-  }
-}
-.hm-nota {
-  margin: 0;
-  max-width: 34rem;
-  font-variation-settings: "wdth" 80;
-  font-size: 0.8125rem;
-  line-height: 1.4;
-  color: var(--c-muted);
+  padding: clamp(1rem, 3vw, 1.5rem) var(--mf-gutter) 0;
+  isolation: isolate;
+  overflow: hidden;
+  transition: --a 1s;
 }
 @media (min-width: 64rem) {
-  .hm-mirillas {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: end;
-  }
-  .hm-nota {
-    grid-column: 2;
-    grid-row: 2;
+  .hm-escena {
+    --alto: clamp(20rem, 66svh, 46rem);
+    padding: 0;
+    align-content: space-between;
+    overflow: visible;
   }
 }
-
-/* ── Cómo se recorre ── */
-
-.hm-metodo {
-  display: grid;
-  gap: clamp(1.75rem, 4vw, 2.75rem);
-  padding: clamp(3rem, 8vw, 6rem) var(--mf-gutter);
-  border-top: 1px solid var(--c-line);
+.hm-halo {
+  position: absolute;
+  inset: -20% -10% 10%;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(48% 52% at 50% 38%, color-mix(in srgb, var(--a) 34%, transparent), transparent 72%),
+    radial-gradient(90% 60% at 50% 110%, color-mix(in srgb, var(--a) 14%, transparent), transparent 70%);
 }
-.hm-h2 {
+.hm-numeral {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 10%;
+  z-index: -1;
   margin: 0;
-  max-width: 14ch;
-  font-variation-settings: "wdth" 62;
-  font-weight: 900;
-  font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);
-  line-height: 0.9;
-  letter-spacing: -0.015em;
-}
-.hm-pasos {
-  counter-reset: paso;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 2rem;
-}
-.hm-pasos li {
-  counter-increment: paso;
-  display: grid;
-  align-content: start;
-  gap: 0.6rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--c-line);
-}
-.hm-pasos li::before {
-  content: counter(paso);
-  font-variation-settings: "wdth" 125;
-  font-weight: 900;
-  font-size: 2.5rem;
-  line-height: 1;
+  text-align: right;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(9rem, 26vw, 24rem);
+  line-height: 0.8;
   color: transparent;
-  -webkit-text-stroke: 1px var(--c-ink);
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--a) 45%, transparent);
+  opacity: 0.22;
+  pointer-events: none;
+  user-select: none;
+  animation: hm-numeral 1s var(--ease-cine) both;
+  translate: calc(var(--px, 0) * 22px) calc(var(--py, 0) * 12px);
+  transition: translate 0.7s var(--ease-cine);
 }
-.hm-pasos h3 {
-  margin: 0;
-  font-variation-settings: "wdth" 100;
-  font-weight: 700;
-  font-size: 1.25rem;
-  line-height: 1.2;
+@keyframes hm-numeral {
+  from { opacity: 0; transform: translateY(1.5rem); }
 }
-.hm-pasos p {
-  margin: 0;
-  max-width: 30rem;
-  color: var(--c-muted);
+
+.hm-escenario { display: grid; gap: 0.9rem; min-width: 0; }
+@media (min-width: 64rem) {
+  .hm-escenario { grid-template-columns: minmax(0, 1fr) 13rem; grid-template-rows: 1fr auto; column-gap: clamp(1rem, 2vw, 2rem); align-items: end; }
 }
+.hm-marco {
+  position: relative;
+  height: var(--alto);
+  min-width: 0;
+  translate: calc(var(--px, 0) * -10px) calc(var(--py, 0) * -7px);
+  transition: translate 0.7s var(--ease-cine);
+}
+@media (min-width: 64rem) { .hm-marco { grid-row: 1 / span 2; } }
+.hm-lamina {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.985);
+  transition: opacity 0.9s var(--ease-cine), transform 1.1s var(--ease-cine), visibility 0s 0.9s;
+}
+.hm-lamina[data-activa="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+  z-index: 1;
+}
+.hm-lamina img,
+.hm-lamina svg {
+  display: block;
+  max-width: 100%;
+  max-height: var(--alto);
+  width: auto;
+  height: auto;
+  box-shadow: 0 2.5rem 5rem -1.5rem rgb(0 0 0 / 0.85), 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+.hm-lamina[data-obra="medusa"] img { border-radius: 50%; }
+.hm-lamina svg { aspect-ratio: 800 / 640; width: min(100%, calc(var(--alto) * 1.25)); height: auto; }
+
+.hm-rotulo { display: grid; gap: 0.2rem; align-content: end; min-width: 0; }
+@media (min-width: 64rem) { .hm-rotulo { grid-column: 2; grid-row: 1; align-self: end; } }
+.hm-rotulo p { margin: 0; }
+.hm-rotulo__n { font-variation-settings: "wdth" 80; font-size: 0.8125rem; letter-spacing: 0.14em; color: var(--c-muted); }
+.hm-rotulo__n span { color: var(--a); font-weight: 700; }
+.hm-rotulo__t { font-family: var(--font-display); font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2.1rem); line-height: 1.05; text-wrap: balance; }
+.hm-rotulo__a { font-variation-settings: "wdth" 85; color: var(--c-muted); font-size: 0.9375rem; }
+.hm-rotulo__g { margin-top: 0.4rem; font-size: 0.9375rem; line-height: 1.4; color: var(--c-ink); }
+.hm-rotulo__g b { color: var(--a); font-weight: 600; }
+.hm-rotulo__nota { font-size: 0.75rem; color: var(--c-muted); font-style: italic; }
+.hm-mandos { display: flex; align-items: center; gap: 0.5rem; }
+@media (min-width: 64rem) { .hm-mandos { grid-column: 2; grid-row: 2; } }
+.hm-flecha, .hm-pausa {
+  display: inline-grid; place-items: center; min-width: 44px; min-height: 44px;
+  border: 1px solid var(--c-line); border-radius: 999px; background: transparent; color: var(--c-ink);
+  font: inherit; font-variation-settings: "wdth" 85; font-size: 0.875rem; cursor: pointer;
+  transition: border-color 0.25s, background-color 0.25s;
+}
+.hm-pausa { padding-inline: 1rem; margin-left: auto; }
+@media (hover: hover) {
+  .hm-flecha:hover, .hm-pausa:hover { border-color: var(--a); background: color-mix(in srgb, var(--a) 14%, transparent); }
+}
+
+/* ── Friso de las diez ── */
+.hm-friso { grid-column: 1 / -1; min-width: 0; }
+@media (min-width: 64rem) { .hm-friso { margin-top: clamp(1rem, 2.5svh, 2rem); } }
+.hm-friso ol {
+  display: flex; gap: clamp(0.5rem, 1.2vw, 1rem); margin: 0; padding: 0.25rem 0 0.75rem; list-style: none;
+  overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+}
+.hm-friso ol::-webkit-scrollbar { display: none; }
+@media (min-width: 64rem) { .hm-friso ol { overflow: visible; justify-content: space-between; } }
+.hm-friso li { flex: 0 0 auto; min-width: 2.75rem; scroll-snap-align: center; }
+@media (min-width: 64rem) { .hm-friso li { flex: 1 1 0; min-width: 0; } }
+.hm-friso a {
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 0.4rem; align-items: baseline;
+  color: var(--c-muted); text-decoration: none; opacity: 0.62;
+  transition: opacity 0.4s, color 0.4s;
+}
+.hm-friso a[data-activa="true"] { opacity: 1; color: var(--c-ink); }
+.hm-tira__img {
+  grid-column: 1 / -1; height: clamp(3.25rem, 6.4svh, 4.25rem); margin-bottom: 0.4rem;
+  border-bottom: 2px solid transparent; transition: border-color 0.4s;
+  display: flex; justify-content: center;
+}
+@media (min-width: 64rem) { .hm-tira__img { justify-content: flex-start; } }
+.hm-friso a[data-activa="true"] .hm-tira__img { border-color: var(--ta); }
+.hm-friso a[href$="/medusa"] img, .hm-friso a[href$="/medusa/"] img { border-radius: 50%; }
+.hm-tira__img img, .hm-tira__img svg { display: block; height: 100%; width: auto; max-width: none; }
+.hm-tira__img svg { aspect-ratio: 800 / 640; }
+.hm-tira__n { font-variation-settings: "wdth" 80; font-size: 0.75rem; font-weight: 700; color: var(--ta); font-variant-numeric: tabular-nums; }
+@media (min-width: 64rem) { .hm-friso a { opacity: 0.55; } }
+.hm-friso a:focus-visible { outline-offset: 4px; }
+@media (hover: hover) { .hm-friso a:hover { opacity: 1; color: var(--c-ink); } }
+
+/* ── Índice ── */
+.hm-indice, .hm-metodo { padding: clamp(2.5rem, 7vw, 5rem) var(--mf-gutter); border-top: 1px solid var(--c-line); }
+.hm-h2 { margin: 0 0 clamp(1.25rem, 3vw, 2rem); font-weight: 800; font-variation-settings: "wdth" 90; font-size: clamp(1.4rem, 1rem + 1.6vw, 2.1rem); letter-spacing: -0.01em; }
+.hm-lista { margin: 0; padding: 0; list-style: none; max-width: 70rem; }
+.hm-lista a {
+  display: grid; grid-template-columns: 2.4rem minmax(0, 1fr) auto; grid-template-areas: "n t g" "n a g";
+  column-gap: 0.75rem; align-items: baseline; min-height: 44px; padding: 0.85rem 0.25rem;
+  border-top: 1px solid var(--c-line); color: var(--c-ink); text-decoration: none;
+  transition: padding-left 0.4s var(--ease-cine), background-color 0.4s;
+}
+.hm-lista li:last-child a { border-bottom: 1px solid var(--c-line); }
+.hm-lista__n { grid-area: n; font-variation-settings: "wdth" 75; font-weight: 800; color: var(--ta); font-variant-numeric: tabular-nums; }
+.hm-lista__t { grid-area: t; font-family: var(--font-display); font-size: clamp(1.25rem, 1rem + 1.4vw, 2rem); line-height: 1.1; }
+.hm-lista__a { grid-area: a; font-variation-settings: "wdth" 85; color: var(--c-muted); font-size: 0.875rem; }
+.hm-lista__g { grid-area: g; align-self: center; font-variation-settings: "wdth" 80; font-size: 0.8125rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted); }
 @media (min-width: 48rem) {
-  .hm-pasos {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: clamp(1.5rem, 3vw, 3rem);
-  }
+  .hm-lista a { grid-template-columns: 3rem minmax(0, 1.4fr) minmax(0, 1fr) 8rem; grid-template-areas: "n t a g"; align-items: center; }
 }
-.hm-volver {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--c-ink);
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: var(--c-accent);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.3em;
+@media (hover: hover) {
+  .hm-lista a:hover { padding-left: 0.9rem; background: linear-gradient(90deg, color-mix(in srgb, var(--ta) 14%, transparent), transparent 70%); }
+  .hm-lista a:hover .hm-lista__g { color: var(--ta); }
 }
+.hm-volver { display: inline-flex; align-items: center; min-height: 44px; margin-top: 1.5rem; color: var(--c-ink); font-variation-settings: "wdth" 90; font-weight: 600; text-underline-offset: 0.3em; }
 
-/* ── Movimiento: una apertura breve y una deriva ambiental casi imperceptible ── */
+/* ── Método ── */
+.hm-pasos { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.75rem; max-width: 70rem; counter-reset: paso; }
+@media (min-width: 48rem) { .hm-pasos { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; } }
+.hm-pasos li { counter-increment: paso; padding-top: 0.9rem; border-top: 1px solid var(--c-accent); }
+.hm-pasos li::before { content: "0" counter(paso); display: block; margin-bottom: 0.6rem; font-family: var(--font-display); font-style: italic; font-size: 1.6rem; color: var(--c-accent); }
+.hm-pasos h3 { margin: 0 0 0.5rem; font-size: 1.125rem; font-variation-settings: "wdth" 90; }
+.hm-pasos p { margin: 0; color: var(--c-muted); line-height: 1.55; font-size: 0.975rem; }
 
+/* ── Entrada ── */
 @media (prefers-reduced-motion: no-preference) {
-  .hm-mirilla__ventana {
-    animation: hm-abre 1s var(--ease-cine) both;
-    animation-delay: calc(0.15s + var(--i, 0) * 0.12s);
-  }
-  .hm-mirilla__ventana img,
-  .hm-grafico {
-    animation: hm-deriva 22s ease-in-out infinite alternate;
-    animation-delay: calc(var(--i, 0) * -7s);
-  }
+  .hm-kicker, .hm-t span, .hm-intro, .hm-acciones { animation: hm-sube 0.9s var(--ease-cine) both; }
+  .hm-t__a { animation-delay: 0.05s; }
+  .hm-t__b { animation-delay: 0.15s; }
+  .hm-t__c { animation-delay: 0.25s; }
+  .hm-intro { animation-delay: 0.4s; }
+  .hm-acciones { animation-delay: 0.5s; }
 }
-@keyframes hm-abre {
-  from {
-    clip-path: inset(100% 0 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
+@keyframes hm-sube { from { opacity: 0; transform: translateY(0.9rem); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-escena, .hm-lamina, .hm-marco, .hm-numeral, .hm-friso a, .hm-tira__img { transition: none !important; animation: none !important; }
+  .hm-marco, .hm-numeral { translate: none; }
 }
-@keyframes hm-deriva {
-  from {
-    translate: -2% 1.5%;
-  }
-  to {
-    translate: 2% -1.5%;
-  }
+
+/* Móvil apaisado: el escenario al lado del texto, sin altura de más */
+@media (orientation: landscape) and (max-height: 32rem) and (max-width: 63.99rem) {
+  .hm-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding-inline: var(--mf-gutter); column-gap: 1.25rem; align-items: start; }
+  .hm-copy { padding: 0.75rem 0 0; }
+  .hm-t { font-size: clamp(1.7rem, min(9cqi, 11svh), 4rem); }
+  .hm-intro { display: none; }
+  .hm-escena { --alto: 52svh; padding: 0.75rem 0 0; }
+  .hm-rotulo__g, .hm-numeral { display: none; }
 }
-/* Margen para que la deriva no descubra los bordes de la composición */
-.hm-grafico {
-  transform: scale(1.08);
+
+/* Móvil vertical: la primera pantalla es titular, entrada y pintura; la introducción queda en el índice */
+@media (max-width: 39.99rem) {
+  .hm-kicker, .hm-intro { display: none; }
+  .hm-escena { --alto: clamp(15rem, 42svh, 24rem); }
 }
+.hm-indice__intro { margin: -0.75rem 0 1.5rem; max-width: 34rem; color: var(--c-muted); line-height: 1.5; }
+@media (min-width: 40rem) { .hm-indice__intro { display: none; } }

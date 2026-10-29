@@ -44,7 +44,7 @@ export function ConceptFooter({
     <footer className="mf-footer">
       <Link href={`/conceptos/${next.slug}`} className="mf-footer__next">
         <span className="mf-footer__label">
-          Siguiente obra · {next.numero} / 0{CONCEPTOS.length}
+          Siguiente obra · {next.numero} / {String(CONCEPTOS.length).padStart(2, "0")}
         </span>
         <span className="mf-footer__title">{next.titulo}</span>
         <span className="mf-footer__meta">
@@ -55,7 +55,7 @@ export function ConceptFooter({
       {relacionada && relacionada.slug !== next.slug ? (
         <p className="mf-footer__rel">
           <span className="mf-footer__label">
-            Obra relacionada · {relacionada.numero} / 0{CONCEPTOS.length}
+            Obra relacionada · {relacionada.numero} / {String(CONCEPTOS.length).padStart(2, "0")}
           </span>{" "}
           <Link href={`/conceptos/${relacionada.slug}`}>
             {relacionada.titulo}, {relacionada.autor}, {relacionada.anio}
@@ -92,7 +92,7 @@ export function ConceptFooter({
           <h2 className="mf-footer__h">MANIFESTO</h2>
           <ul>
             <li>
-              <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"}>Cinco obras, cinco universos</Link>
+              <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"}>Diez obras, diez universos</Link>
             </li>
             {ENTRADA_SELECTOR ? null : (
               <li>
@@ -119,9 +119,10 @@ export function SiteFooter() {
         arte. No es una tienda.
       </p>
       <p>
-        Las reproducciones de Caravaggio y Van Gogh son de obras en dominio público.{" "}
+        Las reproducciones de Medusa y La noche estrellada son de obras en dominio público; las de las obras 06 a 09, de pinturas
+        antiguas cuyas condiciones de imagen figuran en cada página.{" "}
         {PUBLICACION
-          ? "La imagen de Los elefantes es una composición gráfica de MANIFESTO, no la pintura de Dalí. Las de Untitled y Glenn reproducen las pinturas de Basquiat sin licencia de reproducción."
+          ? "La imagen de Los elefantes es una composición gráfica de MANIFESTO, no la pintura de Dalí. Las de Untitled, Glenn y Cristo de San Juan de la Cruz reproducen obras protegidas sin licencia de reproducción."
           : "En esta versión local, las imágenes de Los elefantes, Untitled y Glenn son reproducciones sin licencia; en la versión publicada, la de Los elefantes es una composición gráfica de MANIFESTO."}
       </p>
       <p className="mf-sitefoot__legal">

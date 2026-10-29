@@ -8,6 +8,7 @@ import { CREDITOS, DOCUMENTADO, INTERPRETACION } from "@/content/descendimiento"
 import { gloock } from "@/lib/fonts/gloock";
 import "../sprint.css";
 import "./descendimiento.css";
+import "../pulido.css";
 
 export const metadata: Metadata = {
   title: "El descendimiento de la cruz, de Rubens — MANIFESTO",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function DescendimientoPage() {
   return (
-    <div className={`mf-theme theme-descendimiento ${gloock.variable}`}>
+    <div className={`mf-theme mu-sala theme-descendimiento ${gloock.variable}`}>
       <ConceptHeader />
       <main>
         <section className="dsc-hero" aria-labelledby="dsc-titulo">
@@ -42,7 +43,7 @@ export default function DescendimientoPage() {
         <PesoDeLaLuz />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
-      <PieObra {...CREDITOS} />
+      <PieObra actual="el-descendimiento-de-la-cruz" {...CREDITOS} />
     </div>
   );
 }

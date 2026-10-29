@@ -97,8 +97,8 @@ const env = {
   ...process.env,
   MANIFESTO_DESTINO: "pages",
   MANIFESTO_BASE_PATH: base,
-  // La entrada es el selector de las cinco obras (publicación simplificada)
-  MANIFESTO_ENTRADA: process.env.MANIFESTO_ENTRADA ?? "selector",
+  // La entrada es la portada de las diez obras; MANIFESTO_ENTRADA=selector devuelve el catálogo como entrada
+  MANIFESTO_ENTRADA: process.env.MANIFESTO_ENTRADA ?? "portada",
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? `https://epsilong21.github.io${base}`,
 };
 

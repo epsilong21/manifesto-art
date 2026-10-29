@@ -9,6 +9,7 @@ import { CREDITOS, DATOS, DOCUMENTADO, INTERPRETACION } from "@/content/cristo-d
 import { instrument } from "@/lib/fonts/instrument";
 import "../sprint.css";
 import "./cristo-dali.css";
+import "../pulido.css";
 
 export const metadata: Metadata = {
   title: "Cristo de San Juan de la Cruz, de Dalí — MANIFESTO",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function CristoDaliPage() {
   return (
-    <div className={`mf-theme theme-dali ${instrument.variable}`}>
+    <div className={`mf-theme mu-sala theme-dali ${instrument.variable}`}>
       <ConceptHeader />
       <main>
         <section className="vd-hero" aria-labelledby="vd-titulo">
@@ -51,7 +52,7 @@ export default function CristoDaliPage() {
         <Vertigo />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
-      <PieObra {...CREDITOS} />
+      <PieObra actual="cristo-de-san-juan-de-la-cruz" {...CREDITOS} />
     </div>
   );
 }

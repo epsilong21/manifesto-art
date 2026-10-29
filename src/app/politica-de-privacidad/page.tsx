@@ -361,7 +361,7 @@ export default function PoliticaPrivacidadPage() {
             </section>
 
             <p className="al-volver">
-              <Link href={catalogo}>Volver a las cinco obras</Link>
+              <Link href={catalogo}>Volver a las obras</Link>
             </p>
           </div>
         </div>

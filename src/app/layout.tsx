@@ -9,7 +9,7 @@ const bodoni = Bodoni_Moda({
   style: ["normal", "italic"],
   axes: ["opsz"],
   display: "swap",
-  // Sin uso en las rutas actuales (estilos .display heredados): sin precarga para no penalizar el resto de
+  // Solo la usa el prototipo de La barca de Dante (fuera de las rutas): sin precarga para no penalizar el resto de
   // rutas. Con el CSS en línea, el navegador la descubre igualmente al instante.
   preload: false,
 });
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "MANIFESTO — El arte no se contempla solamente. Se explora.",
   description:
-    "MANIFESTO es una plataforma cultural para descubrir obras de arte, sus símbolos y sus historias mediante experiencias interactivas: Medusa de Caravaggio, La noche estrellada de Van Gogh, Los elefantes de Dalí, y Untitled y Glenn de Basquiat.",
+    "MANIFESTO es una plataforma cultural para descubrir obras de arte, sus símbolos y sus historias mediante experiencias interactivas: Medusa de Caravaggio, La noche estrellada de Van Gogh, Los elefantes de Dalí, y Untitled y Glenn de Basquiat, y cinco más: El Bosco, Rubens, Bruegel y Dalí otra vez.",
   alternates: { canonical: "/" },
   // Vista previa para el cliente en GitHub Pages: fuera de los buscadores
   ...(process.env.MANIFESTO_DESTINO === "pages" ? { robots: { index: false, follow: false } } : {}),
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     siteName: "MANIFESTO",
     title: "El arte no se contempla solamente. Se explora.",
-    description: "Cinco obras, cinco experiencias interactivas para descubrir la historia del arte.",
+    description: "Diez obras, diez experiencias interactivas para descubrir la historia del arte.",
   },
 };
 

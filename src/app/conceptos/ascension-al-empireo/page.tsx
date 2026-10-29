@@ -8,6 +8,7 @@ import { CREDITOS, DOCUMENTADO, INTERPRETACION } from "@/content/empireo";
 import { cormorant } from "@/lib/fonts/cormorant";
 import "../sprint.css";
 import "./empireo.css";
+import "../pulido.css";
 
 export const metadata: Metadata = {
   title: "La ascensión al Empíreo, de El Bosco — MANIFESTO",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function EmpireoPage() {
   return (
-    <div className={`mf-theme theme-empireo ${cormorant.variable}`}>
+    <div className={`mf-theme mu-sala theme-empireo ${cormorant.variable}`}>
       <ConceptHeader />
       <main>
         <section className="emp-hero" aria-labelledby="emp-titulo">
@@ -42,7 +43,7 @@ export default function EmpireoPage() {
         <Ascension />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
-      <PieObra {...CREDITOS} />
+      <PieObra actual="ascension-al-empireo" {...CREDITOS} />
     </div>
   );
 }

@@ -176,6 +176,9 @@ body:has(.mf-theme) { background: transparent; }
   right: 0;
   z-index: 40;
   width: min(22rem, calc(100vw - 2 * var(--mf-gutter)));
+  max-height: calc(100svh - 5.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0.4rem;
   border: 1px solid color-mix(in srgb, var(--c-ink) 18%, transparent);
   background: color-mix(in srgb, var(--c-bg) 94%, #efe8dc);
@@ -209,11 +212,6 @@ body:has(.mf-theme) { background: transparent; }
   color: var(--c-ink);
   text-decoration: none;
 }
-.mf-obras__obra[data-obra="medusa"] { --o-accent: #e5636d; }
-.mf-obras__obra[data-obra="noche-estrellada"] { --o-accent: #e0aa45; }
-.mf-obras__obra[data-obra="los-elefantes"] { --o-accent: #dc9b65; }
-.mf-obras__obra[data-obra="basquiat-untitled"] { --o-accent: #f0c53a; }
-.mf-obras__obra[data-obra="glenn"] { --o-accent: #a8f5d0; }
 .mf-obras__num {
   grid-row: span 2;
   font-variation-settings: "wdth" 75;

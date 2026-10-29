@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent } from "react";
 import { CONCEPTOS, type Concepto } from "@/content/conceptos";
 
 /** Publicación simplificada: el selector es la entrada, no hay otra portada. */
@@ -63,7 +63,7 @@ export function ObrasMenu({ actual }: { actual?: Concepto["slug"] }) {
             <span className="mf-obras__n">
               {obra.numero}
               <span aria-hidden="true"> / </span>
-              <span className="sr-only"> de </span>0{CONCEPTOS.length}
+              <span className="sr-only"> de </span>{String(CONCEPTOS.length).padStart(2, "0")}
             </span>
             <span className="mf-obras__t">{obra.corto}</span>
             <span className="sr-only">. Cambiar de obra</span>
@@ -80,8 +80,10 @@ export function ObrasMenu({ actual }: { actual?: Concepto["slug"] }) {
             <li key={c.slug}>
               <Link
                 href={`/conceptos/${c.slug}`}
+                prefetch={false}
                 className="mf-obras__obra"
                 data-obra={c.slug}
+                style={{ "--o-accent": c.acento } as CSSProperties}
                 aria-current={c.slug === actual ? "page" : undefined}
                 onClick={() => cerrar()}
               >
@@ -99,7 +101,7 @@ export function ObrasMenu({ actual }: { actual?: Concepto["slug"] }) {
         <ul className="mf-obras__extra">
           <li>
             <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"} onClick={() => cerrar()}>
-              Ver las cinco obras
+              Ver las diez obras
             </Link>
           </li>
           {ENTRADA_SELECTOR ? null : (

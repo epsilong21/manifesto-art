@@ -9,6 +9,7 @@ import { CREDITOS, DOCUMENTADO, INTERPRETACION } from "@/content/loca-meg";
 import { instrument } from "@/lib/fonts/instrument";
 import "../sprint.css";
 import "./loca-meg.css";
+import "../pulido.css";
 
 export const metadata: Metadata = {
   title: "La loca Meg, de Bruegel el Viejo — MANIFESTO",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function LocaMegPage() {
   return (
-    <div className={`mf-theme theme-meg ${instrument.variable}`}>
+    <div className={`mf-theme mu-sala theme-meg ${instrument.variable}`}>
       <ConceptHeader />
       <main>
         <section className="meg-hero" aria-labelledby="meg-titulo">
@@ -44,7 +45,7 @@ export default function LocaMegPage() {
         <Restauracion />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
-      <PieObra {...CREDITOS} />
+      <PieObra actual="la-loca-meg" {...CREDITOS} />
     </div>
   );
 }
