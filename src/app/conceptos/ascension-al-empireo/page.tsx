@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import { ConceptHeader } from "@/components/concepts/ConceptChrome";
-import { Ascension } from "@/components/empireo/Ascension";
 import { Pintura } from "@/components/empireo/Pintura";
+import { Umbral } from "@/components/empireo/Umbral";
 import { Ficha } from "@/components/sprint/Ficha";
 import { PieObra } from "@/components/sprint/PieObra";
 import { CREDITOS, DOCUMENTADO, INTERPRETACION } from "@/content/empireo";
 import { cormorant } from "@/lib/fonts/cormorant";
 import "../sprint.css";
 import "./empireo.css";
+import "./umbral.css";
 import "../pulido.css";
 import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
 export const metadata: Metadata = {
   title: "La ascensión al Empíreo, de El Bosco — MANIFESTO",
-  description: "Sube de la oscuridad a la luz por la tabla de El Bosco y mide, estación a estación, cuánta luz tiene el camino.",
+  description: "Atraviesa un túnel de luz en cinco estaciones de la tabla de El Bosco: su brillo sigue la luz medida en cada tramo de la pintura.",
   alternates: { canonical: "/conceptos/ascension-al-empireo" },
   openGraph: {
     type: "article",
@@ -35,14 +36,14 @@ export default function EmpireoPage() {
             <p className="emp-kicker">06 · Hieronymus Bosch · hacia 1505–1515</p>
             <h1 id="emp-titulo">La ascensión al Empíreo</h1>
             <p className="emp-lede">Un túnel de luz al final de una subida en silencio. ¿Cuánta luz hace falta para llegar?</p>
-            <a className="mf-btn mf-btn--solid" href="#emp-explora-h">Empezar a subir ↓</a>
+            <a className="mf-btn mf-btn--solid" href="#um-titulo">Entrar en el umbral ↓</a>
           </div>
           <figure className="emp-hero__fig">
             <Pintura prioridad className="emp-hero__img" />
             <figcaption>Tabla completa · Palazzo Ducale, Venecia</figcaption>
           </figure>
         </section>
-        <Ascension />
+        <Umbral />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
       <PieObra actual="ascension-al-empireo" {...CREDITOS} />

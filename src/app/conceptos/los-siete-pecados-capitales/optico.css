@@ -1,0 +1,266 @@
+/* ─────────────────────────────────────────────────────────────
+   09 · «El ojo que observa»
+   Un banco óptico antiguo: la mesa en el centro, un ocular de bronce con graduación que encuadra
+   cada escena (y la mesa que gira debajo), una lupa con bisel y la cartela grabada a un lado.
+   Bronce envejecido, marfil y sombras profundas; Cormorant. Composición simétrica en escritorio.
+   ───────────────────────────────────────────────────────────── */
+
+.oj-sala {
+  --oj-sombra: #070605;
+  --oj-marfil: #efe6d2;
+  --oj-marfil-2: #c9bea6;
+  --oj-bronce: #b08d57;
+  --oj-bronce-luz: #d9bb82;
+  --oj-bronce-osc: #5e4422;
+  --oj-linea: rgb(217 187 130 / 0.22);
+  --oj-bisel: conic-gradient(from 30deg, #5e4422, #d9bb82, #7a5a30, #ecd29b, #4f391c, #c9a466, #6b4f2a, #e0c38b, #5e4422);
+  position: relative;
+  padding: clamp(2rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--oj-linea);
+  color: var(--oj-marfil);
+  background:
+    radial-gradient(60% 55% at 50% 52%, rgb(176 141 87 / 0.14), transparent 70%),
+    radial-gradient(120% 100% at 50% 0%, #120e09, var(--oj-sombra) 70%);
+}
+
+/* ── Placa de título, centrada como en un instrumento ── */
+.oj-cabeza { display: grid; justify-items: center; gap: 0.4rem; padding: 0 var(--mf-gutter) clamp(1.25rem, 3vw, 2rem); text-align: center; }
+.oj-ante {
+  margin: 0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--oj-bronce-luz);
+}
+.oj-ante::before, .oj-ante::after { content: "—"; margin-inline: 0.6em; color: var(--oj-bronce); }
+@media (max-width: 22.5rem) { .oj-ante::before, .oj-ante::after { content: none; } }
+.oj-cabeza h2 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-style: italic;
+  font-size: clamp(2.3rem, 1.3rem + 4.4vw, 4.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+}
+
+/* ── Banco: cartela · instrumento · mandos ── */
+.oj-banco {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "vista" "perillas" "cartela";
+  gap: clamp(1rem, 3vw, 1.5rem);
+}
+
+.oj-vista {
+  grid-area: vista;
+  position: relative;
+  justify-self: center;
+  width: min(100%, 72svh);
+  aspect-ratio: 1;
+  overflow: hidden;
+  outline: none;
+  touch-action: manipulation;
+  background: radial-gradient(closest-side, #17110b, var(--oj-sombra));
+}
+.oj-sala[data-lupa="true"] .oj-vista { touch-action: none; cursor: none; }
+.oj-vista:focus-visible { box-shadow: inset 0 0 0 2px var(--oj-marfil); }
+
+.oj-lienzo { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.oj-lienzo img { display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+.oj-lienzo svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+.oj-zona {
+  fill: rgb(0 0 0 / 0.001);
+  stroke: transparent;
+  stroke-width: 1.25px;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  outline: none;
+  transition: fill 0.35s, stroke 0.35s;
+}
+.oj-zona[data-visto="true"] { stroke: rgb(217 187 130 / 0.38); stroke-dasharray: 2 5; }
+.oj-zona[data-bajo="true"], .oj-zona:focus-visible { fill: rgb(217 187 130 / 0.12); stroke: var(--oj-marfil); stroke-dasharray: none; }
+.oj-zona:focus-visible { stroke-width: 2.5px; }
+.oj-sala[data-ocular="true"] .oj-zona { pointer-events: none; }
+.oj-sala[data-lupa="true"] .oj-zona { pointer-events: none; }
+
+.oj-rayos line {
+  stroke: rgb(236 210 155 / 0.85);
+  stroke-width: 1.5px;
+  stroke-dasharray: 7 5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 1.5px rgb(0 0 0 / 0.95));
+}
+.oj-rayos { transition: opacity 0.5s; }
+.oj-sala[data-ocular="true"] .oj-rayos { opacity: 0; }
+.oj-rayos circle { fill: var(--oj-bronce-luz); stroke: rgb(0 0 0 / 0.7); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.oj-iris { fill: var(--oj-sombra); opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
+.oj-sala[data-ocular="true"] .oj-iris { opacity: 0.55; }
+
+/* El ocular: bisel de bronce, graduación y penumbra alrededor */
+.oj-ocular {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--d, 90%);
+  height: var(--d, 90%);
+  border-radius: 50%;
+  translate: -50% -50%;
+  scale: 1.6;
+  pointer-events: none;
+  box-shadow: 0 0 0 100vmax rgb(7 6 5 / 0), inset 0 0 3rem rgb(0 0 0 / 0);
+  transition: scale 1s cubic-bezier(0.65, 0, 0.35, 1), box-shadow 1s ease;
+}
+.oj-ocular::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  background: var(--oj-bisel);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 10px), #000 calc(100% - 9px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 10px), #000 calc(100% - 9px));
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.oj-ocular svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease 0.2s; }
+.oj-ocular line { stroke: rgb(217 187 130 / 0.8); stroke-width: 0.35; }
+.oj-ocular__aro { fill: none; stroke: rgb(0 0 0 / 0.6); stroke-width: 1.4; }
+.oj-sala[data-ocular="true"] .oj-ocular { scale: 1; box-shadow: 0 0 0 100vmax rgb(7 6 5 / 0.97), inset 0 0 3rem rgb(0 0 0 / 0.7); }
+.oj-sala[data-ocular="true"] .oj-ocular::before, .oj-sala[data-ocular="true"] .oj-ocular svg { opacity: 1; }
+
+/* La lupa: bisel de bronce y aumento real */
+.oj-lupa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: clamp(7.5rem, 26vw, 10rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 1.2rem 2.4rem rgb(0 0 0 / 0.7), inset 0 0 1.2rem rgb(0 0 0 / 0.55);
+}
+.oj-lupa[data-on="true"] { display: block; }
+.oj-lupa img { position: absolute; top: 0; left: 0; max-width: none; }
+.oj-lupa::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--oj-bisel);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+}
+
+/* Placa grabada bajo la escena */
+.oj-placa {
+  position: absolute;
+  left: 50%;
+  bottom: 0.7rem;
+  z-index: 3;
+  translate: -50% 0;
+  margin: 0;
+  padding: 0.25rem 1rem 0.3rem;
+  white-space: nowrap;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: #1b130a;
+  background: linear-gradient(180deg, #e3c58e, #a9844d 55%, #8b6a39);
+  border-radius: 2px;
+  box-shadow: inset 0 1px 0 rgb(255 240 200 / 0.6), 0 2px 6px rgb(0 0 0 / 0.6);
+  pointer-events: none;
+}
+
+/* ── Cartela ── */
+.oj-cartela { grid-area: cartela; display: grid; gap: 0.6rem; align-content: start; padding: 0 var(--mf-gutter); max-width: 40rem; }
+.oj-pos { margin: 0; font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--oj-bronce-luz); }
+.oj-cartela h3 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(2rem, 1.4rem + 2vw, 3rem); line-height: 1; text-wrap: balance; }
+.oj-rotulo { font-style: italic; font-weight: 400; color: var(--oj-bronce-luz); font-size: 0.7em; white-space: nowrap; }
+.oj-cartela p:not(.oj-pos) { margin: 0; color: var(--oj-marfil-2); font-size: 0.9688rem; line-height: 1.55; text-wrap: pretty; }
+.oj-cartela b { color: var(--oj-marfil); font-weight: 600; }
+.oj-cartela .oj-int { font-style: italic; padding-top: 0.6rem; border-top: 1px solid var(--oj-linea); }
+.oj-cartela .oj-int b { font-style: normal; }
+.oj-cartela .oj-nota { font-size: 0.8125rem; color: rgb(201 190 166 / 0.85); }
+.oj-cartela .oj-cierre { color: var(--oj-marfil); padding-left: 0.8rem; border-left: 2px solid var(--oj-bronce); }
+.oj-cartela .oj-cuenta { font-size: 0.8125rem; color: var(--oj-marfil-2); }
+.oj-cuenta span { letter-spacing: 0.25em; color: var(--oj-bronce-luz); }
+
+/* ── Mandos: botones con bisel ── */
+.oj-perillas { grid-area: perillas; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; padding: 0 var(--mf-gutter); }
+.oj-perillas button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: radial-gradient(circle at 40% 35%, #2a1f14, #120d08 75%);
+  color: var(--oj-marfil);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.55);
+}
+.oj-perillas button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--oj-bisel);
+  -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  padding: 2px;
+  pointer-events: none;
+}
+.oj-perillas .oj-texto-b { padding: 0 1.15rem; }
+.oj-perillas button[aria-pressed="true"] { background: radial-gradient(circle at 40% 35%, #d9bb82, #8b6a39 75%); color: #1b130a; font-weight: 600; }
+.oj-perillas svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) { .oj-perillas button:not([aria-pressed="true"]):hover { background: radial-gradient(circle at 40% 35%, #3a2a19, #17110a 75%); } }
+.oj-perillas button:focus-visible { outline: 2px solid var(--oj-marfil); outline-offset: 3px; }
+
+/* Escritorio estrecho: instrumento y cartela lado a lado */
+@media (min-width: 56rem) {
+  .oj-banco { grid-template-columns: auto minmax(18rem, 26rem); grid-template-areas: "vista cartela" "vista perillas"; justify-content: center; align-items: start; column-gap: clamp(2rem, 4vw, 3rem); }
+  .oj-vista { width: min(74svh, 46rem); }
+  .oj-cartela { padding: 0; align-self: end; }
+  .oj-perillas { padding: 0; justify-content: flex-start; }
+}
+/* Escritorio: cartela · instrumento · mandos, simétrico */
+@media (min-width: 80rem) {
+  .oj-banco {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: "cartela vista perillas";
+    align-items: center;
+    column-gap: clamp(2rem, 3.5vw, 4rem);
+    padding-inline: var(--mf-gutter);
+  }
+  .oj-vista { width: min(76svh, 50rem); }
+  .oj-cartela { justify-self: end; text-align: right; max-width: 24rem; align-self: center; }
+  .oj-cartela .oj-cierre { padding: 0 0.8rem 0 0; border-left: 0; border-right: 2px solid var(--oj-bronce); }
+  .oj-perillas { flex-direction: column; align-items: flex-start; justify-content: center; }
+}
+/* Horizontal bajo */
+@media (orientation: landscape) and (max-height: 32rem) {
+  .oj-vista { width: min(100%, 86svh); }
+}
+
+/* Sin JavaScript: las doce lecturas */
+.oj-nojs { display: none; }
+html:not(.js) .oj-banco { display: none; }
+html:not(.js) .oj-nojs { display: grid; gap: 0.6rem; margin: 0; padding: 0 var(--mf-gutter) 0 calc(var(--mf-gutter) + 1.2rem); max-width: 48rem; color: var(--oj-marfil-2); line-height: 1.5; }
+.oj-nojs strong { color: var(--oj-marfil); }
+
+@media (prefers-reduced-motion: reduce) {
+  .oj-sala *, .oj-sala *::before, .oj-sala *::after { transition: none !important; }
+}

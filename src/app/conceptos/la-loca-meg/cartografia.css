@@ -1,0 +1,412 @@
+/* ─────────────────────────────────────────────────────────────
+   08 · «Cartografía del caos»
+   La tabla como una carta antigua: orla con retícula A–H / 1–6, sellos grabados para los
+   territorios, aspas para los detalles, caminos punteados para las expediciones y una carta de
+   situación en la esquina. Pergamino envejecido, óxido, tierra quemada, carbón y verde sombrío.
+   La escena tiene alto fijo: el texto de abajo cambia sin reencuadrar la tabla.
+   ───────────────────────────────────────────────────────────── */
+
+.cg-sala {
+  --cg-carbon: #120d09;
+  --cg-pergamino: #e8d9b8;
+  --cg-pergamino-2: #cbb68c;
+  --cg-oxido: #b4492b;
+  --cg-oxido-luz: #e07a4c;
+  --cg-tierra: #6e3b1d;
+  --cg-verde: #4d5a3f;
+  --cg-tenue: #b9aa90;
+  --cg-linea: rgb(232 217 184 / 0.18);
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding: clamp(1.75rem, 5vw, 3.5rem) 0 clamp(1.5rem, 4vw, 3rem);
+  border-top: 1px solid var(--cg-linea);
+  color: var(--cg-pergamino);
+  background:
+    radial-gradient(rgb(232 217 184 / 0.045) 1px, transparent 1.2px) 0 0 / 13px 13px,
+    linear-gradient(180deg, #160f0a, var(--cg-carbon) 30%);
+  scroll-margin-top: 0;
+}
+
+/* ── Cabecera ── */
+.cg-cabeza { padding: 0 var(--mf-gutter) clamp(0.9rem, 2.5vw, 1.4rem); display: grid; gap: 0.35rem; }
+.cg-ante {
+  margin: 0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cg-oxido-luz);
+}
+.cg-cabeza h2 {
+  margin: 0;
+  font-size: clamp(2.1rem, 1.2rem + 3.4vw, 4rem);
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+}
+
+/* ── Escena ── */
+.cg-escena {
+  position: relative;
+  height: clamp(17rem, calc(72vw + 6.5rem), 62svh);
+  overflow: hidden;
+  outline: none;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  background:
+    radial-gradient(70% 80% at 50% 50%, rgb(110 59 29 / 0.22), transparent 75%),
+    var(--cg-carbon);
+  border-block: 1px solid var(--cg-linea);
+}
+.cg-escena[data-cerca="true"] { touch-action: none; }
+.cg-escena:active { cursor: grabbing; }
+.cg-escena:focus-visible { box-shadow: inset 0 0 0 2px var(--cg-pergamino); }
+@media (min-width: 48rem) { .cg-escena { height: min(64svh, 48rem); } }
+
+.cg-lienzo, .cg-capa { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.cg-lienzo img { display: block; width: 100%; height: 100%; pointer-events: none; }
+.cg-lienzo svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.cg-camino {
+  fill: none;
+  stroke: rgb(232 217 184 / 0.75);
+  stroke-width: 1.5px;
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 1.5px rgb(0 0 0 / 0.95));
+}
+.cg-trazo {
+  fill: none;
+  stroke: var(--cg-oxido-luz);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-dasharray: 0 1;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.95));
+}
+.cg-velo { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+.cg-capa { z-index: 2; pointer-events: none; }
+
+/* Orla de carta: neatline doble y retícula fuera de la pintura, solo con el cuadro entero */
+.cg-orla {
+  position: absolute;
+  inset: -10px;
+  border: 1px solid rgb(232 217 184 / 0.4);
+  outline: 1px solid rgb(232 217 184 / 0.16);
+  outline-offset: 4px;
+  transition: opacity 0.5s;
+}
+.cg-escena[data-cerca="true"] .cg-orla { opacity: 0; }
+.cg-col, .cg-fila {
+  position: absolute;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: rgb(232 217 184 / 0.55);
+  translate: -50% -50%;
+}
+.cg-col { top: -12px; }
+.cg-fila { left: -13px; }
+.cg-col::before, .cg-fila::before { content: ""; position: absolute; background: rgb(232 217 184 / 0.35); }
+.cg-col::before { width: 1px; height: 5px; left: 50%; top: 13px; }
+.cg-fila::before { width: 5px; height: 1px; top: 50%; left: 13px; }
+
+/* Sellos de los territorios: emblema grabado, numeral y, en pantallas anchas, su nombre */
+.cg-sello, .cg-hallazgo, .cg-etapa {
+  position: absolute;
+  translate: -50% -50%;
+  scale: calc(1 / var(--z, 1));
+  pointer-events: auto;
+  cursor: pointer;
+  font: inherit;
+}
+.cg-sello {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--cg-pergamino);
+}
+.cg-sello::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4a2a17, #20130b 70%);
+  border: 1px solid rgb(232 217 184 / 0.75);
+  box-shadow: 0 0 0 3px rgb(18 13 9 / 0.55), 0 0 0 4px rgb(232 217 184 / 0.25), 0 4px 12px rgb(0 0 0 / 0.6);
+  transition: background-color 0.4s, border-color 0.4s, transform 0.5s var(--ease-cine);
+}
+.cg-sello svg { position: relative; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.cg-sello__n {
+  position: absolute;
+  top: -0.65rem;
+  left: 50%;
+  translate: -50% 0;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 0.8125rem;
+  color: var(--cg-pergamino);
+  text-shadow: 0 0 4px #000, 0 0 2px #000;
+}
+.cg-sello__t {
+  position: absolute;
+  left: calc(100% + 0.3rem);
+  top: 50%;
+  translate: 0 -50%;
+  display: none;
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 1.0625rem;
+  color: var(--cg-pergamino);
+  background: linear-gradient(90deg, rgb(18 13 9 / 0.82), rgb(18 13 9 / 0.5));
+  border-left: 1px solid var(--cg-oxido-luz);
+}
+.cg-sello[data-on="true"]::before { background: radial-gradient(circle at 35% 30%, #c4572f, #6e2a14 75%); border-color: var(--cg-pergamino); }
+@media (hover: hover) {
+  .cg-sello:hover::before { transform: scale(1.12); border-color: var(--cg-oxido-luz); }
+  .cg-sello:hover .cg-sello__t { display: block; }
+}
+.cg-sello:focus-visible .cg-sello__t { display: block; }
+.cg-sello:focus-visible { outline: none; }
+.cg-sello:focus-visible::before { box-shadow: 0 0 0 3px var(--cg-pergamino), 0 0 0 5px #000; }
+
+/* Detalles: el aspa de los mapas del tesoro */
+.cg-hallazgo {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.cg-hallazgo::before, .cg-hallazgo::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--cg-pergamino);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 6px rgb(0 0 0 / 0.8);
+  translate: -50% -50%;
+  rotate: 45deg;
+  transition: background-color 0.3s, width 0.4s var(--ease-cine);
+}
+.cg-hallazgo::after { rotate: -45deg; }
+/* Elegido, el aspa se aparta: pequeña y translúcida para no tapar el detalle */
+.cg-hallazgo[data-on="true"]::before, .cg-hallazgo[data-on="true"]::after { background: var(--cg-oxido-luz); width: 10px; opacity: 0.6; }
+.cg-hallazgo[data-on="true"] .cg-hallazgo__t { display: none; }
+.cg-hallazgo__t {
+  position: absolute;
+  left: calc(100% - 0.4rem);
+  top: 50%;
+  translate: 0 -50%;
+  display: none;
+  white-space: nowrap;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--cg-pergamino);
+  text-shadow: 0 0 6px #000, 0 0 3px #000, 0 0 1px #000;
+}
+@media (min-width: 48rem) { .cg-hallazgo__t { display: block; } }
+.cg-hallazgo:focus-visible { outline: 2px solid var(--cg-pergamino); outline-offset: -6px; border-radius: 4px; }
+
+/* Etapas de una expedición */
+.cg-etapa {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cg-pergamino);
+  font-family: var(--f-display);
+  font-size: 1rem;
+  line-height: 1;
+}
+.cg-etapa::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  z-index: -1;
+  rotate: 45deg;
+  background: var(--cg-carbon);
+  border: 1px solid var(--cg-pergamino);
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55);
+  transition: background-color 0.4s, inset 0.4s var(--ease-cine);
+}
+.cg-etapa[data-hecha="true"]::before { background: var(--cg-tierra); }
+.cg-etapa[data-on="true"]::before { inset: 7px; background: var(--cg-oxido); }
+.cg-etapa:focus-visible { outline: 2px solid var(--cg-pergamino); outline-offset: 0; border-radius: 4px; }
+
+/* Carta de situación */
+.cg-situacion {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 3;
+  width: clamp(5.5rem, 16vw, 9rem);
+  border: 1px solid rgb(232 217 184 / 0.6);
+  box-shadow: 0 0 0 3px rgb(18 13 9 / 0.7), 0 8px 20px rgb(0 0 0 / 0.6);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s, visibility 0.4s;
+}
+.cg-situacion[data-on="true"] { opacity: 1; visibility: visible; }
+.cg-situacion img { display: block; width: 100%; height: auto; aspect-ratio: 2000 / 1442; filter: brightness(0.75); cursor: pointer; }
+.cg-situacion span {
+  position: absolute;
+  border: 1.5px solid var(--cg-oxido-luz);
+  box-shadow: 0 0 0 999px rgb(18 13 9 / 0.35);
+  pointer-events: none;
+}
+.cg-situacion { overflow: hidden; }
+
+/* Mandos de la escena */
+.cg-mando {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 3;
+  display: flex;
+  gap: 0.35rem;
+}
+.cg-mando button {
+  display: inline-grid;
+  grid-auto-flow: column;
+  place-items: center;
+  gap: 0.4rem;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 0.6rem;
+  border: 1px solid rgb(232 217 184 / 0.55);
+  border-radius: 999px;
+  background: rgb(18 13 9 / 0.78);
+  color: var(--cg-pergamino);
+  font: inherit;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: border-color 0.3s, background-color 0.3s;
+}
+.cg-mando svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.cg-todo span { display: none; font-size: 0.8125rem; }
+@media (min-width: 48rem) { .cg-todo span { display: inline; } }
+@media (hover: hover) { .cg-mando button:hover { border-color: var(--cg-oxido-luz); } }
+.cg-mando button:focus-visible { outline: 2px solid var(--cg-pergamino); outline-offset: 2px; }
+
+/* ── Leyenda: lo que se ve y adónde ir ── */
+.cg-leyenda {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.75rem) var(--mf-gutter) 0;
+}
+.cg-texto { display: grid; gap: 0.5rem; align-content: start; max-width: 44rem; }
+.cg-texto__n {
+  margin: 0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cg-oxido-luz);
+}
+.cg-texto h3 { margin: 0; font-size: clamp(1.7rem, 1.2rem + 2vw, 2.9rem); line-height: 1; text-wrap: balance; }
+.cg-texto p:not(.cg-texto__n) { margin: 0; color: var(--cg-tenue); font-size: 0.9688rem; line-height: 1.5; text-wrap: pretty; }
+.cg-texto b { color: var(--cg-pergamino); font-weight: 600; }
+.cg-texto .cg-int { font-style: italic; padding-top: 0.5rem; border-top: 1px dashed var(--cg-linea); }
+.cg-texto .cg-int b { font-style: normal; }
+.cg-texto .cg-pregunta { font-family: var(--f-display); font-style: italic; font-size: 1.15rem; color: var(--cg-pergamino-2); }
+.cg-texto .cg-pista { font-size: 0.8125rem; }
+
+.cg-acciones { display: grid; gap: 0.9rem; align-content: start; }
+.cg-fila-b { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.cg-fila-b button, .cg-expediciones button {
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid rgb(232 217 184 / 0.28);
+  border-radius: 2px;
+  background: none;
+  color: var(--cg-pergamino);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+.cg-fila-b button:not(.cg-texto-b):not(.cg-avanza) { width: 44px; padding: 0; font-size: 1.05rem; }
+.cg-fila-b .cg-avanza { background: var(--cg-oxido); border-color: var(--cg-oxido); color: #fff6ea; font-weight: 600; }
+.cg-expediciones { display: grid; gap: 0.4rem; }
+.cg-expediciones button { display: flex; align-items: center; gap: 0.7rem; text-align: left; font-family: var(--f-display); font-size: 1.15rem; }
+.cg-expediciones button span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--cg-oxido-luz);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--cg-oxido-luz);
+}
+.cg-expediciones button[aria-pressed="true"] { border-color: var(--cg-oxido-luz); background: rgb(180 73 43 / 0.16); }
+@media (hover: hover) {
+  .cg-fila-b button:hover, .cg-expediciones button:hover { border-color: var(--cg-oxido-luz); }
+}
+.cg-fila-b button:focus-visible, .cg-expediciones button:focus-visible { outline: 2px solid var(--cg-pergamino); outline-offset: 2px; }
+.cg-nota { margin: 0; font-size: 0.75rem; color: rgb(185 170 144 / 0.8); font-style: italic; }
+
+@media (min-width: 56rem) and (max-width: 63.99rem) {
+  .cg-leyenda { grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem); column-gap: 2rem; align-items: start; }
+  .cg-nota { grid-column: 1 / -1; }
+}
+/* Escritorio: la tabla a la izquierda, la leyenda en una columna de 24rem; todo en una pantalla */
+@media (min-width: 64rem) {
+  .cg-sala { grid-template-columns: minmax(0, 1fr) 24rem; grid-template-areas: "cabeza cabeza" "escena leyenda"; column-gap: 0; }
+  .cg-cabeza { grid-area: cabeza; }
+  .cg-escena { grid-area: escena; height: min(76svh, 52rem); border-right: 1px solid var(--cg-linea); }
+  .cg-leyenda { grid-area: leyenda; align-content: space-between; padding: 0.25rem var(--mf-gutter) 0 clamp(1.5rem, 2.5vw, 2.5rem); }
+  .cg-texto h3 { font-size: clamp(2rem, 1.2rem + 1.4vw, 2.8rem); }
+}
+
+/* Sin JavaScript: los textos de territorios y expediciones */
+.cg-nojs { display: none; }
+html:not(.js) :is(.cg-escena, .cg-leyenda) { display: none; }
+html:not(.js) .cg-nojs { display: grid; gap: 1.5rem; padding: 0 var(--mf-gutter); max-width: 48rem; }
+.cg-nojs ol { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.6rem; color: var(--cg-tenue); line-height: 1.5; }
+.cg-nojs strong { color: var(--cg-pergamino); }
+
+/* Los mandos de zoom suben a la esquina superior: abajo taparían sellos (el IV) al encuadrar un territorio */
+@media (max-width: 63.99rem) {
+  .cg-mando { inset: auto 0 0 0; height: 56px; justify-content: flex-end; align-items: center; padding-right: 0.6rem; background: var(--cg-carbon); border-top: 1px solid var(--cg-linea); }
+  .cg-situacion { bottom: calc(56px + 0.6rem); }
+}
+.cg-clave { margin: 0; font-size: 0.8125rem; line-height: 1.5; color: var(--cg-tenue); }
+.cg-clave b { color: var(--cg-oxido-luz); font-family: var(--f-display); font-style: italic; font-weight: 400; }
+
+/* Pantallas estrechas: sellos más pequeños (el área táctil sigue siendo de 44 px) */
+@media (max-width: 29.99rem) {
+  .cg-col, .cg-fila { font-size: 0.625rem; }
+  .cg-sello::before { inset: 8px; }
+  .cg-sello__n { top: -0.2rem; font-size: 0.75rem; }
+}
+@media (min-width: 30rem) { .cg-sello svg { width: 20px; height: 20px; } }
+
+/* Horizontal bajo: la escena se queda con casi toda la altura */
+@media (orientation: landscape) and (max-height: 32rem) {
+  .cg-escena { height: 82svh; }
+  .cg-sala { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-sala *, .cg-sala *::before, .cg-sala *::after { transition: none !important; }
+}

@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
 import { ConceptHeader } from "@/components/concepts/ConceptChrome";
 import { Contemplar } from "@/components/cristo-dali/Contemplar";
+import { Imposible } from "@/components/cristo-dali/Imposible";
 import { Pintura } from "@/components/cristo-dali/Pintura";
-import { Vertigo } from "@/components/cristo-dali/Vertigo";
 import { Ficha } from "@/components/sprint/Ficha";
 import { PieObra } from "@/components/sprint/PieObra";
 import { CREDITOS, DATOS, DOCUMENTADO, INTERPRETACION } from "@/content/cristo-dali";
 import { instrument } from "@/lib/fonts/instrument";
 import "../sprint.css";
 import "./cristo-dali.css";
+import "./imposible.css";
 import "../pulido.css";
 import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
 export const metadata: Metadata = {
   title: "Cristo de San Juan de la Cruz, de Dalí — MANIFESTO",
-  description: "Mira el Cristo de Dalí desde arriba: su perspectiva imposible, los dos mundos de su luz y la geometría del núcleo del átomo.",
+  description: "Una escena 3D original sobre el Cristo de Dalí: cambia el punto de vista para ver su perspectiva imposible, desciende del vacío a la bahía y revela la geometría del núcleo.",
   alternates: { canonical: "/conceptos/cristo-de-san-juan-de-la-cruz" },
   openGraph: {
     type: "article",
@@ -46,12 +47,12 @@ export default function CristoDaliPage() {
               ))}
             </dl>
             <div className="vd-acciones">
-              <a className="mf-btn mf-btn--solid" href="#vd-explora-h">Entrar en el cuadro ↓</a>
+              <a className="mf-btn mf-btn--solid" href="#perspectiva-imposible">Cambiar de punto de vista ↓</a>
               <Contemplar />
             </div>
           </div>
         </section>
-        <Vertigo />
+        <Imposible />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
       <PieObra actual="cristo-de-san-juan-de-la-cruz" {...CREDITOS} />

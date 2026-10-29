@@ -1,0 +1,341 @@
+/* ─────────────────────────────────────────────────────────────
+   «Umbral de luz» (V6) · La ascensión al Empíreo
+   Una sala a pantalla completa: el túnel (canvas WebGL2 o, sin él, un fondo estático), las
+   visiones de la tabla que emergen en cada estación, la tabla entera como eje de la subida y
+   un solo mando principal. Móvil primero; todo el movimiento se apaga con prefers-reduced-motion.
+   ───────────────────────────────────────────────────────────── */
+
+.um-sala {
+  --luz: 0.2;
+  --gut: var(--mf-gutter);
+  position: relative;
+  isolation: isolate;
+  height: 100svh;
+  min-height: 38rem;
+  max-height: 72rem;
+  overflow: hidden;
+  background: #030304;
+  color: var(--c-ink);
+  scroll-margin-top: 0;
+  touch-action: pan-y;
+}
+/* Velos para que el texto se lea sobre la luz */
+.um-sala::before,
+.um-sala::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.um-sala::before { top: 0; height: 38%; background: linear-gradient(to bottom, rgb(3 3 5 / 0.82), rgb(3 3 5 / 0.5) 35%, rgb(3 3 5 / 0.16) 70%, rgb(3 3 5 / 0)); }
+.um-sala::after { bottom: 0; height: 56%; background: linear-gradient(to top, rgb(3 3 5 / 0.9) 12%, rgb(3 3 5 / 0.55) 40%, rgb(3 3 5 / 0.18) 72%, rgb(3 3 5 / 0)); }
+
+.um-lienzo,
+.um-fondo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* Sin WebGL2 (o antes de que arranque): túnel estático en CSS con la misma luz medida */
+.um-fondo {
+  background:
+    radial-gradient(circle at 50% 33%, rgb(255 244 222 / calc(0.55 + 0.45 * var(--luz))) 0, rgb(255 226 172 / 0.35) 2.5%, transparent 13%),
+    repeating-radial-gradient(ellipse 90% 100% at 50% 33%, rgb(150 168 196 / calc(0.05 + 0.12 * var(--luz))) 0 1px, transparent 2px 4.5vmin),
+    radial-gradient(circle at 50% 33%, #222a3a, #06070a 62%, #030304);
+}
+.um-sala[data-gl="si"] .um-fondo { display: none; }
+.um-sala[data-gl="no"] .um-lienzo { visibility: hidden; }
+
+/* ── Visiones: fragmentos de la tabla que aparecen en cada estación ── */
+.um-vision {
+  --s: min(54vw, 30svh);
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: var(--s);
+  height: var(--s);
+  translate: -50% -50%;
+  scale: var(--k, 1);
+  border-radius: 50%;
+  background-repeat: no-repeat;
+  background-size: calc(var(--z) * 100%) auto;
+  background-position:
+    calc(var(--s) / 2 - var(--x) * var(--s) * var(--z))
+    calc(var(--s) / 2 - var(--y) * var(--s) * var(--z) * var(--alto));
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 50%, rgb(0 0 0 / 0.55) 74%, transparent 100%);
+  mask-image: radial-gradient(circle closest-side, #000 50%, rgb(0 0 0 / 0.55) 74%, transparent 100%);
+  pointer-events: none;
+  will-change: opacity, scale;
+}
+
+/* ── Cabecera ── */
+.um-cab {
+  position: absolute;
+  z-index: 3;
+  top: clamp(1rem, 4svh, 3.5rem);
+  left: var(--gut);
+  right: var(--gut);
+  max-width: 34rem;
+}
+.um-cab__k {
+  margin: 0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.um-cab__t {
+  margin: 0.35rem 0 0.5rem;
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 1.5rem + 4.6vw, 6.4rem);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 2.5rem rgb(0 0 0 / 0.7);
+}
+.um-cab__p {
+  margin: 0;
+  max-width: 21rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgb(236 231 218 / 0.86);
+  text-shadow: 0 1px 0.9rem rgb(0 0 0 / 0.95), 0 0 2rem rgb(0 0 0 / 0.7);
+}
+
+/* ── Leyenda de la estación ── */
+.um-pie {
+  position: absolute;
+  z-index: 3;
+  left: var(--gut);
+  bottom: clamp(1rem, 4svh, 3.5rem);
+  width: calc(100% - 2 * var(--gut) - 8.5rem);
+  max-width: 32rem;
+}
+.um-pie__n {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0 0.5rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.um-pie__n span {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 1.6rem;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1;
+}
+.um-pie__e { font-style: normal; }
+@media (max-width: 29.99rem) {
+  .um-pie__e { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+.um-pie__t {
+  margin: 0.2rem 0 0.5rem;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 1.1rem + 3vw, 3.9rem);
+  line-height: 1;
+  text-wrap: balance;
+  text-shadow: 0 0 2rem rgb(0 0 0 / 0.8);
+}
+.um-pie__x {
+  margin: 0;
+  text-shadow: 0 1px 0.8rem rgb(0 0 0 / 0.9);
+  max-width: 28rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgb(236 231 218 / 0.84);
+  text-wrap: pretty;
+}
+
+/* ── Eje: la tabla entera, la franja de luz que sube y el mando ── */
+.um-eje {
+  position: absolute;
+  z-index: 3;
+  right: var(--gut);
+  bottom: clamp(1rem, 4svh, 3.5rem);
+  display: grid;
+  justify-items: end;
+  gap: 0.75rem;
+}
+.um-mapa {
+  position: relative;
+  height: clamp(9rem, 22svh, 26rem);
+  aspect-ratio: 1200 / 2668;
+  margin-left: 2.25rem;
+  background-size: 100% 100%;
+  outline: 1px solid rgb(236 231 218 / 0.14);
+  outline-offset: 4px;
+}
+.um-mapa::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgb(3 3 5 / 0.66);
+}
+.um-mapa__luz {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-size: 100% 100%;
+  clip-path: inset(calc(var(--y) * 100% - 6%) 0 calc(100% - var(--y) * 100% - 6%) 0);
+  filter: brightness(1.15);
+}
+.um-mapa::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: -5px;
+  right: -5px;
+  top: calc(var(--y) * 100% - 6%);
+  height: 12%;
+  border-block: 1px solid rgb(241 215 160 / 0.85);
+  box-shadow: 0 0 1.4rem rgb(241 215 160 / calc(0.15 + 0.4 * var(--luz)));
+  pointer-events: none;
+}
+.um-nodo {
+  position: absolute;
+  z-index: 4;
+  right: 0;
+  width: calc(100% + 2.25rem);
+  /* Las estaciones distan 23–26 px en móvil vertical: más alto, los botones se pisarían */
+  height: 24px;
+  translate: 0 -50%;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  cursor: pointer;
+}
+.um-nodo span {
+  width: 1.75rem;
+  text-align: right;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: color 0.3s;
+}
+.um-nodo span::after {
+  content: "";
+  display: inline-block;
+  width: 0.4rem;
+  height: 1px;
+  margin-left: 0.2rem;
+  vertical-align: middle;
+  background: currentColor;
+}
+.um-nodo[aria-current="step"] { color: var(--c-accent); }
+.um-nodo:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 0; }
+@media (hover: hover) { .um-nodo:hover { color: var(--c-ink); } }
+
+.um-control { display: flex; align-items: center; gap: 0.6rem; }
+.um-subir,
+.um-bajar {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--c-ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.3s, box-shadow 0.4s, scale 0.3s, opacity 0.3s;
+}
+.um-subir svg,
+.um-bajar svg { width: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.um-subir {
+  width: 4.25rem;
+  height: 4.25rem;
+  border: 1px solid rgb(241 215 160 / 0.6);
+  background: radial-gradient(circle, rgb(241 215 160 / 0.28), rgb(241 215 160 / 0.04) 70%);
+  box-shadow: 0 0 calc(1rem + 2rem * var(--luz)) rgb(241 215 160 / 0.25);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.um-subir[data-activo="true"] { scale: 0.94; border-color: #fff; box-shadow: 0 0 3rem rgb(241 215 160 / 0.7); }
+.um-bajar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgb(236 231 218 / 0.25);
+  background: rgb(3 3 5 / 0.4);
+}
+.um-bajar:disabled { opacity: 0.3; cursor: default; }
+@media (hover: hover) {
+  .um-subir:hover { border-color: #fff; }
+  .um-bajar:not(:disabled):hover { border-color: var(--c-ink); }
+}
+.um-subir:focus-visible,
+.um-bajar:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 4px; }
+.um-pista {
+  margin: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+/* Sin JavaScript: las cinco estaciones como texto, sobre el túnel estático */
+.um-nojs { display: none; }
+html:not(.js) .um-sala { height: auto; max-height: none; }
+html:not(.js) .um-pie,
+html:not(.js) .um-eje { display: none; }
+html:not(.js) .um-nojs {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 58svh var(--gut) 3rem 2.5rem;
+  max-width: 40rem;
+  line-height: 1.5;
+}
+
+/* Móvil muy estrecho: la leyenda se compacta */
+@media (max-width: 22.5rem) {
+  .um-pie__x { font-size: 0.8125rem; }
+  .um-pie__t { font-size: 1.6rem; }
+  .um-mapa { height: 8rem; }
+  .um-vision { top: 45%; }
+}
+
+/* Móvil apaisado: tres columnas en una sola franja */
+@media (orientation: landscape) and (max-height: 32rem) {
+  .um-sala { min-height: 20rem; }
+  .um-cab__p { display: none; }
+  /* La frase sigue en el árbol de accesibilidad: solo se oculta a la vista */
+  .um-pie__x { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .um-cab__t { font-size: 2rem; }
+  .um-vision { --s: 52svh; top: 52%; }
+  .um-mapa { height: 46svh; }
+  .um-eje { bottom: 0.75rem; }
+  .um-nodo { height: 30px; }
+}
+
+/* Escritorio: la sala se abre; la tabla sube por el lateral a media altura */
+@media (min-width: 48rem) {
+  .um-vision { --s: min(44svh, 30vw, 28rem); top: 60%; }
+  .um-pie { width: auto; max-width: min(32rem, 40vw); }
+  .um-cab__p { font-size: 0.9375rem; max-width: 24rem; }
+  .um-eje { bottom: auto; top: 50%; translate: 0 -50%; }
+  .um-mapa { height: clamp(16rem, 46svh, 28rem); }
+  .um-nodo { height: 44px; }
+  .um-pie__x { font-size: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .um-subir, .um-bajar, .um-nodo span { transition: none; }
+}

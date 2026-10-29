@@ -8,7 +8,7 @@ const ENTRADA_SELECTOR = process.env.NEXT_PUBLIC_MANIFESTO_ENTRADA === "selector
 /** Logotipo de la identidad madre: grotesca ancha frente a la tipografía de cada universo. */
 export function ManifestoMark({ href = "/" }: { href?: string }) {
   return (
-    <Link href={href} className="mf-mark">
+    <Link href={href} prefetch={false} className="mf-mark">
       <span className="mf-mark__word">MANIFESTO</span>
       <span className="mf-mark__sub">Experimental Art Journal</span>
       <span className="sr-only">, ir a la portada</span>

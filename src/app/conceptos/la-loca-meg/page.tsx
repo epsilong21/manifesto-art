@@ -9,12 +9,13 @@ import { CREDITOS, DOCUMENTADO, INTERPRETACION } from "@/content/loca-meg";
 import { instrument } from "@/lib/fonts/instrument";
 import "../sprint.css";
 import "./loca-meg.css";
+import "./cartografia.css";
 import "../pulido.css";
 import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
 export const metadata: Metadata = {
   title: "La loca Meg, de Bruegel el Viejo — MANIFESTO",
-  description: "Recorre La loca Meg por cinco territorios y sigue las pistas que cruzan el cuadro: criaturas, objetos, bocas y un cielo recuperado por la restauración.",
+  description: "Explora La loca Meg como una carta antigua: arrastra y acércate por la tabla, viaja a sus cinco territorios y sigue tres expediciones entre criaturas, objetos y bocas.",
   alternates: { canonical: "/conceptos/la-loca-meg" },
   openGraph: {
     type: "article",
@@ -40,7 +41,7 @@ export default function LocaMegPage() {
             <p className="meg-kicker">08 · Pieter Bruegel el Viejo · 1563</p>
             <h1 id="meg-titulo">La loca Meg</h1>
             <p className="meg-lede">Una mujer armada con sartén y espada avanza hacia la boca del infierno, y el cuadro entero se desordena a su alrededor. ¿Dónde mirar primero?</p>
-            <a className="mf-btn mf-btn--solid" href="#meg-explora-h">Recorrer el caos ↓</a>
+            <a className="mf-btn mf-btn--solid" href="#mundo-de-meg">Entrar en la carta ↓</a>
           </div>
         </section>
         <Cartografia />

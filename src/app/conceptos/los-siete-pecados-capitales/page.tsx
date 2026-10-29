@@ -8,12 +8,13 @@ import { CREDITOS, DOCUMENTADO, INTERPRETACION } from "@/content/pecados";
 import { cormorant } from "@/lib/fonts/cormorant";
 import "../sprint.css";
 import "./pecados.css";
+import "./optico.css";
 import "../pulido.css";
 import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
 export const metadata: Metadata = {
   title: "Los siete pecados capitales, atribuida a El Bosco — MANIFESTO",
-  description: "Recorre la mesa de los siete pecados capitales y las cuatro postrimerías, atribuida a El Bosco, hasta el ojo central donde Cristo mira cada escena.",
+  description: "Mira la mesa de los siete pecados capitales, atribuida a El Bosco, por un ocular de bronce: la mesa gira para dejar derecha cada escena, y cada escena vista traza un rayo desde el ojo central.",
   alternates: { canonical: "/conceptos/los-siete-pecados-capitales" },
   openGraph: {
     type: "article",
@@ -45,7 +46,7 @@ export default function PecadosPage() {
               <div><dt>Técnica</dt><dd>Óleo sobre tabla, 119,5 × 139,5 cm</dd></div>
               <div><dt>Colección</dt><dd>Museo Nacional del Prado</dd></div>
             </dl>
-            <a className="mf-btn mf-btn--solid" href="#pec-explora-h">Mirar la mesa ↓</a>
+            <a className="mf-btn mf-btn--solid" href="#ojo-que-observa">Mirar por el ocular ↓</a>
           </div>
         </section>
         <Mesa />

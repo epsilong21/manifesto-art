@@ -147,58 +147,6 @@
   .mu-sala ol[class$="-lista"] button, .mu-sala [class$="-hero__texto"] .mf-btn--solid { transition: none !important; }
 }
 
-/* ═══════════ 06 · La ascensión al Empíreo: la subida medida en luz ═══════════ */
-.theme-empireo .emp-regla {
-  width: 1.1rem;
-  background:
-    repeating-linear-gradient(to bottom, rgb(236 231 218 / 0.35) 0 1px, transparent 1px calc(var(--alto) / 10)) right / 0.45rem 100% no-repeat,
-    linear-gradient(to top, #07080b, #f1d7a0);
-  opacity: 0.9;
-}
-.theme-empireo .emp-regla__marca { height: 3px; background: #fff; box-shadow: 0 0 0.8rem 0.15rem var(--c-accent); }
-.theme-empireo .emp-luz { padding-bottom: 0.2rem; }
-.theme-empireo .emp-luz__n { font-size: clamp(3.5rem, 3rem + 3vw, 5.5rem); text-shadow: 0 0 2rem color-mix(in srgb, var(--c-accent) 55%, transparent); }
-.theme-empireo .emp-estacion h3 { font-size: 1.9rem; }
-.theme-empireo .emp-vela { background: radial-gradient(circle at 50% 38%, transparent calc(25% + 55% * var(--brillo)), rgb(0 0 0 / 0.6) 100%); }
-
-/* ═══════════ 07 · El descendimiento de la cruz: leer con tres lentes ═══════════ */
-.theme-descendimiento .dsc-modos { grid-template-columns: repeat(3, 1fr); }
-.theme-descendimiento .dsc-modo { font-family: var(--f-display); font-size: 1.05rem; letter-spacing: 0.01em; }
-.theme-descendimiento .dsc-modo[aria-pressed="true"] { background: #b52d24; color: #fff; }
-.theme-descendimiento .dsc-ruta--vivo { filter: drop-shadow(0 0 0.35rem color-mix(in srgb, var(--c-accent) 80%, transparent)); }
-.theme-descendimiento .dsc-punto { transition: transform 0.4s var(--ease-cine), opacity 0.3s; }
-.theme-descendimiento ol[class$="-lista"] button[aria-current="step"] { color: #ff8a7a; }
-.theme-descendimiento ol[class$="-lista"] button[aria-current="step"] span { background: #ff8a7a; border-color: #ff8a7a; color: #140605; }
-
-/* ═══════════ 08 · La loca Meg: cartografía artística ═══════════ */
-.theme-meg .meg-marco {
-  outline: 1px solid color-mix(in srgb, var(--c-accent) 35%, transparent);
-  outline-offset: 5px;
-}
-.meg-mapa { fill: none; stroke: rgb(241 230 211 / 0.8); stroke-width: 1.25px; stroke-dasharray: 2 5; stroke-linecap: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.95)); }
-.meg-rotulo {
-  position: absolute; translate: 0 -100%; margin: 0 0 0.35rem; padding: 0.15rem 0.55rem 0.15rem 0.35rem;
-  display: flex; align-items: center; gap: 0.4rem; pointer-events: none;
-  background: rgb(14 8 5 / 0.82); border: 1px solid rgb(241 230 211 / 0.45); border-radius: 999px;
-  font: 600 0.72rem/1.2 var(--font-archivo), system-ui, sans-serif; letter-spacing: 0.04em; color: var(--c-ink); white-space: nowrap;
-  animation: mu-aparece 0.8s var(--ease-cine) both;
-}
-.meg-rotulo b { display: grid; place-items: center; width: 1.25rem; aspect-ratio: 1; border-radius: 50%; background: var(--c-accent); color: #1a0d05; font-size: 0.7rem; }
-@media (max-width: 47.99rem) { .meg-rotulo span { display: none; } .meg-rotulo { padding: 0.15rem; } }
-.theme-meg .meg-lista button[aria-current="step"] { color: var(--c-ink); }
-.theme-meg .meg-texto h3 { font-family: var(--f-display); font-weight: 400; font-size: 2rem; }
-.theme-meg .meg-vis--punto { background: linear-gradient(90deg, color-mix(in srgb, var(--c-accent) 12%, transparent), transparent); padding-block: 0.4rem; }
-.theme-meg .meg-union { stroke-width: 2.25; filter: drop-shadow(0 0 3px color-mix(in srgb, var(--c-accent) 70%, transparent)); }
-
-/* ═══════════ 09 · Los siete pecados: la mesa y el ojo ═══════════ */
-.theme-pec .pec-zona path { stroke: rgb(239 232 210 / 0.5); stroke-dasharray: 3 5; }
-.theme-pec .pec-zona:not([data-on="true"]):hover path { fill: rgb(224 187 85 / 0.16); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c-accent) 70%, transparent)); }
-.theme-pec .pec-zona[data-on="true"] path { filter: drop-shadow(0 0 8px color-mix(in srgb, var(--c-accent) 85%, transparent)); }
-.theme-pec .pec-lupa { outline: 1px solid color-mix(in srgb, var(--c-accent) 55%, transparent); outline-offset: 4px; border-radius: 2px; }
-.theme-pec .pec-texto h3 { font-family: var(--f-display); font-weight: 500; font-size: 2rem; }
-.theme-pec .pec-rotulo { font-family: var(--f-display); font-size: 1.25rem; }
-.theme-pec .pec-chip { border-radius: 999px; transition: border-color 0.3s, background-color 0.3s; }
-
 /* ═══════════ 10 · Cristo de San Juan de la Cruz: sala oscura, un haz de luz ═══════════ */
 .theme-dali .vd-hero::before {
   background:
@@ -210,16 +158,6 @@
   .theme-dali .vd-hero::before { animation: mu-respira 9s ease-in-out infinite alternate; }
 }
 @keyframes mu-respira { from { opacity: 0.72; } to { opacity: 1; } }
-.theme-dali .vd-marco { box-shadow: 0 3rem 6rem -2rem rgb(0 0 0 / 0.95), 0 0 6rem -1rem color-mix(in srgb, var(--c-accent) 14%, transparent); }
-.theme-dali .vd-escena::before {
-  content: ""; position: absolute; inset: -10% 10% auto; height: 55%; z-index: -1; pointer-events: none;
-  background: radial-gradient(60% 80% at 50% 0%, color-mix(in srgb, var(--c-accent) 14%, transparent), transparent 80%);
-}
-.theme-dali .vd-escena { position: relative; }
-.theme-dali .vd-estado { transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
-.theme-dali .vd-texto h3 { font-family: var(--f-display); font-weight: 400; font-size: 2.1rem; }
-.theme-dali .vd-estado-linea[data-imposible="true"] { color: var(--c-accent); }
-.theme-dali .vd-cita { border-left: 2px solid var(--c-accent); }
 
 /* ═══════════ V5.2-A ═══════════ */
 
@@ -237,18 +175,8 @@
   font-family: var(--f-display, inherit); font-style: italic; font-size: clamp(5.5rem, 3rem + 12vw, 13rem); line-height: 0.8;
   color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--c-accent) 38%, transparent); pointer-events: none; user-select: none;
 }
-.theme-empireo .emp-explora__cab::before { content: "06"; }
-.theme-descendimiento .dsc-explora__cab::before { content: "07"; }
-.theme-meg .meg-explora__cab::before { content: "08"; }
-.theme-pec .pec-explora__cab::before { content: "09"; }
-.theme-dali .vd-explora__cab::before { content: "10"; }
 
 /* Paneles: cada obra con su borde y su luz */
-.theme-empireo .emp-mandos { border: 0; border-top: 1px solid var(--c-accent); background: linear-gradient(to bottom, color-mix(in srgb, var(--c-accent) 9%, transparent), transparent 55%); }
-.theme-descendimiento .dsc-mandos { border: 0; border-left: 3px solid var(--c-accent); background: linear-gradient(100deg, color-mix(in srgb, var(--c-accent) 10%, transparent), transparent 60%); }
-.theme-meg .meg-mandos { border: 1px dashed color-mix(in srgb, var(--c-accent) 55%, transparent); background: linear-gradient(160deg, rgb(240 220 180 / 0.07), transparent 70%); }
-.theme-pec .pec-mandos { border: 3px double color-mix(in srgb, var(--c-accent) 55%, transparent); }
-.theme-dali .vd-mandos { border: 1px solid color-mix(in srgb, var(--c-accent) 40%, transparent); box-shadow: inset 0 0 3rem rgb(0 0 0 / 0.5); }
 
 /* Fundido de estado (solo opacidad) */
 @media (prefers-reduced-motion: no-preference) {
@@ -256,68 +184,8 @@
 }
 @keyframes mu-fundido { from { opacity: 0.25; } }
 
-/* 06 · la ventana de la pintura gana espacio y la regla se ve */
-@media (min-width: 56rem) {
-  .theme-empireo .emp-explora { --alto: min(76svh, 46rem); }
-  .theme-empireo .emp-explora__cuerpo { grid-template-columns: minmax(0, 1fr) minmax(0, 28rem); justify-content: center; gap: clamp(2rem, 5vw, 5rem); }
-  .theme-empireo .emp-ventana-col { justify-content: flex-end; }
-  .theme-empireo .emp-ventana { width: min(100%, calc(var(--alto) * 0.9)); }
-}
-.theme-empireo .emp-regla { width: 1.4rem; }
-
-/* 08 · contornos discretos, tono de papel */
-.meg-mapa { stroke: rgb(241 230 211 / 0.5); stroke-width: 1px; stroke-dasharray: 1 6; }
-.theme-meg .meg-marco::after { box-shadow: inset 0 0 4rem rgb(70 40 10 / 0.45), inset 0 0 0 1px rgb(255 255 255 / 0.07); }
-.meg-rotulo { background: rgb(40 25 12 / 0.88); border-color: rgb(235 205 150 / 0.6); }
-
-/* 09 · en móvil la ampliación solo aparece al elegir una escena; en escritorio, con indicación */
-@media (max-width: 55.99rem) {
-  .theme-pec .pec-lupa[data-vacia="true"] { display: none; }
-}
-.theme-pec .pec-lupa[data-vacia="true"]::before {
-  content: "Elige un sector, un medallón o el ojo"; position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 1rem; text-align: center;
-  background: rgb(5 8 4 / 0.72); font-family: var(--f-display); font-style: italic; font-size: 1.15rem; color: var(--c-ink);
-}
-
 /* ═══════════ V5.2-B ═══════════ */
 
-/* 07 · puntos numerados, con halo y contraste sobre el paño blanco */
-.theme-descendimiento .dsc-lienzo { counter-reset: marca; }
-.theme-descendimiento .dsc-marca {
-  counter-increment: marca; display: grid; place-items: center; width: 1.9rem;
-  border: 2px solid #fff; background: rgb(20 6 5 / 0.82);
-  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55), 0 0 0.9rem rgb(255 255 255 / 0.35);
-}
-.theme-descendimiento .dsc-marca::after { content: counter(marca); font: 700 0.75rem/1 var(--font-archivo), system-ui, sans-serif; color: #fff; }
-.theme-descendimiento .dsc-marco[data-modo="manos"] .dsc-marca { width: 1.9rem; }
-.theme-descendimiento .dsc-marca[data-on="true"] { background: #c93a2e; border-color: #fff; box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55), 0 0 1.4rem 0.2rem rgb(255 120 100 / 0.7); }
-@media (prefers-reduced-motion: no-preference) {
-  .theme-descendimiento .dsc-marca[data-on="true"] { animation: mu-pulso 1.8s ease-in-out infinite; }
-}
-@keyframes mu-pulso { 50% { box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55), 0 0 2rem 0.5rem rgb(255 120 100 / 0.35); } }
-
-/* 07 · escritorio: la reproducción crece y el panel se equilibra */
-@media (min-width: 56rem) {
-  .theme-descendimiento .dsc-explora { --alto: min(80svh, 52rem); }
-  .theme-descendimiento .dsc-explora__cuerpo { grid-template-columns: minmax(0, 1fr) minmax(0, 30rem); justify-content: center; gap: clamp(2rem, 5vw, 5rem); }
-  .theme-descendimiento .dsc-escena { justify-content: flex-end; }
-  .theme-descendimiento .dsc-mandos { max-width: 30rem; }
-  .theme-descendimiento .dsc-punto h3 { font-size: 1.8rem; }
-}
-
-/* 08 · rosa de los vientos y separadores, fuera de la pintura */
-.theme-meg .meg-mandos { position: relative; }
-.theme-meg .meg-mandos::before {
-  content: ""; position: absolute; top: 0.6rem; right: 0.6rem; width: 3.2rem; aspect-ratio: 1; opacity: 0.5; pointer-events: none;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100' fill='none' stroke='%23e8c89a' stroke-width='1.6'%3E%3Ccircle r='34'/%3E%3Ccircle r='24' stroke-dasharray='2 4'/%3E%3Cpath d='M0-48 6-6 0 0-6-6ZM0 48-6 6 0 0 6 6ZM-48 0-6-6 0 0-6 6ZM48 0 6 6 0 0 6-6Z' fill='%23e8c89a' fill-opacity='.35'/%3E%3C/svg%3E") center / contain no-repeat;
-}
-.theme-meg .meg-modos { margin-right: 3.6rem; }
-.theme-meg .meg-lista button { border-top-style: dotted; border-top-color: rgb(232 200 154 / 0.35); }
-.theme-meg .meg-lista button span { font-family: var(--f-display); font-style: italic; font-size: 0.95rem; border-style: double; border-width: 3px; }
-.theme-meg .meg-explora { background-image: radial-gradient(rgb(232 200 154 / 0.05) 1px, transparent 1px); background-size: 14px 14px; }
-
-/* 10 · escena de perspectiva: fondo y marco con más profundidad */
-.theme-dali .vd-marco { background: #020203; }
 
 /* Cierre V5.2: el numeral de sección ocupa su propia columna y no pisa el titular */
 .mu-sala [class$="-explora__cab"] { --num: clamp(5.5rem, 3rem + 12vw, 13rem); max-width: 56rem; padding-right: calc(var(--num) * 0.8); }

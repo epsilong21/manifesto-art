@@ -8,12 +8,13 @@ import { CREDITOS, DOCUMENTADO, INTERPRETACION } from "@/content/descendimiento"
 import { gloock } from "@/lib/fonts/gloock";
 import "../sprint.css";
 import "./descendimiento.css";
+import "./peso.css";
 import "../pulido.css";
 import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
 export const metadata: Metadata = {
   title: "El descendimiento de la cruz, de Rubens — MANIFESTO",
-  description: "Lee el panel central de Rubens por su diagonal, por las manos que reciben el cuerpo y por la luz que lo separa de la sombra.",
+  description: "El panel central de Rubens en penumbra: una luz dirigida recorre su diagonal, se detiene en las seis manos que sostienen el cuerpo y revela su claroscuro.",
   alternates: { canonical: "/conceptos/el-descendimiento-de-la-cruz" },
   openGraph: {
     type: "article",
@@ -39,7 +40,7 @@ export default function DescendimientoPage() {
             <p className="dsc-kicker">07 · Peter Paul Rubens · 1611–1614</p>
             <h1 id="dsc-titulo">El descendimiento de la cruz</h1>
             <p className="dsc-lede">Un cuerpo muerto baja sobre un paño blanco, y toda la escena se ordena para sostenerlo. ¿Cuánto pesa la luz?</p>
-            <a className="mf-btn mf-btn--solid" href="#dsc-explora-h">Leer el cuadro ↓</a>
+            <a className="mf-btn mf-btn--solid" href="#peso-de-la-luz">Entrar en la penumbra ↓</a>
           </div>
         </section>
         <PesoDeLaLuz />

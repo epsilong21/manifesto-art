@@ -34,62 +34,6 @@ html:has(.theme-pec) { background: #0a0d09; }
   .pec-hero__fig { justify-self: stretch; justify-items: center; }
 }
 
-/* ── Explorador ── */
-.pec-explora { --alto: clamp(14rem, 46svh, 28rem); padding: clamp(2rem, 6vw, 4rem) var(--mf-gutter); border-top: 1px solid var(--c-line); scroll-margin-top: 1rem; }
-@media (min-width: 56rem) { .pec-explora { --alto: min(70svh, 46rem); } }
-.pec-explora__cab { max-width: 36rem; }
-.pec-explora__cab p { margin: 0 0 1.5rem; color: var(--c-muted); }
-.pec-explora__cuerpo { display: grid; gap: 1.25rem; }
-@media (min-width: 56rem) { .pec-explora__cuerpo { grid-template-columns: minmax(0, 1fr) 26rem; gap: 3rem; align-items: start; } }
-.pec-escena { display: flex; justify-content: center; }
-.pec-marco { position: relative; width: min(100%, calc(var(--alto) * 2000 / 1705)); aspect-ratio: 2000 / 1705; background: #000; outline: 1px solid var(--c-line); touch-action: auto; }
-.pec-img { display: block; width: 100%; height: 100%; aspect-ratio: 2000 / 1705; user-select: none; }
-.pec-svg { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: auto; }
-
-.pec-zona { cursor: pointer; }
-.pec-zona, .pec-zona:focus, .pec-zona:focus-visible { outline: none; }
-.pec-zona path { fill: rgb(0 0 0 / 0.001); stroke: rgb(239 232 210 / 0.38); stroke-width: 1px; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; transition: fill 0.3s, stroke 0.3s; }
-.pec-zona[data-on="true"] path { fill: rgb(224 187 85 / 0.2); stroke: var(--c-accent); stroke-width: 2.5px; stroke-dasharray: none; }
-.pec-zona:focus-visible path { stroke: #fff; stroke-width: 3px; stroke-dasharray: none; fill: rgb(255 255 255 / 0.12); }
-@media (hover: hover) { .pec-zona:not([data-on="true"]):hover path { fill: rgb(224 187 85 / 0.14); stroke: var(--c-accent); } }
-.pec-visto { display: none; fill: var(--c-accent); stroke: #000; stroke-width: 0.25; pointer-events: none; }
-.pec-zona[data-visto="true"] .pec-visto { display: block; }
-
-.pec-mandos { display: grid; gap: 1rem; max-width: 26rem; align-content: start; }
-.pec-lupa { position: relative; overflow: hidden; width: 100%; max-width: 23rem; aspect-ratio: 2000 / 1705; background: #000; outline: 1px solid var(--c-line); }
-.pec-lienzo { position: absolute; inset: 0; transform-origin: 0 0; transition: transform 0.7s cubic-bezier(0.3, 0.7, 0.2, 1); will-change: transform; }
-.pec-lienzo img { display: block; width: 100%; height: 100%; aspect-ratio: 2000 / 1705; }
-
-.pec-texto { display: grid; gap: 0.6rem; align-content: start; }
-.pec-texto h3 { margin: 0; font-size: 1.7rem; line-height: 1.1; }
-.pec-rotulo { font-size: 1.1rem; font-style: italic; color: var(--c-muted); }
-.pec-texto p { margin: 0; line-height: 1.5; font-size: 0.975rem; color: var(--c-muted); }
-.pec-pos { font-size: 0.75rem !important; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-accent) !important; }
-.pec-vis b { color: var(--c-ink); }
-.pec-int { border-top: 1px dashed var(--c-line); padding-top: 0.6rem; font-style: italic; }
-.pec-int b { font-style: normal; color: var(--c-ink); }
-.pec-cierre { color: var(--c-ink) !important; border-left: 2px solid var(--c-accent); padding-left: 0.8rem; }
-.pec-cuenta { font-size: 0.8125rem !important; letter-spacing: 0.04em; }
-.pec-botones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.pec-botones .mf-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
-
-.pec-lista { border-top: 1px solid var(--c-line); }
-.pec-lista summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; color: var(--c-muted); font-size: 0.95rem; }
-.pec-lista summary:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
-.pec-grupo { padding-bottom: 0.8rem; }
-.pec-grupo h4 { margin: 0.2rem 0 0.4rem; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted); font-weight: 500; }
-.pec-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.pec-chip { min-height: 44px; padding: 0.4rem 0.9rem; background: none; border: 1px solid var(--c-line); border-radius: 2rem; color: var(--c-ink); font: inherit; font-size: 0.9rem; cursor: pointer; }
-.pec-chip[data-visto="true"]::before { content: ""; display: inline-block; width: 0.45rem; aspect-ratio: 1; margin-right: 0.45rem; border-radius: 50%; background: var(--c-accent); }
-.pec-chip[aria-pressed="true"] { background: var(--c-ink); color: var(--c-bg); border-color: var(--c-ink); }
-.pec-chip[aria-pressed="true"]::before { background: var(--c-bg); }
-@media (hover: hover) { .pec-chip:not([aria-pressed="true"]):hover { border-color: var(--c-accent); } }
-
-/* Móvil: la ampliación va justo bajo la mesa, y los textos después */
-@media (max-width: 55.99rem) {
-  .pec-lupa { max-width: min(100%, 26rem); justify-self: center; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .theme-pec *, .theme-pec *::before { transition: none !important; }
 }

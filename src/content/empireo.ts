@@ -31,6 +31,26 @@ export const ESTACIONES: Estacion[] = [
   { id: "luz", titulo: "La luz", x: 0.31, y: 0.268, zoom: 2.4, texto: "Dentro del túnel, una figura diminuta espera ante un círculo casi blanco. Es lo más luminoso del cuadro y lo más pequeño." },
 ];
 
+/** Luz media (0–100) de la reproducción a una altura y (0 arriba, 1 abajo), interpolada en PERFIL_LUZ. */
+export function luzEn(y: number) {
+  const f = Math.min(1, Math.max(0, y)) * (PERFIL_LUZ.length - 1);
+  const i = Math.floor(f);
+  const j = Math.min(i + 1, PERFIL_LUZ.length - 1);
+  return PERFIL_LUZ[i] + (PERFIL_LUZ[j] - PERFIL_LUZ[i]) * (f - i);
+}
+
+/**
+ * «Umbral de luz»: atmósfera de cada estación en la instalación (tinte de la pared y color del núcleo,
+ * RGB 0–1). Son decisiones de diseño de MANIFESTO, no colores medidos en la tabla; lo medido es la luz.
+ */
+export const ATMOSFERAS: { tinte: [number, number, number]; nucleo: [number, number, number] }[] = [
+  { tinte: [0.3, 0.4, 0.55], nucleo: [1, 0.84, 0.6] },
+  { tinte: [0.5, 0.44, 0.42], nucleo: [1, 0.87, 0.68] },
+  { tinte: [0.55, 0.26, 0.22], nucleo: [1, 0.82, 0.62] },
+  { tinte: [0.3, 0.38, 0.52], nucleo: [0.96, 0.9, 0.8] },
+  { tinte: [0.78, 0.74, 0.66], nucleo: [1, 0.97, 0.9] },
+];
+
 export const DOCUMENTADO = [
   "Es una de las cuatro tablas de las «Visiones del más allá» (Paraíso terrenal, Ascensión al Empíreo, Caída de los condenados e Infierno).",
   "Óleo sobre tabla de unos 88 × 40 cm (las fuentes dan entre 86,5 y 88,8 cm de alto). Se conserva en el Palazzo Ducale de Venecia.",

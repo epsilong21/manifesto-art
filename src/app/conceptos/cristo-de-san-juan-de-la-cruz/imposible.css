@@ -1,0 +1,260 @@
+/* ─────────────────────────────────────────────────────────────
+   10 · «La perspectiva imposible»
+   Una escena 3D a lo ancho de la sala, con grandes áreas de silencio. Los mandos son pocos y se
+   quedan en los márgenes: momentos arriba a la izquierda, el raíl vertical a la derecha y la vista
+   original abajo. El texto, debajo de la escena. Negro azulado, azul nocturno, bronce tenue,
+   blanco frío y ámbar en el horizonte; Instrument Serif.
+   ───────────────────────────────────────────────────────────── */
+
+.pi-sala {
+  --pi-noche: #03050b;
+  --pi-azul: #0b1630;
+  --pi-frio: #e9eef8;
+  --pi-frio-2: #a9b3c6;
+  --pi-ambar: #e9a35c;
+  --pi-bronce: #b48a58;
+  --pi-linea: rgb(233 238 248 / 0.16);
+  position: relative;
+  color: var(--pi-frio);
+  background: var(--pi-noche);
+  border-top: 1px solid var(--pi-linea);
+  scroll-margin-top: 0;
+}
+
+/* ── Escena ── */
+.pi-escena {
+  position: relative;
+  height: clamp(28rem, 128vw, 76svh);
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(180deg, #02030a 0%, #060a18 52%, #1b1c2c 72%, #8a5a33 86.5%, #20304e 88%, #0a1428 100%);
+}
+@media (min-width: 48rem) { .pi-escena { height: min(78svh, 52rem); } }
+.pi-lienzo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.pi-lienzo:active { cursor: grabbing; }
+.pi-lienzo:focus-visible { box-shadow: inset 0 0 0 2px var(--pi-frio); }
+
+/* Velo superior: el título queda siempre sobre el silencio del vacío */
+.pi-escena::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: clamp(9rem, 32%, 16rem);
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(3 5 11 / 0.82), rgb(3 5 11 / 0.45) 55%, rgb(3 5 11 / 0));
+}
+
+/* Sin WebGL2: una composición fija con la estructura en trazo */
+.pi-alternativa { position: absolute; inset: 0; display: none; pointer-events: none; }
+.pi-sala[data-gl="no"] .pi-alternativa { display: block; }
+.pi-sala[data-gl="no"] .pi-lienzo { opacity: 0; }
+.pi-alternativa svg { position: absolute; left: 50%; top: 8%; width: min(78%, 34rem); height: 56%; translate: -50% 0; }
+.pi-alt-cruz path, .pi-alt-cruz circle { fill: none; stroke: var(--pi-bronce); stroke-width: 1.4; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.pi-alt-cruz .pi-alt-tri { stroke: var(--pi-frio-2); stroke-width: 0.8; }
+.pi-alt-cruz .pi-alt-esf { stroke: var(--pi-frio); fill: rgb(233 238 248 / 0.12); }
+
+/* La costura entre las dos miradas, solo en el modo «como en el cuadro» */
+.pi-costura {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 62%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(233 238 248 / 0.07) 20%, rgb(233 238 248 / 0.07) 80%, transparent);
+  opacity: 0;
+  transition: opacity 0.8s;
+}
+.pi-costura[data-on="true"] { opacity: 1; }
+
+/* Cabecera y momentos, sobre el silencio del vacío */
+.pi-cabeza {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: grid;
+  gap: 0.35rem;
+  padding: clamp(1rem, 3vw, 2.25rem) var(--mf-gutter) 0;
+  max-width: 34rem;
+  pointer-events: none;
+}
+.pi-ante { margin: 0; font-size: 0.6875rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--pi-ambar); }
+.pi-cabeza h2 {
+  margin: 0;
+  font-size: clamp(1.9rem, 1.1rem + 3.2vw, 3.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.8);
+}
+.pi-momentos { display: flex; flex-wrap: wrap; gap: 0 0.9rem; margin-top: 0.35rem; pointer-events: auto; }
+.pi-momentos button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: none;
+  color: var(--pi-frio-2);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.9);
+  transition: color 0.3s, border-color 0.4s;
+}
+.pi-momentos button span { font-family: var(--f-display); font-size: 1.05rem; color: var(--pi-ambar); }
+.pi-momentos b { font-weight: inherit; }
+.pi-corto { display: none; }
+@media (max-width: 39.99rem) { .pi-largo { display: none; } .pi-corto { display: inline; } }
+.pi-momentos button[aria-pressed="true"] { color: var(--pi-frio); border-bottom-color: var(--pi-ambar); }
+@media (hover: hover) { .pi-momentos button:hover { color: var(--pi-frio); } }
+.pi-momentos button:focus-visible { outline: 2px solid var(--pi-frio); outline-offset: 3px; }
+
+/* Raíl vertical: elevación o descenso, con área táctil propia */
+.pi-rail {
+  position: absolute;
+  right: clamp(0.4rem, 2vw, 1.5rem);
+  top: 24%;
+  bottom: 22%;
+  z-index: 2;
+  width: 44px;
+  touch-action: none;
+  cursor: ns-resize;
+  outline: none;
+}
+.pi-rail:focus-visible { outline: 2px solid var(--pi-frio); outline-offset: 4px; border-radius: 22px; }
+.pi-rail__via { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: linear-gradient(180deg, rgb(233 238 248 / 0.05), rgb(233 238 248 / 0.4), rgb(233 238 248 / 0.05)); }
+.pi-rail__dali { position: absolute; left: 50%; width: 12px; height: 1px; translate: -50% 0; background: var(--pi-ambar); }
+.pi-rail__asa {
+  position: absolute;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--pi-frio);
+  box-shadow: 0 0 0 5px rgb(233 238 248 / 0.12), 0 0 18px rgb(233 238 248 / 0.5);
+  transition: top 0.25s ease-out;
+}
+.pi-rail__asa i {
+  position: absolute;
+  right: calc(100% + 0.7rem);
+  top: 50%;
+  translate: 0 -50%;
+  white-space: nowrap;
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--pi-frio);
+  text-shadow: 0 1px 8px #000, 0 0 2px #000;
+}
+
+/* Acciones: abajo a la derecha, fuera del centro */
+.pi-acciones { position: absolute; right: var(--mf-gutter); bottom: clamp(0.75rem, 2.5vw, 1.5rem); z-index: 2; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.45rem; }
+.pi-acciones button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid rgb(233 238 248 / 0.3);
+  border-radius: 999px;
+  background: rgb(3 5 11 / 0.55);
+  color: var(--pi-frio);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: border-color 0.3s, background-color 0.3s;
+}
+.pi-acciones button[aria-pressed="true"] { border-color: var(--pi-ambar); }
+.pi-acciones svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.pi-restablecer span { display: none; }
+@media (min-width: 30rem) { .pi-restablecer span { display: inline; } }
+@media (max-width: 29.99rem) { .pi-restablecer { width: 44px; padding: 0 !important; justify-content: center; } }
+@media (hover: hover) { .pi-acciones button:hover { border-color: var(--pi-ambar); } }
+.pi-acciones button:focus-visible { outline: 2px solid var(--pi-frio); outline-offset: 2px; }
+
+/* ── Cartela ── */
+.pi-cartela {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 2rem) var(--mf-gutter) clamp(1.5rem, 4vw, 2.5rem);
+}
+.pi-texto { display: grid; gap: 0.45rem; align-content: start; max-width: 40rem; }
+.pi-n { margin: 0; font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pi-ambar); }
+.pi-texto h3 { margin: 0; font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem); line-height: 1.05; text-wrap: balance; }
+.pi-texto p { margin: 0; color: var(--pi-frio-2); font-size: 0.9688rem; line-height: 1.55; text-wrap: pretty; }
+.pi-texto .pi-dato { font-size: 0.875rem; color: var(--pi-frio); }
+.pi-texto b { color: var(--pi-frio); }
+.pi-etiqueta { display: inline-block; margin-right: 0.3rem; padding: 0.05rem 0.55rem; border: 1px solid var(--pi-bronce); border-radius: 999px; font-size: 0.75rem; color: var(--pi-ambar); }
+.pi-etiqueta[data-tipo="interpretacion"] { border-color: var(--pi-linea); color: var(--pi-frio); font-style: italic; }
+.pi-cita { margin: 0.4rem 0 0; padding: 0.15rem 0 0.15rem 0.9rem; border-left: 2px solid var(--pi-ambar); }
+.pi-cita p { font-family: var(--f-display); font-style: italic; font-size: 1.1rem; color: var(--pi-frio); }
+.pi-cita footer { margin-top: 0.4rem; font-size: 0.75rem; color: var(--pi-frio-2); }
+
+.pi-pasos { display: flex; flex-wrap: wrap; gap: 0.4rem; align-content: start; }
+.pi-pasos button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--pi-linea);
+  border-radius: 999px;
+  background: none;
+  color: var(--pi-frio-2);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
+}
+.pi-pasos button span { font-family: var(--f-display); color: var(--pi-ambar); }
+.pi-pasos button[aria-pressed="true"] { color: var(--pi-frio); border-color: var(--pi-ambar); }
+@media (hover: hover) { .pi-pasos button:hover { color: var(--pi-frio); } }
+.pi-pasos button:focus-visible { outline: 2px solid var(--pi-frio); outline-offset: 2px; }
+
+.pi-lamina { margin: 0; display: grid; gap: 0.4rem; justify-items: start; }
+.pi-lamina .vd-nucleo { width: 7.5rem; height: auto; aspect-ratio: 800 / 1426; box-shadow: 0 0 0 1px var(--pi-linea), 0 1rem 2rem rgb(0 0 0 / 0.6); }
+.pi-lamina figcaption { font-size: 0.75rem; color: var(--pi-frio-2); }
+
+.pi-notas { max-width: 44rem; border-top: 1px solid var(--pi-linea); padding-top: 0.7rem; }
+.pi-notas summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-size: 0.875rem; color: var(--pi-frio-2); }
+.pi-notas summary:focus-visible { outline: 2px solid var(--pi-frio); outline-offset: 2px; }
+.pi-notas p { margin: 0 0 0.6rem; font-size: 0.875rem; line-height: 1.55; color: var(--pi-frio-2); }
+.pi-notas b { color: var(--pi-frio); }
+
+@media (min-width: 64rem) {
+  .pi-cartela {
+    grid-template-columns: minmax(0, 40rem) minmax(0, 1fr) auto;
+    grid-template-areas: "texto pasos lamina" "notas notas lamina";
+    column-gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+  }
+  .pi-texto { grid-area: texto; }
+  .pi-pasos { grid-area: pasos; justify-content: flex-end; }
+  .pi-lamina { grid-area: lamina; }
+  .pi-notas { grid-area: notas; }
+  .pi-lamina .vd-nucleo { width: 8.5rem; }
+}
+
+@media (orientation: landscape) and (max-height: 32rem) {
+  .pi-escena { height: 88svh; }
+  .pi-ante { display: none; }
+  .pi-cabeza h2 { font-size: 1.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pi-sala *, .pi-sala *::before, .pi-sala *::after { transition: none !important; }
+}

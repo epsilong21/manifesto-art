@@ -1,5 +1,4 @@
-import type { CSSProperties } from "react";
-import { DALI_IMG as I, HORIZONTE, NUCLEO as N, PERFIL_LUZ, UMBRAL } from "@/content/cristo-dali";
+import { DALI_IMG as I, NUCLEO as N, PERFIL_LUZ } from "@/content/cristo-dali";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const VB_H = I.ratio * 100;
@@ -10,42 +9,10 @@ export const centroFranja = (t: number) => 0.08 + 0.87 * t;
 /** Luminosidad medida (0–100) en la franja que está bajo el centro. */
 export const luzEn = (y: number) => PERFIL_LUZ[Math.min(PERFIL_LUZ.length - 1, Math.max(0, Math.floor(y * PERFIL_LUZ.length)))];
 
-/**
- * Estado B: la pintura entera, con una franja de luz que se desplaza entre la sombra y la bahía.
- * La cámara se acerca un poco a la franja (profundidad) y el resto queda en penumbra, sin ocultarse.
- */
-export function Mundos({ t }: { t: number }) {
-  const c = centroFranja(t);
-  const estilo = { "--c": `${(c * 100).toFixed(2)}%` } as CSSProperties;
-  return (
-    <div className="vd-mundos" style={estilo} role="img" aria-label="La pintura con una franja de luz que recorre el espacio oscuro y la bahía">
-      <div className="vd-mundos__cam" style={{ transformOrigin: `50% ${(c * 100).toFixed(2)}%` }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="vd-img" src={SRC} width={I.width} height={I.height} alt="" loading="lazy" decoding="async" draggable={false} />
-      </div>
-      <div className="vd-mundos__penumbra" aria-hidden="true" />
-      <span className="vd-linea" style={{ top: `${UMBRAL * 100}%` }} data-cerca={Math.abs(c - UMBRAL) < 0.07} aria-hidden="true"><i>Umbral</i></span>
-      <span className="vd-linea vd-linea--agua" style={{ top: `${HORIZONTE * 100}%` }} data-cerca={Math.abs(c - HORIZONTE) < 0.07} aria-hidden="true"><i>Horizonte</i></span>
-    </div>
-  );
-}
-
-/** Regla de luminosidad medida, con el marcador de la franja actual. */
-export function ReglaLuz({ t }: { t: number }) {
-  const c = centroFranja(t);
-  return (
-    <div className="vd-regla" aria-hidden="true">
-      {PERFIL_LUZ.map((v, i) => (
-        <span key={i} style={{ width: `${Math.max(6, v * 2.6)}%` }} data-on={Math.floor(c * PERFIL_LUZ.length) === i} />
-      ))}
-    </div>
-  );
-}
-
 const IDX = (id: string) => N.pasos.findIndex((p) => p.id === id);
 
 /**
- * Estado C: triángulo, círculo y ejes sobre la pintura. `fundido` (0–1) lleva la pintura a la penumbra
+ * Guías sobre la pintura: triángulo, círculo y ejes sobre la pintura. `fundido` (0–1) lleva la pintura a la penumbra
  * para dejar solo la geometría. Lo que se ve de cada paso depende de `paso`.
  */
 export function Nucleo({ paso, fundido }: { paso: number; fundido: number }) {
@@ -57,7 +24,7 @@ export function Nucleo({ paso, fundido }: { paso: number; fundido: number }) {
   const ejes = paso >= IDX("ejes"), triangulo = paso >= IDX("triangulo"), circulo = paso >= IDX("circulo"), nucleo = paso >= IDX("nucleo");
   const brillo = 1 - 0.78 * fundido;
   return (
-    <div className="vd-nucleo" role="img" aria-label={`La pintura con ${["los ejes", "el triángulo", "el círculo", "el núcleo"][paso]} dibujado encima`}>
+    <div className="vd-nucleo" role="img" aria-label={paso < 0 ? "La pintura, sin guías" : `La pintura con ${["los ejes", "el triángulo", "el círculo", "el núcleo"][paso]} dibujado encima`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="vd-img" src={SRC} width={I.width} height={I.height} alt="" loading="lazy" decoding="async" draggable={false} style={{ filter: `brightness(${brillo.toFixed(3)}) saturate(${(1 - 0.5 * fundido).toFixed(2)})` }} />
       <svg className="vd-svg vd-svg--geo" viewBox={`0 0 100 ${VB_H}`} aria-hidden="true" preserveAspectRatio="none">
