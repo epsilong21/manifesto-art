@@ -98,7 +98,7 @@ export function Mesa() {
         </div>
 
         <div className="pec-mandos">
-          <div className="pec-lupa" aria-hidden="true">
+          <div className="pec-lupa" data-vacia={!e} aria-hidden="true">
             <div className="pec-lienzo" style={{ transform: `translate(${vista.tx}%, ${vista.ty}%) scale(${vista.scale})` }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`${BASE}${I.base}-${I.anchos[1]}.webp`} width={I.width} height={I.height} alt="" loading="lazy" decoding="async" draggable={false} />

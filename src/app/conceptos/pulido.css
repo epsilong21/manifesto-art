@@ -220,3 +220,106 @@
 .theme-dali .vd-texto h3 { font-family: var(--f-display); font-weight: 400; font-size: 2.1rem; }
 .theme-dali .vd-estado-linea[data-imposible="true"] { color: var(--c-accent); }
 .theme-dali .vd-cita { border-left: 2px solid var(--c-accent); }
+
+/* ═══════════ V5.2-A ═══════════ */
+
+/* Titulares monumentales con numeral de sección en trazo */
+.mu-sala [class$="-explora__cab"] { position: relative; isolation: isolate; max-width: 48rem; }
+.mu-sala [class$="-explora__cab"] .sp-h2 {
+  font-size: clamp(2.3rem, 1.2rem + 5.6vw, 5.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.mu-sala [class$="-explora__cab"]::before {
+  position: absolute; z-index: -1; right: 0; top: -0.35em;
+  font-family: var(--f-display, inherit); font-style: italic; font-size: clamp(5.5rem, 3rem + 12vw, 13rem); line-height: 0.8;
+  color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--c-accent) 38%, transparent); pointer-events: none; user-select: none;
+}
+.theme-empireo .emp-explora__cab::before { content: "06"; }
+.theme-descendimiento .dsc-explora__cab::before { content: "07"; }
+.theme-meg .meg-explora__cab::before { content: "08"; }
+.theme-pec .pec-explora__cab::before { content: "09"; }
+.theme-dali .vd-explora__cab::before { content: "10"; }
+
+/* Paneles: cada obra con su borde y su luz */
+.theme-empireo .emp-mandos { border: 0; border-top: 1px solid var(--c-accent); background: linear-gradient(to bottom, color-mix(in srgb, var(--c-accent) 9%, transparent), transparent 55%); }
+.theme-descendimiento .dsc-mandos { border: 0; border-left: 3px solid var(--c-accent); background: linear-gradient(100deg, color-mix(in srgb, var(--c-accent) 10%, transparent), transparent 60%); }
+.theme-meg .meg-mandos { border: 1px dashed color-mix(in srgb, var(--c-accent) 55%, transparent); background: linear-gradient(160deg, rgb(240 220 180 / 0.07), transparent 70%); }
+.theme-pec .pec-mandos { border: 3px double color-mix(in srgb, var(--c-accent) 55%, transparent); }
+.theme-dali .vd-mandos { border: 1px solid color-mix(in srgb, var(--c-accent) 40%, transparent); box-shadow: inset 0 0 3rem rgb(0 0 0 / 0.5); }
+
+/* Fundido de estado (solo opacidad) */
+@media (prefers-reduced-motion: no-preference) {
+  .mu-fundido { animation: mu-fundido 0.22s ease-out; }
+}
+@keyframes mu-fundido { from { opacity: 0.25; } }
+
+/* 06 · la ventana de la pintura gana espacio y la regla se ve */
+@media (min-width: 56rem) {
+  .theme-empireo .emp-explora { --alto: min(76svh, 46rem); }
+  .theme-empireo .emp-explora__cuerpo { grid-template-columns: minmax(0, 1fr) minmax(0, 28rem); justify-content: center; gap: clamp(2rem, 5vw, 5rem); }
+  .theme-empireo .emp-ventana-col { justify-content: flex-end; }
+  .theme-empireo .emp-ventana { width: min(100%, calc(var(--alto) * 0.9)); }
+}
+.theme-empireo .emp-regla { width: 1.4rem; }
+
+/* 08 · contornos discretos, tono de papel */
+.meg-mapa { stroke: rgb(241 230 211 / 0.5); stroke-width: 1px; stroke-dasharray: 1 6; }
+.theme-meg .meg-marco::after { box-shadow: inset 0 0 4rem rgb(70 40 10 / 0.45), inset 0 0 0 1px rgb(255 255 255 / 0.07); }
+.meg-rotulo { background: rgb(40 25 12 / 0.88); border-color: rgb(235 205 150 / 0.6); }
+
+/* 09 · en móvil la ampliación solo aparece al elegir una escena; en escritorio, con indicación */
+@media (max-width: 55.99rem) {
+  .theme-pec .pec-lupa[data-vacia="true"] { display: none; }
+}
+.theme-pec .pec-lupa[data-vacia="true"]::before {
+  content: "Elige un sector, un medallón o el ojo"; position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 1rem; text-align: center;
+  background: rgb(5 8 4 / 0.72); font-family: var(--f-display); font-style: italic; font-size: 1.15rem; color: var(--c-ink);
+}
+
+/* ═══════════ V5.2-B ═══════════ */
+
+/* 07 · puntos numerados, con halo y contraste sobre el paño blanco */
+.theme-descendimiento .dsc-lienzo { counter-reset: marca; }
+.theme-descendimiento .dsc-marca {
+  counter-increment: marca; display: grid; place-items: center; width: 1.9rem;
+  border: 2px solid #fff; background: rgb(20 6 5 / 0.82);
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55), 0 0 0.9rem rgb(255 255 255 / 0.35);
+}
+.theme-descendimiento .dsc-marca::after { content: counter(marca); font: 700 0.75rem/1 var(--font-archivo), system-ui, sans-serif; color: #fff; }
+.theme-descendimiento .dsc-marco[data-modo="manos"] .dsc-marca { width: 1.9rem; }
+.theme-descendimiento .dsc-marca[data-on="true"] { background: #c93a2e; border-color: #fff; box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55), 0 0 1.4rem 0.2rem rgb(255 120 100 / 0.7); }
+@media (prefers-reduced-motion: no-preference) {
+  .theme-descendimiento .dsc-marca[data-on="true"] { animation: mu-pulso 1.8s ease-in-out infinite; }
+}
+@keyframes mu-pulso { 50% { box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55), 0 0 2rem 0.5rem rgb(255 120 100 / 0.35); } }
+
+/* 07 · escritorio: la reproducción crece y el panel se equilibra */
+@media (min-width: 56rem) {
+  .theme-descendimiento .dsc-explora { --alto: min(80svh, 52rem); }
+  .theme-descendimiento .dsc-explora__cuerpo { grid-template-columns: minmax(0, 1fr) minmax(0, 30rem); justify-content: center; gap: clamp(2rem, 5vw, 5rem); }
+  .theme-descendimiento .dsc-escena { justify-content: flex-end; }
+  .theme-descendimiento .dsc-mandos { max-width: 30rem; }
+  .theme-descendimiento .dsc-punto h3 { font-size: 1.8rem; }
+}
+
+/* 08 · rosa de los vientos y separadores, fuera de la pintura */
+.theme-meg .meg-mandos { position: relative; }
+.theme-meg .meg-mandos::before {
+  content: ""; position: absolute; top: 0.6rem; right: 0.6rem; width: 3.2rem; aspect-ratio: 1; opacity: 0.5; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100' fill='none' stroke='%23e8c89a' stroke-width='1.6'%3E%3Ccircle r='34'/%3E%3Ccircle r='24' stroke-dasharray='2 4'/%3E%3Cpath d='M0-48 6-6 0 0-6-6ZM0 48-6 6 0 0 6 6ZM-48 0-6-6 0 0-6 6ZM48 0 6 6 0 0 6-6Z' fill='%23e8c89a' fill-opacity='.35'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.theme-meg .meg-modos { margin-right: 3.6rem; }
+.theme-meg .meg-lista button { border-top-style: dotted; border-top-color: rgb(232 200 154 / 0.35); }
+.theme-meg .meg-lista button span { font-family: var(--f-display); font-style: italic; font-size: 0.95rem; border-style: double; border-width: 3px; }
+.theme-meg .meg-explora { background-image: radial-gradient(rgb(232 200 154 / 0.05) 1px, transparent 1px); background-size: 14px 14px; }
+
+/* 10 · escena de perspectiva: fondo y marco con más profundidad */
+.theme-dali .vd-marco { background: #020203; }
+
+/* Cierre V5.2: el numeral de sección ocupa su propia columna y no pisa el titular */
+.mu-sala [class$="-explora__cab"] { --num: clamp(5.5rem, 3rem + 12vw, 13rem); max-width: 56rem; padding-right: calc(var(--num) * 0.8); }
+.mu-sala [class$="-explora__cab"]::before { font-size: var(--num); }
+.mu-sala [class$="-explora__cab"] p { max-width: 36rem; }

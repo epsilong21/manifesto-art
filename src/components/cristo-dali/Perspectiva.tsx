@@ -12,7 +12,7 @@ const focal = (grados: number) => 112 + (175 - 112) * Math.min(1, grados / 58);
 const CX = 50;
 const CY = 55;
 const OBJETIVO: V = [0, -5.2, 0];
-const LUZ: V = norm([-0.5, 0.8, 0.6]);
+const LUZ: V = norm([-0.65, 0.85, 0.4]);
 
 function norm(v: V): V {
   const l = Math.hypot(v[0], v[1], v[2]);
@@ -66,18 +66,22 @@ export function Perspectiva({ elev }: { elev: number }) {
   const c = camara(elev);
   const F = c.F;
   // Caras visibles, de más lejos a más cerca
-  const caras: { d: string; fill: string; z: number }[] = [];
+  const caras: { d: string; fill: string; z: number; l: number }[] = [];
   for (const b of CRUZ) {
     const vs = vertices(b).map((v) => ({ v, p: c.proyecta(v) }));
     for (const { n, v } of NORMALES) {
       const centro: V = [0, 1, 2].map((k) => v.reduce((s, i) => s + vs[i].v[k], 0) / 4) as V;
       if (dot(n, sub(c.pos, centro)) <= 0) continue;
       const l = Math.max(0, dot(n, LUZ));
-      const k = 0.22 + 0.78 * l;
+      // Luz directa con mucho contraste; la sombra se enfría hacia un azul profundo
+      const k = 0.1 + 1.0 * Math.pow(l, 1.15);
+      const frio = (1 - l) * 0.45;
+      const tono = (c0: number, f0: number) => Math.min(255, Math.round((c0 * k) * (1 - frio) + f0 * frio));
       const pts = v.map((i) => vs[i].p);
       caras.push({
         d: `M${pts.map((p) => `${p[0].toFixed(2)},${p[1].toFixed(2)}`).join(" L")}Z`,
-        fill: `rgb(${Math.round(b.color[0] * k)},${Math.round(b.color[1] * k)},${Math.round(b.color[2] * k)})`,
+        fill: `rgb(${tono(b.color[0], 18)},${tono(b.color[1], 28)},${tono(b.color[2], 60)})`,
+        l,
         z: pts.reduce((s, p) => s + p[2], 0) / 4,
       });
     }
@@ -106,13 +110,25 @@ export function Perspectiva({ elev }: { elev: number }) {
       <defs>
         <linearGradient id="vd-cielo" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#040405" />
-          <stop offset="0.62" stopColor="#0a0907" />
-          <stop offset="0.86" stopColor="#3b3626" />
-          <stop offset="1" stopColor="#6d6444" />
+          <stop offset="0.5" stopColor="#0a0a10" />
+          <stop offset="0.74" stopColor="#1b1a22" />
+          <stop offset="0.87" stopColor="#6a5a3c" />
+          <stop offset="1" stopColor="#b08f55" />
         </linearGradient>
         <linearGradient id="vd-agua" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#2a3a5c" />
           <stop offset="1" stopColor="#0d1424" />
+        </linearGradient>
+        <filter id="vd-sombra" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="1.4" dy="2.2" stdDeviation="1.6" floodColor="#000" floodOpacity="0.75" />
+        </filter>
+        <radialGradient id="vd-vineta" cx="0.5" cy="0.45" r="0.75">
+          <stop offset="0.55" stopColor="#000" stopOpacity="0" />
+          <stop offset="1" stopColor="#000" stopOpacity="0.7" />
+        </radialGradient>
+        <linearGradient id="vd-haz" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#f1dca0" stopOpacity="0.16" />
+          <stop offset="1" stopColor="#f1dca0" stopOpacity="0" />
         </linearGradient>
         <radialGradient id="vd-halo" cx="0.5" cy="0.5" r="0.5">
           <stop offset="0" stopColor="#c9a24a" stopOpacity="0.28" />
@@ -142,10 +158,12 @@ export function Perspectiva({ elev }: { elev: number }) {
           <line x1={bordeDer[0]} y1={bordeDer[1]} x2={CX} y2={vpY} />
         </g>
       ) : null}
+      {/* Haz de luz cenital */}
+      <polygon points={`${CX - 6},0 ${CX + 6},0 ${CX + 30},${HORIZONTE_Y} ${CX - 30},${HORIZONTE_Y}`} fill="url(#vd-haz)" />
       {/* La cruz */}
-      <g strokeLinejoin="round">
+      <g strokeLinejoin="round" filter="url(#vd-sombra)">
         {caras.map((f, i) => (
-          <path key={i} d={f.d} fill={f.fill} stroke="#f1dca0" strokeOpacity="0.28" strokeWidth="0.22" />
+          <path key={i} d={f.d} fill={f.fill} stroke="#ffe9b0" strokeOpacity={0.08 + 0.5 * f.l} strokeWidth="0.2" />
         ))}
       </g>
       {/* Figura abstracta */}
@@ -161,6 +179,7 @@ export function Perspectiva({ elev }: { elev: number }) {
         </g>
       ) : null}
       {brecha > 10 ? <text x={W - 2} y={6} textAnchor="end" className="vd-rot vd-rot--oro">{`Cruz a ${Math.round(elev)}° · paisaje a ${MIRADA_PAISAJE}°`}</text> : null}
+      <rect width={W} height={H} fill="url(#vd-vineta)" pointerEvents="none" />
     </svg>
   );
 }

@@ -9,6 +9,7 @@ import { cormorant } from "@/lib/fonts/cormorant";
 import "../sprint.css";
 import "./pecados.css";
 import "../pulido.css";
+import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
 export const metadata: Metadata = {
   title: "Los siete pecados capitales, atribuida a El Bosco — MANIFESTO",
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 export default function PecadosPage() {
   return (
     <div className={`mf-theme mu-sala theme-pec ${cormorant.variable}`}>
+      <FundidoEstados />
       <ConceptHeader />
       <main>
         <section className="pec-hero" aria-labelledby="pec-titulo">

@@ -92,11 +92,11 @@ export function ConceptFooter({
           <h2 className="mf-footer__h">MANIFESTO</h2>
           <ul>
             <li>
-              <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"}>Diez obras, diez universos</Link>
+              <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"} prefetch={false}>Diez obras, diez universos</Link>
             </li>
             {ENTRADA_SELECTOR ? null : (
               <li>
-                <Link href="/">Portada</Link>
+                <Link href="/" prefetch={false}>Portada</Link>
               </li>
             )}
           </ul>

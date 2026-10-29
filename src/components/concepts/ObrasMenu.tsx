@@ -100,13 +100,13 @@ export function ObrasMenu({ actual }: { actual?: Concepto["slug"] }) {
         </ol>
         <ul className="mf-obras__extra">
           <li>
-            <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"} onClick={() => cerrar()}>
+            <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"} prefetch={false} onClick={() => cerrar()}>
               Ver las diez obras
             </Link>
           </li>
           {ENTRADA_SELECTOR ? null : (
             <li>
-              <Link href="/" onClick={() => cerrar()}>
+              <Link href="/" prefetch={false} onClick={() => cerrar()}>
                 Portada
               </Link>
             </li>

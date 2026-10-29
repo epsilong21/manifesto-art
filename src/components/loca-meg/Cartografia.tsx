@@ -88,7 +88,7 @@ export function Cartografia() {
               </svg>
               {mapa
                 ? TERRITORIOS.map((x, k) => {
-                    const p = x.zona ? { left: x.zona.x, top: Math.max(x.zona.y, 0.05) } : x.anillos ? { left: x.anillos[0].x, top: x.anillos[0].y } : null;
+                    const p = x.zona ? { left: x.zona.x, top: Math.max(x.zona.y, 0.12) } : x.anillos ? { left: x.anillos[0].x, top: Math.max(x.anillos[0].y, 0.12) } : null;
                     return p ? (
                       <span key={x.id} className="meg-rotulo" style={{ left: `${p.left * 100}%`, top: `${p.top * 100}%` }} aria-hidden="true">
                         <b>{k + 1}</b>

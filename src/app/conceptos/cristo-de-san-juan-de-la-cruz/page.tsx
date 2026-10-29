@@ -10,6 +10,7 @@ import { instrument } from "@/lib/fonts/instrument";
 import "../sprint.css";
 import "./cristo-dali.css";
 import "../pulido.css";
+import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
 export const metadata: Metadata = {
   title: "Cristo de San Juan de la Cruz, de Dalí — MANIFESTO",
@@ -27,6 +28,7 @@ export const metadata: Metadata = {
 export default function CristoDaliPage() {
   return (
     <div className={`mf-theme mu-sala theme-dali ${instrument.variable}`}>
+      <FundidoEstados />
       <ConceptHeader />
       <main>
         <section className="vd-hero" aria-labelledby="vd-titulo">

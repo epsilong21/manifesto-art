@@ -39,7 +39,7 @@ export function PieObra({ actual, imagen, nota, fuentes }: { actual: Concepto["s
         <div>
           <h2 className="mf-footer__h">MANIFESTO</h2>
           <ul>
-            <li><Link href="/conceptos">Todas las obras</Link></li>
+            <li><Link href="/conceptos" prefetch={false}>Todas las obras</Link></li>
             <li><Link href="/aviso-legal">Aviso legal</Link></li>
             <li><Link href="/politica-de-privacidad">Política de privacidad</Link></li>
           </ul>
