@@ -47,7 +47,7 @@ páginas se crean a mano una sola vez y el resto no cambia:
 
 1. **Acceso del CLI para crear páginas** (abre el navegador; entra con la cuenta dueña de la tienda):
    ```
-   shopify store auth --store manifestocol.myshopify.com --scopes read_content,write_content
+   shopify store auth --store 539bc0.myshopify.com --scopes read_content,write_content
    ```
 2. **Empaquetar:** `npm run shopify:empaquetar`
 3. **Subir al tema en vivo** (solo añade archivos; no toca el resto del tema):

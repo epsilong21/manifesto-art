@@ -3,7 +3,7 @@
 //       npm run shopify:crear-paginas                   → las crea en la tienda
 //
 // Requisito (una vez): dar acceso al CLI para gestionar páginas, iniciando sesión con la cuenta dueña de la tienda:
-//       shopify store auth --store manifestocol.myshopify.com --scopes read_content,write_content
+//       shopify store auth --store 539bc0.myshopify.com --scopes read_content,write_content
 //
 // Cada página es /pages/<handle> y usa la plantilla page.<handle>.liquid del tema (la genera shopify:empaquetar).
 // Si la página ya existe solo se corrige su plantilla; nunca se borra ni se cambia su contenido.
@@ -12,7 +12,8 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const TIENDA = "manifestocol.myshopify.com";
+// Dominio permanente de la tienda (manifestocol.myshopify.com es un alias): es el que devuelve Shopify al autorizar
+const TIENDA = "539bc0.myshopify.com";
 const soloMostrar = process.argv.includes("--mostrar");
 
 const PAGINAS = [

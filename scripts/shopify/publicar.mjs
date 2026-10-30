@@ -2,7 +2,7 @@
 // Uso:  npm run shopify:publicar
 //       npm run shopify:publicar -- --tema 182672720169     (otro tema; por defecto, el publicado hoy)
 //
-// Requisito (una sola vez): shopify store auth --store manifestocol.myshopify.com --scopes read_content,write_content
+// Requisito (una sola vez): shopify store auth --store 539bc0.myshopify.com --scopes read_content,write_content
 // Solo AÑADE o reemplaza archivos de la web (assets/*, las plantillas page.obra* y el snippet obra-manifesto); no toca el
 // resto del tema. Procedimiento completo: scripts/shopify/LEEME.md
 import { spawnSync } from "node:child_process";
