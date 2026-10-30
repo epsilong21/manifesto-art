@@ -1,6 +1,6 @@
 import { MEG_IMG as I, RESTAURACION as R } from "@/content/loca-meg";
+import { rutaPublica } from "@/lib/rutaPublica";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
 /**
@@ -24,7 +24,7 @@ export function Restauracion() {
           <div className="meg-resta__caja">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`${BASE}${I.base}-${I.anchos[1]}.webp`}
+              src={`${rutaPublica(I.base)}-${I.anchos[1]}.webp`}
               width={I.width}
               height={I.height}
               alt="Detalle del cielo del centro del cuadro, entre el rojo del incendio, con tonos verdosos."

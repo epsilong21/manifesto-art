@@ -10,6 +10,8 @@ const eslintConfig = defineConfig([
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
+    // Tema de Shopify generado (npm run shopify:empaquetar)
+    "shopify-tema/**",
     "build/**",
     "next-env.d.ts",
   ]),

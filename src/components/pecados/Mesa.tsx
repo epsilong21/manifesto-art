@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { CIERRE_OJO, CIRCULO as C, ESCENAS, PEC_IMG as I, TOTAL_ESCENAS, type Escena } from "@/content/pecados";
+import { rutaPublica } from "@/lib/rutaPublica";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const SRC = `${BASE}${I.base}-${I.anchos[1]}.webp`;
+const SRC = `${rutaPublica(I.base)}-${I.anchos[1]}.webp`;
 const VB_H = I.ratio * 100;
 /** Nitidez: como mucho 1,35 píxeles CSS por píxel de la reproducción (2000 px), y nunca más de 5×. */
 const NITIDEZ = 1.35;

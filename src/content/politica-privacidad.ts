@@ -24,6 +24,7 @@ export const AREA_ATENCION = "Atención de consultas y reclamos de MANIFESTO S.A
 export const PROVEEDORES = {
   githubPages: "https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection",
   githubPrivacidad: "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+  shopifyPrivacidad: "https://www.shopify.com/legal/privacy",
   googlePrivacidad: "https://policies.google.com/privacy?hl=es",
 };
 

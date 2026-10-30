@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { CONCEPTOS } from "@/content/conceptos";
 import { PRODUCTOS, imagenProducto, urlProducto } from "@/content/tienda";
+import { slugDeObra } from "@/lib/rutaObra";
 
 /**
  * Banda bajo cada obra: la prenda de la tienda de MANIFESTO inspirada en ella. Se decide por la ruta, así queda fuera
@@ -10,7 +11,7 @@ import { PRODUCTOS, imagenProducto, urlProducto } from "@/content/tienda";
  */
 export function ProductoDeLaObra() {
   const ruta = usePathname() ?? "";
-  const slug = ruta.split("/").filter(Boolean).pop() ?? "";
+  const slug = slugDeObra(ruta);
   const producto = PRODUCTOS[slug];
   const obra = CONCEPTOS.find((c) => c.slug === slug);
   if (!producto || !obra) return null;

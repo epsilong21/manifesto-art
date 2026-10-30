@@ -62,3 +62,6 @@ assets-source/glenn-referencia/*.jpg
 # Capturas sueltas de QA: se conservan en local; en Git solo informes y herramientas
 presentation-review/**/*.jpg
 presentation-review/**/*.png
+
+# Tema de Shopify generado (npm run shopify:empaquetar)
+/shopify-tema/

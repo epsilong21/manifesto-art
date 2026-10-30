@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { DESC_IMG as I, DIAGONAL, LUZ, MANOS, MEDIDAS } from "@/content/descendimiento";
+import { rutaPublica } from "@/lib/rutaPublica";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const SRC = `${BASE}${I.base}-${I.anchos[1]}.webp`;
+const SRC = `${rutaPublica(I.base)}-${I.anchos[1]}.webp`;
 const ACTOS = ["La diagonal", "Las manos", "El claroscuro"] as const;
 const ROMANOS = ["I", "II", "III"];
 const N = DIAGONAL.length - 1;

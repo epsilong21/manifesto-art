@@ -46,7 +46,13 @@ Consulta [`CREDITOS.md`](CREDITOS.md). *Los elefantes* de Dalí es una obra prot
 
 *Untitled* y *Glenn* de Basquiat también están protegidas y no hay licencia de reproducción: el repositorio no incluye las pinturas y las páginas no las muestran.
 
-## Publicación y dominio propio
+## Publicación oficial: dentro de Shopify
+
+La web oficial se sirve desde el tema de Shopify (`manifestocol.com/pages/obras`, `/pages/obra-medusa`…), sin GitHub ni DNS
+aparte: `npm run shopify:empaquetar` genera los archivos del tema y `npm run shopify:crear-paginas` crea las páginas.
+Procedimiento completo en [`scripts/shopify/LEEME.md`](scripts/shopify/LEEME.md).
+
+## GitHub Pages (entorno de pruebas) y dominio propio
 
 Cada `push` a `main` publica la web sola (GitHub Actions → GitHub Pages, ~1–2 min). No hay que desplegar nada a mano:
 modificar la web «en vivo» es hacer un commit en `main`. Si el despliegue falla por una descarga de fuentes de Google en el

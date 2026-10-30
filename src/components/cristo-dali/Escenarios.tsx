@@ -1,8 +1,8 @@
 import { DALI_IMG as I, NUCLEO as N, PERFIL_LUZ } from "@/content/cristo-dali";
+import { rutaPublica } from "@/lib/rutaPublica";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const VB_H = I.ratio * 100;
-const SRC = `${BASE}${I.base}-${I.anchos[1]}.webp`;
+const SRC = `${rutaPublica(I.base)}-${I.anchos[1]}.webp`;
 
 /** Centro de la franja iluminada para un recorrido t (0–1). */
 export const centroFranja = (t: number) => 0.08 + 0.87 * t;

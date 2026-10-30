@@ -9,6 +9,9 @@
     "lint": "eslint",
     "build:pages": "node scripts/pages/exportar.mjs",
     "typecheck": "next typegen && tsc --noEmit",
+    "shopify:empaquetar": "node scripts/shopify/empaquetar.mjs",
+    "shopify:publicar": "node scripts/shopify/publicar.mjs",
+    "shopify:crear-paginas": "node scripts/shopify/crear-paginas.mjs",
     "tienda:actualizar": "node scripts/tienda/actualizar.mjs",
     "preview:pages": "node scripts/pages/servir.mjs out /manifesto-art 4010",
     "glenn:registrar": "node scripts/glenn/registrar.mjs"

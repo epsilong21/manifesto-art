@@ -6,6 +6,7 @@ import { AREA_ATENCION, ENTRADA_EN_VIGENCIA, PROVEEDORES, SECCIONES_POLITICA } f
 import "../conceptos/conceptos.css";
 import "../aviso-legal/aviso-legal.css";
 import "./politica-privacidad.css";
+import { EN_SHOPIFY } from "@/lib/destino";
 
 export const metadata: Metadata = {
   title: "Política de tratamiento de datos personales — MANIFESTO",
@@ -228,14 +229,28 @@ export default function PoliticaPrivacidadPage() {
                 <span className="al-n">7</span> Proveedores externos
               </h2>
               <p>MANIFESTO se apoya en dos servicios de terceros, cada uno sujeto a su propia política de privacidad:</p>
-              <h3>GitHub Pages (GitHub, Inc.): alojamiento del sitio</h3>
-              <p>
-                Según la documentación de GitHub, cuando se visita un sitio de GitHub Pages la dirección IP del visitante se
-                registra y almacena por motivos de seguridad, haya iniciado sesión en GitHub o no. Ese registro lo realiza
-                GitHub; MANIFESTO no lo utiliza. Más información en la{" "}
-                <Fuente href={PROVEEDORES.githubPages}>documentación de GitHub Pages</Fuente> y en la{" "}
-                <Fuente href={PROVEEDORES.githubPrivacidad}>declaración de privacidad de GitHub</Fuente>.
-              </p>
+              {EN_SHOPIFY ? (
+                <>
+                  <h3>Shopify (Shopify Inc.): alojamiento del sitio</h3>
+                  <p>
+                    Este sitio se aloja en la plataforma de Shopify, la misma de la tienda de MANIFESTO. Al visitarlo, Shopify
+                    trata datos técnicos de la visita, como la dirección IP, para prestar el servicio y por seguridad. Ese
+                    registro lo realiza Shopify; MANIFESTO no lo utiliza. Más información en la{" "}
+                    <Fuente href={PROVEEDORES.shopifyPrivacidad}>política de privacidad de Shopify</Fuente>.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h3>GitHub Pages (GitHub, Inc.): alojamiento del sitio</h3>
+                  <p>
+                    Según la documentación de GitHub, cuando se visita un sitio de GitHub Pages la dirección IP del visitante se
+                    registra y almacena por motivos de seguridad, haya iniciado sesión en GitHub o no. Ese registro lo realiza
+                    GitHub; MANIFESTO no lo utiliza. Más información en la{" "}
+                    <Fuente href={PROVEEDORES.githubPages}>documentación de GitHub Pages</Fuente> y en la{" "}
+                    <Fuente href={PROVEEDORES.githubPrivacidad}>declaración de privacidad de GitHub</Fuente>.
+                  </p>
+                </>
+              )}
               <h3>Gmail (Google): correo electrónico</h3>
               <p>
                 El correo <Correo /> es una cuenta de Gmail, el servicio de correo de Google. Los mensajes que se envían a

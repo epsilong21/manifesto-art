@@ -5,8 +5,8 @@ import { GlennGrafico } from "@/components/concepts/GlennGrafico";
 import { ALT, IMAGEN_NEXT, IMAGEN_PLANA, RATIO_GRAFICO } from "@/content/catalogo";
 import type { Concepto } from "@/content/conceptos";
 import { miniaturaProtegida } from "@/lib/miniaturas";
+import { rutaPublica } from "@/lib/rutaPublica";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 type Origen = { tipo: "next"; src: string; width: number; height: number } | { tipo: "plana"; base: string; anchos: [number, number]; width: number; height: number } | { tipo: "grafico" };
 
@@ -55,7 +55,7 @@ export function ImagenObra({
   if (o.tipo === "plana") {
     const [a, b] = o.anchos;
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={`${BASE}${o.base}-${a}.webp`} srcSet={`${BASE}${o.base}-${a}.webp ${a}w, ${BASE}${o.base}-${b}.webp ${b}w`} sizes={sizes} width={o.width} height={o.height} alt="" className={className} style={{ aspectRatio: `${o.width} / ${o.height}` }} decoding="async" loading={prioridad || ansiosa ? "eager" : "lazy"} fetchPriority={prioridad ? "high" : undefined} />;
+    return <img src={`${rutaPublica(o.base)}-${a}.webp`} srcSet={`${rutaPublica(o.base)}-${a}.webp ${a}w, ${rutaPublica(o.base)}-${b}.webp ${b}w`} sizes={sizes} width={o.width} height={o.height} alt="" className={className} style={{ aspectRatio: `${o.width} / ${o.height}` }} decoding="async" loading={prioridad || ansiosa ? "eager" : "lazy"} fetchPriority={prioridad ? "high" : undefined} />;
   }
   if (slug === "basquiat-untitled") return <BasquiatGrafico className={className} />;
   if (slug === "glenn") return <GlennGrafico className={className} />;

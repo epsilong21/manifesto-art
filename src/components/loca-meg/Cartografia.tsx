@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { MEG_IMG as I, PISTAS, TERRITORIOS, type Punto, type Zona } from "@/content/loca-meg";
+import { rutaPublica } from "@/lib/rutaPublica";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const SRC = `${BASE}${I.base}-${I.anchos[1]}.webp`;
-const MINI = `${BASE}${I.base}-${I.anchos[0]}.webp`;
+const SRC = `${rutaPublica(I.base)}-${I.anchos[1]}.webp`;
+const MINI = `${rutaPublica(I.base)}-${I.anchos[0]}.webp`;
 const VB_H = I.ratio * 100;
 const ROMANOS = ["I", "II", "III", "IV", "V"];
 const COLUMNAS = "ABCDEFGH";

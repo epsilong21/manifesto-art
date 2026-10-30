@@ -28,7 +28,8 @@ const out = join(raiz, "out");
 // Con un dominio propio, `public/CNAME` lleva solo su nombre (p. ej. obras.manifestocol.com): la web se construye
 // para la raíz de ese dominio (sin prefijo) y las URL canónicas, el mapa del sitio y robots.txt usan ese dominio.
 const dominio = existsSync(join(raiz, "public/CNAME")) ? readFileSync(join(raiz, "public/CNAME"), "utf8").trim() : "";
-const base = dominio ? "" : (process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art");
+// Exportación para el tema de Shopify (npm run shopify:empaquetar): las páginas son plantillas del tema, sin prefijo
+const base = dominio || process.env.MANIFESTO_SHOPIFY === "1" ? "" : (process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art");
 const publicacion = esPublicacion();
 
 // Los elefantes: la misma elección que hará next.config.ts dentro del build

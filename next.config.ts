@@ -11,6 +11,8 @@ import { elegirReproduccion as elegirReproduccionGlenn } from "./scripts/glenn/r
  *   estática bajo un subdirectorio, con las imágenes pregeneradas.
  */
 const pages = process.env.MANIFESTO_DESTINO === "pages";
+// Exportación para el tema de Shopify (scripts/shopify/): CSS en archivos aparte y rutas de /public con nombres planos
+const shopify = process.env.MANIFESTO_SHOPIFY === "1";
 const basePath = pages ? (process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art") : "";
 // Reproducción de Los elefantes para este build (null: la página usa su alternativa)
 const { elegida: reproduccion } = elegirReproduccion();
@@ -26,11 +28,13 @@ const nextConfig: NextConfig = {
   experimental: {
     // CSS en el <head>: elimina 3-4 peticiones bloqueantes en cada primera visita.
     // El CSS total es pequeño (Tailwind + estilos propios), así que compensa.
-    inlineCss: true,
+    // (En Shopify cada página es una plantilla de Liquid con un límite de tamaño: el CSS va en assets.)
+    inlineCss: !shopify,
   },
   // Rutas a /public escritas a mano (p. ej. texturas en SVG) necesitan el prefijo
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
+    NEXT_PUBLIC_DESTINO: shopify ? "shopify" : "",
     // «selector»: la entrada es el selector de tres obras y la navegación no ofrece otra portada
     NEXT_PUBLIC_MANIFESTO_ENTRADA: process.env.MANIFESTO_ENTRADA ?? "portada",
     // Solo los datos de la reproducción elegida (ver src/content/elefantes.ts); vacío si no hay

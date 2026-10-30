@@ -12,6 +12,7 @@ import { hayImagenElefantes } from "@/lib/obraElefantes";
 import { hayImagenGlenn } from "@/lib/obraGlenn";
 import "../conceptos/conceptos.css";
 import "./aviso-legal.css";
+import { EN_SHOPIFY } from "@/lib/destino";
 
 export const metadata: Metadata = {
   title: "Aviso legal y derechos de reproducción — MANIFESTO",
@@ -234,12 +235,18 @@ export default function AvisoLegalPage() {
                 colaboración ni autorización de reproducción.
               </p>
               <p>
-                Los créditos de cada obra están en el <a href="#obras">anexo</a> y en el pie de su página; las fuentes,
-                procedencia y condiciones de cada imagen, en el{" "}
-                <a href={CREDITOS_URL} target="_blank" rel="noopener noreferrer">
-                  registro de créditos del sitio
-                </a>
-                .
+                Los créditos de cada obra están en el <a href="#obras">anexo</a> y en el pie de su página
+                {EN_SHOPIFY ? (
+                  ", donde figuran también las fuentes, la procedencia y las condiciones de cada imagen."
+                ) : (
+                  <>
+                    ; las fuentes, procedencia y condiciones de cada imagen, en el{" "}
+                    <a href={CREDITOS_URL} target="_blank" rel="noopener noreferrer">
+                      registro de créditos del sitio
+                    </a>
+                    .
+                  </>
+                )}
               </p>
             </section>
 

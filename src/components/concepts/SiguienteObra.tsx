@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { CONCEPTOS, type Concepto } from "@/content/conceptos";
+import { slugDeObra } from "@/lib/rutaObra";
 
 const TOTAL = String(CONCEPTOS.length).padStart(2, "0");
 
@@ -36,7 +37,7 @@ function Tarjeta({ obra, etiqueta, lamina }: { obra: Concepto; etiqueta: string;
  */
 export function SiguienteObra({ laminas }: { laminas: Record<string, ReactNode> }) {
   const ruta = usePathname() ?? "";
-  const slug = ruta.split("/").filter(Boolean).pop() ?? "";
+  const slug = slugDeObra(ruta);
   const i = CONCEPTOS.findIndex((c) => c.slug === slug);
   if (i < 0) return null;
 

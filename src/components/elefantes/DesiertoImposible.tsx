@@ -5,6 +5,7 @@ import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { KindTag } from "@/components/concepts/ConceptChrome";
 import { CAPAS_ELEFANTES, CONTEXTO_ELEFANTES, DESIERTO, type Capa } from "@/content/elefantes";
 import { DUNAS, MESAS, MOJON, MONOLITO, PUERTA, ROCA, type Pieza } from "./desierto/geometria";
+import { rutaPublica } from "@/lib/rutaPublica";
 
 type Punto =
   | { id: Capa["id"]; tipo: "concepto"; num: string; capa: Capa }
@@ -370,7 +371,7 @@ export function DesiertoImposible() {
             <stop offset="1" stopColor="#efe1c9" stopOpacity="0.7" />
           </linearGradient>
           <pattern id="ds-mineral" width="160" height="160" patternUnits="userSpaceOnUse">
-            <image href={`${process.env.NEXT_PUBLIC_BASE_PATH}/texturas/mineral.png`} width="160" height="160" />
+            <image href={rutaPublica("/texturas/mineral.png")} width="160" height="160" />
           </pattern>
         </defs>
       </svg>

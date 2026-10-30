@@ -1,0 +1,78 @@
+{%- comment -%}
+  Obra de arte de la prenda: enlaza la página de producto con la experiencia interactiva de esa obra en la web de arte
+  de MANIFESTO. Cada prenda se relaciona con su obra por el handle del producto (no hace falta tocar los productos).
+  Para una prenda nueva, añade su handle en el `case` de abajo. Las obras viven en el propio tema: /pages/obra-<obra>
+  (npm run shopify:empaquetar en el repositorio de la web de arte).
+  Parámetros: product, block.
+{%- endcomment -%}
+{%- assign base_url = routes.root_url | append: 'pages/obra-' -%}
+{%- assign obras = '' -%}
+{%- case product.handle -%}
+  {%- when 'camiseta-semioversize-medusa' -%}
+    {%- assign obras = 'medusa' -%}
+  {%- when 'camiseta-regular-noche-estrellada' -%}
+    {%- assign obras = 'noche-estrellada' -%}
+  {%- when 'camiseta-regular-noche-de-van-gogh' -%}
+    {%- assign obras = 'los-elefantes' -%}
+  {%- when 'camiseta-regular-basquiat' -%}
+    {%- assign obras = 'basquiat-untitled,glenn' -%}
+  {%- when 'camiseta-oversize-woman-ochre-copia', 'crop-top-ascencion-al-empireo' -%}
+    {%- assign obras = 'ascension-al-empireo' -%}
+  {%- when 'camiseta-regular-descendimiento-de-la-cruz' -%}
+    {%- assign obras = 'el-descendimiento-de-la-cruz' -%}
+  {%- when 'camiseta-oversize-dullet-griet' -%}
+    {%- assign obras = 'la-loca-meg' -%}
+  {%- when 'crop-top-mesa-de-los-pecados' -%}
+    {%- assign obras = 'los-siete-pecados-capitales' -%}
+  {%- when 'camiseta-regular-cristo-de-san-juan' -%}
+    {%- assign obras = 'cristo-de-san-juan-de-la-cruz' -%}
+{%- endcase -%}
+
+{%- if obras != blank -%}
+  {%- assign lista_obras = obras | split: ',' -%}
+  <div class="msto-obra"{% if block.settings.margin != blank %} style="margin:{{ block.settings.margin }}"{% endif %}>
+    <p class="msto-obra__k">{{ block.settings.heading | default: 'Esta prenda es una obra' }}</p>
+    {%- for slug in lista_obras -%}
+      {%- case slug -%}
+        {%- when 'medusa' -%}
+          {%- assign titulo_obra = 'Medusa' -%}{%- assign autor_obra = 'Caravaggio, hacia 1597–1598' -%}
+        {%- when 'noche-estrellada' -%}
+          {%- assign titulo_obra = 'La noche estrellada' -%}{%- assign autor_obra = 'Vincent van Gogh, 1889' -%}
+        {%- when 'los-elefantes' -%}
+          {%- assign titulo_obra = 'Los elefantes' -%}{%- assign autor_obra = 'Salvador Dalí, 1948' -%}
+        {%- when 'basquiat-untitled' -%}
+          {%- assign titulo_obra = 'Untitled' -%}{%- assign autor_obra = 'Jean-Michel Basquiat, 1981' -%}
+        {%- when 'glenn' -%}
+          {%- assign titulo_obra = 'Glenn' -%}{%- assign autor_obra = 'Jean-Michel Basquiat, 1984–1985' -%}
+        {%- when 'ascension-al-empireo' -%}
+          {%- assign titulo_obra = 'La ascensión al Empíreo' -%}{%- assign autor_obra = 'El Bosco, hacia 1505–1515' -%}
+        {%- when 'el-descendimiento-de-la-cruz' -%}
+          {%- assign titulo_obra = 'El descendimiento de la cruz' -%}{%- assign autor_obra = 'Peter Paul Rubens, 1611–1614' -%}
+        {%- when 'la-loca-meg' -%}
+          {%- assign titulo_obra = 'La loca Meg' -%}{%- assign autor_obra = 'Pieter Bruegel el Viejo, 1563' -%}
+        {%- when 'los-siete-pecados-capitales' -%}
+          {%- assign titulo_obra = 'Los siete pecados capitales' -%}{%- assign autor_obra = 'Atribuida a El Bosco, hacia 1505–1510' -%}
+        {%- when 'cristo-de-san-juan-de-la-cruz' -%}
+          {%- assign titulo_obra = 'Cristo de San Juan de la Cruz' -%}{%- assign autor_obra = 'Salvador Dalí, 1951' -%}
+      {%- endcase -%}
+      <div class="msto-obra__fila">
+        <div class="msto-obra__txt">
+          <strong>{{ titulo_obra }}</strong>
+          <span>{{ autor_obra }}</span>
+        </div>
+        <a class="msto-obra__btn" href="{{ base_url }}{{ slug }}">{{ block.settings.button | default: 'Ver la obra' }}</a>
+      </div>
+    {%- endfor -%}
+  </div>
+  <style>
+    .msto-obra { margin: 20px 0; padding: 18px 20px; border: 1px solid #000; }
+    .msto-obra__k { margin: 0 0 12px; color: #ce0909; font-size: 12px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; }
+    .msto-obra__fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .msto-obra__fila + .msto-obra__fila { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e5e5e5; }
+    .msto-obra__txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .msto-obra__txt strong { color: #000; font-size: 16px; font-weight: 500; }
+    .msto-obra__txt span { color: #868686; font-size: 14px; }
+    .msto-obra__btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 22px; border: 1px solid #000; color: #000; font-size: 12px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; text-decoration: none; transition: background-color .25s, border-color .25s, color .25s; }
+    .msto-obra__btn:hover { background: #ff0000; border-color: #ff0000; color: #fff; }
+  </style>
+{%- endif -%}

@@ -2,8 +2,8 @@
 
 import { useRef } from "react";
 import { DALI_IMG as I } from "@/content/cristo-dali";
+import { rutaPublica } from "@/lib/rutaPublica";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 /**
  * Modo de contemplación: la pintura a toda la altura, sobre negro, sin más control que cerrar.
@@ -26,7 +26,7 @@ export function Contemplar() {
           ×
         </button>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`${BASE}${I.base}-${I.anchos[1]}.webp`} width={I.width} height={I.height} alt={I.alt} decoding="async" onClick={() => ref.current?.close()} />
+        <img src={`${rutaPublica(I.base)}-${I.anchos[1]}.webp`} width={I.width} height={I.height} alt={I.alt} decoding="async" onClick={() => ref.current?.close()} />
       </dialog>
     </>
   );

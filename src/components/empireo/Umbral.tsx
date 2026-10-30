@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import { ATMOSFERAS, EMPIREO_IMG as I, ESTACIONES, luzEn, PERFIL_LUZ } from "@/content/empireo";
 import { crearUmbral, type Umbral as Motor } from "./umbralGL";
+import { rutaPublica } from "@/lib/rutaPublica";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const IMG = `${BASE}${I.base}-${I.anchos[1]}.webp`;
+const IMG = `${rutaPublica(I.base)}-${I.anchos[1]}.webp`;
 const ROMANOS = ["I", "II", "III", "IV", "V"];
 const MAX = ESTACIONES.length - 1;
 const LUCES = ESTACIONES.map((e) => Math.round(luzEn(e.y)));
