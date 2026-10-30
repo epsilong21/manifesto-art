@@ -1,14 +1,14 @@
 /* ─────────────────────────────────────────────────────────────
    Portada MANIFESTO · «La sala»
    Una sola idea: la pintura entera, sobre un halo de su propio color, y el friso de las
-   diez debajo. El resto es tipografía de la identidad madre (Archivo, contraste de anchuras).
+   diez debajo. El resto es tipografía de la identidad madre (Outfit, la fuente de la marca, en negro, blanco y rojo).
    Solo se animan opacidad y transform; todo se apaga con prefers-reduced-motion.
    ───────────────────────────────────────────────────────────── */
 
 @property --a {
   syntax: "<color>";
   inherits: true;
-  initial-value: #c98a4e;
+  initial-value: #ff0000;
 }
 
 .hm-hero {
@@ -49,23 +49,16 @@
 .hm-t {
   margin: 0;
   font-weight: 900;
-  font-size: clamp(2.1rem, min(13.2cqi, 10.5svh), 7rem);
-  line-height: 0.88;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.1rem, min(11cqi, 10svh), 6.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
 }
 .hm-t span { display: block; }
-.hm-t__a { font-variation-settings: "wdth" 62; text-wrap: balance; }
-.hm-t__b {
-  font-variation-settings: "wdth" 125;
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--c-ink);
-}
+.hm-t__a { text-wrap: balance; }
+.hm-t__b { font-weight: 200; }
 .hm-t__c {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  color: var(--a, var(--c-accent));
+  color: var(--c-accent);
 }
 .hm-intro {
   margin: 0;

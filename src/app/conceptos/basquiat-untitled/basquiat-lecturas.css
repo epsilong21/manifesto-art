@@ -120,7 +120,7 @@
 .bq-recorte__marco img { position: absolute; max-width: none; }
 .bq-recorte figcaption {
   margin-top: 0.5rem;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -149,7 +149,7 @@
 .bq-limite__k {
   display: block;
   margin-bottom: 0.35rem;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-style: normal;
   font-size: 0.6875rem;
   font-weight: 700;
@@ -177,7 +177,7 @@
 .bq-ciclo .bq-recorte { width: min(100%, 14rem); margin-bottom: 0.9rem; }
 .bq-ciclo p { margin: 0; }
 .bq-ciclo__k {
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -246,7 +246,7 @@
   display: inline-block;
   padding: 0.1rem 0.4rem;
   border: 1px dashed var(--bq-salmon);
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -281,7 +281,7 @@
   .bq-crono .bq-meta > span:last-child { flex-basis: 100%; }
 }
 .bq-crono__cuando {
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -305,7 +305,7 @@
   position: absolute;
   right: 0.25rem;
   top: 0.75rem;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--bq-amarillo);
@@ -327,7 +327,7 @@ h3.bq-exp__mas-t { margin: 0; }
 .bq-exp__grupo + .bq-exp__grupo { margin-top: 1.25rem; }
 .bq-exp__grupo h4 {
   margin: 0;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.12em;

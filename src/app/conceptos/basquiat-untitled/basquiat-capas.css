@@ -15,7 +15,7 @@
 .bq-capas__head { max-width: 46rem; margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
 .bq-capas__k {
   margin: 0 0 0.75rem;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -64,7 +64,7 @@
   border: 1px solid var(--c-line);
   background: transparent;
   color: var(--c-ink);
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -90,7 +90,7 @@
   border: 1px solid var(--c-line);
   background: transparent;
   color: var(--c-ink);
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -119,7 +119,7 @@
   margin-bottom: 0.6rem;
   padding-bottom: 0.4rem;
   border-bottom: 1px solid var(--c-line);
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -173,7 +173,7 @@
   border-radius: 50%;
   background: #121110;
   color: var(--c-ink);
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 700;
   line-height: 1;
@@ -207,7 +207,7 @@
   border: 2px solid #121110;
   background: var(--bq-amarillo);
   color: #121110;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 1.125rem;
   font-weight: 800;
   line-height: 1;
@@ -245,7 +245,7 @@
 
 .bq-panel__t {
   margin: 0 0 0.5rem;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -281,7 +281,7 @@
 }
 .bq-indice__n {
   flex: none;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -295,7 +295,7 @@
 }
 .bq-lectura__k {
   margin: 0 0 0.4rem;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -344,7 +344,7 @@
   border: 1px solid var(--c-line);
   background: transparent;
   color: var(--c-muted);
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -383,7 +383,7 @@
   height: 1.375rem;
   border: 2px solid var(--c);
   border-radius: 50%;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 700;
 }

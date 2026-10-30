@@ -170,7 +170,7 @@
   letter-spacing: 0.08em;
 }
 .gl-av__rot {
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--font-outfit), sans-serif;
   font-variation-settings: "wdth" 70;
   font-weight: 800;
   font-size: 1.56em;
@@ -228,7 +228,7 @@
 /* Piezas gráficas */
 .gl-av__hoja[data-pieza="letra"] { place-content: center; justify-items: center; background: #efebe1; }
 .gl-av__letra {
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--font-outfit), sans-serif;
   font-variation-settings: "wdth" 62;
   font-weight: 900;
   font-size: 12cqmin;
@@ -362,7 +362,7 @@
 .gl-av__ficha-cod { font-family: var(--gl-mono); font-size: 0.8125rem; color: var(--gl-luz); }
 .gl-av__ficha-t {
   margin: 0;
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--font-outfit), sans-serif;
   font-variation-settings: "wdth" 75;
   font-weight: 800;
   font-size: 1.375rem;

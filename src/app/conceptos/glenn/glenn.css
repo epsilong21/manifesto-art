@@ -124,7 +124,7 @@ html:has(.theme-glenn) { background: #0f0f0e; }
 
 .gl-t {
   margin: 0;
-  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-family: var(--font-outfit), "Arial Narrow", sans-serif;
   font-variation-settings: "wdth" 62;
   font-weight: 900;
   font-size: clamp(2.75rem, 13vw, 5.25rem);
@@ -401,7 +401,7 @@ html:has(.theme-glenn) { background: #0f0f0e; }
 }
 .gl-h2 {
   margin: 0;
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--font-outfit), sans-serif;
   font-variation-settings: "wdth" 62;
   font-weight: 900;
   font-size: clamp(2rem, 1.3rem + 3.5vw, 3.5rem);
@@ -673,7 +673,7 @@ html:has(.theme-glenn) { background: #0f0f0e; }
 .gl-ficha p { margin: 0; }
 .gl-ficha__t {
   margin: 0 0 0.5rem;
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--font-outfit), sans-serif;
   font-variation-settings: "wdth" 75;
   font-size: 1.25rem;
   font-weight: 800;
@@ -778,7 +778,7 @@ html:not(.js) .gl-lectura + .gl-lectura { margin-top: 2.5rem; }
 .gl-lectura__tesis {
   margin: 0 0 1.75rem;
   max-width: 40rem;
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--font-outfit), sans-serif;
   font-variation-settings: "wdth" 75;
   font-weight: 700;
   font-size: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);
@@ -861,7 +861,7 @@ html:not(.js) .gl-lectura + .gl-lectura { margin-top: 2.5rem; }
   color: #f0c53a;
 }
 .gl-relacion__t {
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--font-outfit), sans-serif;
   font-variation-settings: "wdth" 62;
   font-weight: 900;
   font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);

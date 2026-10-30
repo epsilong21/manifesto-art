@@ -123,7 +123,7 @@ export function ElefantesGrafico({ id, className }: { id: string; className?: st
       <rect width="800" height="640" filter={`url(#${grano})`} />
 
       {/* Los cinco misterios */}
-      <g className="eg-marcas" fontFamily="var(--font-archivo), system-ui, sans-serif" fontSize="13" fontWeight="600" textAnchor="middle">
+      <g className="eg-marcas" fontFamily="var(--font-outfit), system-ui, sans-serif" fontSize="13" fontWeight="600" textAnchor="middle">
         {[
           [401, 214, "1"],
           [366, 372, "2"],

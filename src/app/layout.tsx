@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Bodoni_Moda } from "next/font/google";
+import { Bodoni_Moda, Outfit } from "next/font/google";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -14,10 +14,10 @@ const bodoni = Bodoni_Moda({
   preload: false,
 });
 
-const archivo = Archivo({
-  variable: "--font-archivo",
+// Tipografía de la marca MANIFESTO (la misma de la tienda): Outfit, geométrica y sin serifas.
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
-  axes: ["wdth"],
   display: "swap",
 });
 
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c0b0d",
+  themeColor: "#000000",
   colorScheme: "dark",
 };
 
@@ -49,7 +49,7 @@ const bootScript = `document.documentElement.classList.add('js');`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" suppressHydrationWarning className={`${bodoni.variable} ${archivo.variable}`}>
+    <html lang="es" suppressHydrationWarning className={`${bodoni.variable} ${outfit.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

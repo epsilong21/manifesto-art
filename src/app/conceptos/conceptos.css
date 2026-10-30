@@ -12,12 +12,14 @@
   overflow-x: clip;
 }
 
+/* Universo de la marca: negro, blanco y rojo MANIFESTO, con Outfit también en los titulares */
 .theme-selector {
-  --c-bg: #0c0b0d;
-  --c-ink: #efe8dc;
-  --c-muted: #a9a198;
-  --c-accent: #c98a4e;
-  --c-line: rgb(239 232 220 / 0.16);
+  --c-bg: #000000;
+  --c-ink: #ffffff;
+  --c-muted: #9a9a9a;
+  --c-accent: #ff0000;
+  --c-line: rgb(255 255 255 / 0.18);
+  --font-display: var(--font-outfit), system-ui, sans-serif;
 }
 .theme-medusa {
   --c-bg: #08080a;
@@ -47,7 +49,7 @@
 }
 
 /* El fondo del documento acompaña al universo (sin franjas al hacer overscroll) */
-html:has(.theme-selector) { background: #0c0b0d; }
+html:has(.theme-selector) { background: #000000; }
 html:has(.theme-medusa) { background: #08080a; }
 html:has(.theme-noche) { background: #080d1e; }
 html:has(.theme-elefantes) { background: #121016; }
@@ -79,7 +81,7 @@ body:has(.mf-theme) { background: transparent; }
   align-content: center;
 }
 .mf-mark__word {
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-variation-settings: "wdth" 125;
   font-weight: 800;
   font-size: 1.05rem;
@@ -181,7 +183,7 @@ body:has(.mf-theme) { background: transparent; }
   overscroll-behavior: contain;
   padding: 0.4rem;
   border: 1px solid color-mix(in srgb, var(--c-ink) 18%, transparent);
-  background: color-mix(in srgb, var(--c-bg) 94%, #efe8dc);
+  background: color-mix(in srgb, var(--c-bg) 94%, #ffffff);
   box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.85);
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -202,7 +204,7 @@ body:has(.mf-theme) { background: transparent; }
   list-style: none;
 }
 .mf-obras__obra {
-  --o-accent: #c98a4e;
+  --o-accent: #ff0000;
   display: grid;
   grid-template-columns: 2.4rem minmax(0, 1fr);
   align-items: baseline;
@@ -408,7 +410,7 @@ body:has(.mf-theme) { background: transparent; }
   color: var(--c-muted);
 }
 .mf-footer__title {
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-variation-settings: "wdth" 125;
   font-weight: 800;
   font-size: clamp(2rem, 1.2rem + 4vw, 4.5rem);
@@ -493,7 +495,7 @@ body:has(.mf-theme) { background: transparent; }
 }
 .sel-title {
   margin: 0;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
   font-weight: 900;
   font-size: clamp(2.6rem, 0.9rem + 8.4vw, min(9.5rem, 11svh));
   line-height: 0.86;
@@ -778,7 +780,7 @@ body:has(.mf-theme) { background: transparent; }
 .glg__lectura {
   position: relative;
   padding: 0.1em 0.25em 0;
-  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-family: var(--font-outfit), "Arial Narrow", sans-serif;
   font-variation-settings: "wdth" 62;
   font-weight: 900;
   font-size: clamp(0.85rem, 10cqh, 2.4rem);
@@ -873,7 +875,7 @@ body:has(.mf-theme) { background: transparent; }
   margin-top: 0.45em;
 }
 .sel-item--glenn .sel-name {
-  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-family: var(--font-outfit), "Arial Narrow", sans-serif;
   font-weight: 900;
   font-variation-settings: "wdth" 62;
   text-transform: uppercase;
