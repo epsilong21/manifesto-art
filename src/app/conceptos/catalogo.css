@@ -64,7 +64,7 @@
 }
 .cat-cinta a[aria-current="true"] { color: var(--c-ink); }
 .cat-cinta a[aria-current="true"]::after { transform: scaleX(1); }
-.cat-cinta__n { font-weight: 800; color: var(--ta); font-variant-numeric: tabular-nums; }
+.cat-cinta__n { font-weight: 800; color: color-mix(in srgb, var(--ta) 45%, #000); font-variant-numeric: tabular-nums; }
 .cat-cinta__t { display: none; }
 @media (min-width: 40rem) { .cat-cinta__t { display: inline; } }
 @media (hover: hover) { .cat-cinta a:hover { color: var(--c-ink); } }
@@ -138,7 +138,7 @@ svg.cat-img { aspect-ratio: 800 / 640; width: min(100%, 44rem); }
   font-size: 0.8125rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ta);
+  color: color-mix(in srgb, var(--ta) 45%, #000);
 }
 .cat-titulo {
   margin: 0;
@@ -179,7 +179,7 @@ svg.cat-img { aspect-ratio: 800 / 640; width: min(100%, 44rem); }
 @media (hover: hover) {
   .cat-placa:hover .cat-img { transform: translateY(-6px); box-shadow: 0 3.5rem 6rem -1.75rem rgb(0 0 0 / 0.95), 0 0 0 1px color-mix(in srgb, var(--ta) 60%, transparent); }
   .cat-placa:hover .cat-entrar svg { transform: translateX(6px); }
-  .cat-placa:hover .cat-entrar { color: var(--ta); }
+  .cat-placa:hover .cat-entrar { color: color-mix(in srgb, var(--ta) 45%, #000); }
 }
 
 /* ── Aparición al desplazarse (solo con animation-timeline; con movimiento reducido, ninguna) ── */

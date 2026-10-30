@@ -43,10 +43,10 @@ const PASOS = [
 ];
 
 export default function Portada() {
-  if (entradaSelector) return <ConceptosPage />;
+  if (entradaSelector) return (<><ConceptosPage /><SiteFooter /></>);
   return (
     <div className={`mf-theme theme-selector hm ${bricolage.variable} ${plexMono.variable}`}>
-      <ConceptHeader marca />
+      <ConceptHeader />
       <main>
         <div className="hm-hero">
           <div className="hm-copy">

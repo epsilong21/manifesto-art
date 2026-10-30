@@ -55,22 +55,20 @@ export function MarcaBarras() {
 }
 
 /**
- * Cabecera común: marca (a la portada) y selector de obras con la obra actual.
- * Con `marca`, añade las barras superiores y el menú de la tienda (portada, catálogo y páginas legales).
+ * Cabecera común de la marca: barras superiores, logotipo, menú de la tienda y selector de obras con la
+ * obra actual. Va encima de cada página, fuera del universo de la obra.
  */
-export function ConceptHeader({ actual, marca = false }: { actual?: Concepto["slug"]; marca?: boolean }) {
+export function ConceptHeader({ actual }: { actual?: Concepto["slug"] }) {
   return (
     <>
-      {marca ? <MarcaBarras /> : null}
-      <header className={marca ? "mf-header mf-header--marca" : "mf-header"}>
+      <MarcaBarras />
+      <header className="mf-header mf-header--marca">
         <ManifestoMark />
-        {marca ? (
-          <nav className="mf-nav" aria-label="Principal">
-            <Link href="/" prefetch={false}>Inicio</Link>
-            <Link href="/conceptos" prefetch={false}>Exposición</Link>
-            <a href={CONTACTO.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
-          </nav>
-        ) : null}
+        <nav className="mf-nav" aria-label="Principal">
+          <Link href="/" prefetch={false}>Inicio</Link>
+          <Link href="/conceptos" prefetch={false}>Exposición</Link>
+          <a href={CONTACTO.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
+        </nav>
         <ObrasMenu actual={actual} />
       </header>
     </>

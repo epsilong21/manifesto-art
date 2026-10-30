@@ -52,7 +52,7 @@ export default function PoliticaPrivacidadPage() {
 
   return (
     <div className="mf-theme theme-selector">
-      <ConceptHeader marca />
+      <ConceptHeader />
       <main className="al">
         <header className="al-cab">
           <p className="al-k">MANIFESTO · Enciclopedia digital de arte</p>
