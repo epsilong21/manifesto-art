@@ -33,6 +33,16 @@ cabecera común hace que cada enlace sea una navegación normal.
 Con el acceso del paso 1 hecho una vez, **publicar y actualizar es un solo comando**: `npm run shopify:publicar`
 (empaqueta, sube los archivos al tema en vivo y crea o corrige las páginas). Abajo, el detalle paso a paso.
 
+### Si la cuenta no puede autorizar al CLI («Unauthorized Access»)
+
+`shopify store auth` solo funciona con la cuenta **propietaria** de la tienda (o una con permiso de apps). Sin eso, las
+páginas se crean a mano una sola vez y el resto no cambia:
+
+1. `npm run shopify:publicar -- --sin-paginas` (sube los archivos y lista las páginas).
+2. Shopify → Contenido → Páginas → *Agregar página*, 14 veces. En cada una: **título** (p. ej. «Obra · Medusa»), y a la derecha
+   **Plantilla de tema** = el nombre de la lista (`obra-medusa`…). El **handle** (la URL) debe quedar exactamente como en la
+   lista: se cambia en *Editar el listado de resultados de búsqueda* → *URL y controlador*. Contenido: vacío; visibilidad: visible.
+
 ## Primera publicación (una vez)
 
 1. **Acceso del CLI para crear páginas** (abre el navegador; entra con la cuenta dueña de la tienda):

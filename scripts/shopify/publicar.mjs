@@ -13,6 +13,7 @@ const raiz = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const args = process.argv.slice(2);
 const TIENDA = "manifestocol.myshopify.com";
 const tema = args.includes("--tema") ? args[args.indexOf("--tema") + 1] : "182672720169";
+const sinPaginas = args.includes("--sin-paginas"); // las páginas se crean a mano en Shopify (ver LEEME.md)
 const ensayo = args.includes("--ensayo"); // solo empaqueta; muestra lo que haría después, sin tocar la tienda
 // En Windows `shopify` es un .cmd y necesita shell; Node no (su ruta suele llevar espacios y el shell la rompería)
 const necesitaShell = (comando) => process.platform === "win32" && comando === "shopify";
@@ -39,6 +40,11 @@ paso(
   ["theme", "push", "--store", TIENDA, "--theme", tema, "--allow-live", "--only", '"assets/*"', "--only", '"templates/page.obra*.liquid"', "--only", '"snippets/obra-manifesto.liquid"', "--path", "."],
   join(raiz, "shopify-tema"),
 );
-paso("3/3 Crear o actualizar las páginas", process.execPath, [join(raiz, "scripts/shopify/crear-paginas.mjs")]);
+if (sinPaginas) {
+  console.log(String.fromCharCode(10) + "3/3 Páginas: no se crean desde aquí. Créalas en Shopify (Páginas → Agregar página), cada una con su plantilla de tema:");
+  paso("    (lista)", process.execPath, [join(raiz, "scripts/shopify/crear-paginas.mjs"), "--mostrar"]);
+} else {
+  paso("3/3 Crear o actualizar las páginas", process.execPath, [join(raiz, "scripts/shopify/crear-paginas.mjs")]);
+}
 
 console.log("\n✓ Publicado: https://manifestocol.com/pages/obras");
