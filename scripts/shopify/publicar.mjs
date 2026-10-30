@@ -16,6 +16,7 @@ const args = process.argv.slice(2);
 const TIENDA = "manifestocol.myshopify.com";
 const tema = args.includes("--tema") ? args[args.indexOf("--tema") + 1] : "182672720169";
 const sinPaginas = args.includes("--sin-paginas"); // las páginas se crean a mano en Shopify (ver LEEME.md)
+const sinProbar = args.includes("--sin-probar"); // NO recomendado: salta la prueba de las 14 páginas
 const ensayo = args.includes("--ensayo"); // solo empaqueta; muestra lo que haría después, sin tocar la tienda
 // En Windows `shopify` es un .cmd y necesita shell; Node no (su ruta suele llevar espacios y el shell la rompería)
 const necesitaShell = (comando) => process.platform === "win32" && comando === "shopify";
@@ -30,6 +31,10 @@ function paso(titulo, comando, argumentos, cwd = raiz) {
 }
 
 paso("1/3 Empaquetar la web para Shopify", process.execPath, [join(raiz, "scripts/shopify/empaquetar.mjs")]);
+if (!sinProbar) {
+  // Una web que se ve bien pero en la que React no arrancó (nada responde) pasó desapercibida una vez: se prueba antes de subir
+  paso("Probar las 14 páginas (se hidratan y no dan errores)", process.execPath, [join(raiz, "scripts/shopify/probar.mjs")]);
+}
 if (ensayo) {
   console.log(String.fromCharCode(10) + "(ensayo) No se sube nada ni se crean páginas. Con `npm run shopify:publicar` se haría:");
   console.log(`  · shopify theme push --theme ${tema} --allow-live  (assets/*, templates/page.obra*, snippets/obra-manifesto)`);

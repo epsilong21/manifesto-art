@@ -10,6 +10,7 @@
     "build:pages": "node scripts/pages/exportar.mjs",
     "typecheck": "next typegen && tsc --noEmit",
     "shopify:empaquetar": "node scripts/shopify/empaquetar.mjs",
+    "shopify:probar": "node scripts/shopify/probar.mjs",
     "shopify:publicar": "node scripts/shopify/publicar.mjs",
     "shopify:crear-paginas": "node scripts/shopify/crear-paginas.mjs",
     "tienda:actualizar": "node scripts/tienda/actualizar.mjs",

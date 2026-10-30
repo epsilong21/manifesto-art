@@ -98,8 +98,21 @@ function parcheaCargador(js, archivo) {
   const deshace = /(\w+)\.startsWith\((\w+)\)\?\1\.slice\(\2\.length\):\1/;
   if (!deshace.test(t)) throw new Error(`${archivo}: no encuentro dónde el cargador de Next deduce la ruta de un trozo (¿cambió Next?)`);
   t = t.replace(deshace, '$1.startsWith($2)?$1.slice($2.length).replaceAll("__","/"):$1');
+  // Al cargarse, cada trozo se registra con su `script.src` completo. Con la versión de Shopify (?v=…) esa clave no coincide
+  // con la que espera el cargador (la URL sin consulta): el entorno nunca se completa y React no llega a arrancar.
+  const registra = /(\w+)\("string"==typeof (?<v>\w+)\?(\w+)\(\k<v>\):\k<v>\.src\)\.resolve\(\)/;
+  if (!registra.test(t)) throw new Error(`${archivo}: no encuentro dónde el cargador de Next registra un trozo cargado (¿cambió Next?)`);
+  t = t.replace(registra, (_, fn, _v, aRuta, ...resto) => {
+    const v = resto.at(-1).v; // variable del trozo (nombre minificado)
+    return `${fn}("string"==typeof ${v}?${aRuta}(${v}):${v}.src.replace(/[?#].*$/,"")).resolve()`;
+  });
   return t;
 }
+
+// getAssetPrefix() de Next saca el prefijo de assets de la URL de su propio script y falla si no contiene «/_next/».
+// En un tema no existe esa carpeta (la ruta es …/assets/static__chunks__x.js): el prefijo es vacío.
+const PREFIJO_NEXT = /if\(-1===(\w+)\)throw new \w+\.InvariantError\(`Expected document\.currentScript src to contain '\/_next\/'[^`]*`\);/;
+let prefijosParcheados = 0;
 
 let cargadores = 0;
 for (const [rel, nombre] of assets) {
@@ -108,6 +121,11 @@ for (const [rel, nombre] of assets) {
   if (/^_next\/static\/chunks\/turbopack-.*\.js$/.test(rel)) {
     writeFileSync(salida, parcheaCargador(readFileSync(origen, "utf8"), rel));
     cargadores++;
+  } else if (rel.endsWith(".js") && readFileSync(origen, "utf8").includes("to contain '/_next/'")) {
+    const js = readFileSync(origen, "utf8");
+    if (!PREFIJO_NEXT.test(js)) throw new Error(`${rel}: no encuentro la comprobación de «/_next/» de Next (¿cambió Next?)`);
+    writeFileSync(salida, js.replace(PREFIJO_NEXT, 'if(-1===$1)return"";'));
+    prefijosParcheados++;
   } else if (rel.endsWith(".css")) {
     // Las fuentes se pedían como ../media/x.woff2; en la carpeta plana de assets están al lado, con la ruta aplanada
     writeFileSync(salida, readFileSync(origen, "utf8").replace(/url\(\.\.\/media\/([^)]+)\)/g, "url(static__media__$1)"));
@@ -116,6 +134,7 @@ for (const [rel, nombre] of assets) {
   }
 }
 if (cargadores !== 1) throw new Error(`Esperaba 1 cargador de Next (turbopack-*.js) y hay ${cargadores}`);
+if (prefijosParcheados !== 1) throw new Error(`Esperaba 1 comprobación de «/_next/» de Next y encontré ${prefijosParcheados}`);
 // Archivo ancla: su asset_url da la carpeta de assets del tema
 writeFileSync(join(destino, "assets", "msto-base.css"), "/* Ancla: la carpeta de assets de este archivo es la de las obras. */\n");
 
@@ -137,7 +156,12 @@ const CABECERA = `<script>
 (function () {
   var B = {{ b | json }};
   window.__MSTO_ASSETS = B;
-  window.TURBOPACK_CHUNK_BASE_PATH = new URL(B, location.href).href;
+  // El cargador compara el texto del atributo src de cada <script> (//host/…, tal como lo escribe asset_url) con esta base:
+  // debe ir escrita igual, no como URL absoluta.
+  window.TURBOPACK_CHUNK_BASE_PATH = B;
+  // El cargador copia el ?v=… de su propio script a cada trozo que pide; cada asset de Shopify tiene su versión, así que no
+  // coincidiría con el registro del trozo. Sin sufijo, las URL de los trozos son siempre «carpeta + nombre».
+  window.TURBOPACK_ASSET_SUFFIX = "";
   var R = ${JSON.stringify(rutasParaCliente)};
   // Cada enlace interno es una navegación normal (sin el router de Next, que aquí no tiene dónde pedir las páginas)
   document.addEventListener("click", function (e) {
@@ -174,6 +198,11 @@ const sustituciones = (t, ruta) => {
   // La URL canónica y og:url de cada página son su página de Shopify
   const propia = `${DOMINIO}/pages/${PAGINAS.get(ruta)}`;
   t = t.replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${propia}$2`).replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${propia}$2`);
+  // Next pide los trozos de cliente por la URL exacta que trae el payload (`self.__next_f.push(…)`), y el trozo, al cargarse,
+  // se registra con su src SIN consulta. Si en el payload la URL llevara el ?v=… de Shopify, nunca coincidirían y la
+  // hidratación se quedaría esperando: allí los .js van como carpeta + nombre; en las etiquetas, con asset_url completo.
+  const rangosPayload = [...t.matchAll(/<script>self\.__next_f\.push[\s\S]*?<\/script>/g)].map((m) => [m.index, m.index + m[0].length]);
+  const enPayload = (pos) => rangosPayload.some(([a, b]) => pos >= a && pos < b);
   const piezas = []; // [{texto, liquid}]
   let ultimo = 0;
   const RX = new RegExp(
@@ -181,7 +210,7 @@ const sustituciones = (t, ruta) => {
       "https://msto-asset\\.invalid/([A-Za-z0-9._-]+)", // 1: marcador de rutaPublica
       "https://manifestocol\\.com(/[^\"'\\s\\\\<>)]*)?", // 2: URL absoluta del sitio
       "/_next/(static/[^\"'\\s\\\\)?]+)", //                  3: archivos de Next
-      '(?<=href=")/icon\\.png[^"]*', //                       (icono)
+      "(?<=\")/icon\\.png[^\"'\\s\\\\]*", //                    (icono, en etiquetas y en el payload)
       '(?<=href=")/[^"]*(?=")', //                            (enlaces internos)
     ].join("|"),
     "g",
@@ -197,7 +226,7 @@ const sustituciones = (t, ruta) => {
         liquid = liquidAsset(nombreAsset(`_next/${next}`)); // trozo de URL partido entre dos <script>
       } else {
         if (!assets.has(rel)) throw new Error(`${ruta}: falta el archivo ${rel}`);
-        liquid = liquidAsset(assets.get(rel));
+        liquid = rel.endsWith(".js") && enPayload(offset) ? `{{ b }}${assets.get(rel)}` : liquidAsset(assets.get(rel));
       }
     } else if (m.startsWith("https://manifestocol.com")) {
       const resto = absoluta ?? "";

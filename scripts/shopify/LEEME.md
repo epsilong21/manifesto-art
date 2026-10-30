@@ -30,6 +30,9 @@ cabecera común hace que cada enlace sea una navegación normal.
 
 ## Publicar (resumen)
 
+`shopify:publicar` **prueba primero las 14 páginas** (`npm run shopify:probar`: las sirve en local como lo haría el tema y
+comprueba en Chrome que React arranca de verdad y no hay errores) y no sube nada si alguna falla.
+
 Con el acceso del paso 1 hecho una vez, **publicar y actualizar es un solo comando**: `npm run shopify:publicar`
 (empaqueta, sube los archivos al tema en vivo y crea o corrige las páginas). Abajo, el detalle paso a paso.
 
