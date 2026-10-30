@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ObrasMenu } from "@/components/concepts/ObrasMenu";
 import { CONCEPTOS, type Concepto } from "@/content/conceptos";
@@ -5,12 +6,19 @@ import { CONCEPTOS, type Concepto } from "@/content/conceptos";
 /** Publicación simplificada: el selector es la entrada, no hay otra portada. */
 const ENTRADA_SELECTOR = process.env.NEXT_PUBLIC_MANIFESTO_ENTRADA === "selector";
 
-/** Logotipo de la identidad madre: grotesca ancha frente a la tipografía de cada universo. */
+/** Logotipo oficial de MANIFESTO (blanco, el mismo de la tienda): va sobre la cabecera negra. */
 export function ManifestoMark({ href = "/" }: { href?: string }) {
   return (
     <Link href={href} prefetch={false} className="mf-mark">
-      <span className="mf-mark__word">MANIFESTO</span>
-      <span className="mf-mark__sub">Experimental Art Journal</span>
+      <Image
+        src="/marca/logo-manifesto-blanco.png"
+        alt="MANIFESTO"
+        width={1297}
+        height={228}
+        sizes="(min-width: 64rem) 205px, 160px"
+        priority
+        className="mf-mark__logo"
+      />
       <span className="sr-only">, ir a la portada</span>
     </Link>
   );
@@ -182,7 +190,14 @@ export function SiteFooter() {
         </div>
         <div>
           <h2 className="mf-sitefoot__h">
-            <span className="mf-mark__word">MANIFESTO</span>
+            <Image
+              src="/marca/logo-manifesto-blanco.png"
+              alt="MANIFESTO"
+              width={1297}
+              height={228}
+              sizes="160px"
+              className="mf-sitefoot__logo"
+            />
           </h2>
           <p>Plataforma cultural y educativa sobre historia del arte. No es una tienda.</p>
         </div>
