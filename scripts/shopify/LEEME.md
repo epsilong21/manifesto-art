@@ -53,7 +53,7 @@ páginas se crean a mano una sola vez y el resto no cambia:
 3. **Subir al tema en vivo** (solo añade archivos; no toca el resto del tema):
    ```
    cd shopify-tema
-   shopify theme push --store manifestocol.myshopify.com --theme 182672720169 --allow-live --only "assets/*" --only "templates/page.obra*.liquid" --only "snippets/obra-manifesto.liquid"
+   shopify theme push --store manifestocol.myshopify.com --theme 182672720169 --allow-live --nodelete --only "assets/*" --only "templates/page.obra*.liquid" --only "snippets/obra-manifesto.liquid"
    ```
 4. **Crear las 14 páginas** (cada una con su plantilla): `npm run shopify:crear-paginas`
    (`-- --mostrar` solo lista lo que haría; si una página ya existe solo se corrige su plantilla).
@@ -74,6 +74,10 @@ Genera las plantillas de modo que se abren con `/pages/colecciones?view=obras`, 
 que ya exista). Súbelas a un tema **sin publicar** y míralas con `?preview_theme_id=<id>`. Los clientes no lo ven.
 
 ## Qué hay que saber
+
+- **Nunca subir con `--only "assets/*"` sin `--nodelete`.** Con ese filtro, `shopify theme push` borra del tema todos los assets que
+  no estén en la carpeta local, es decir, los del propio tema (JS, CSS, fuentes y logos). `shopify:publicar` ya lo lleva.
+  Si pasara, se restauran bajando antes una copia del tema (`shopify theme pull`) y subiendo esos archivos con `--nodelete`.
 
 - **Copias del tema:** las URL de los archivos salen de `asset_url`, así que al duplicar o publicar otra copia del tema
   todo sigue funcionando. Si se borra el tema, se van sus assets: conviene que las plantillas y assets estén en el tema en vivo.

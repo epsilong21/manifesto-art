@@ -3,6 +3,8 @@
 //       npm run shopify:publicar -- --tema 182672720169     (otro tema; por defecto, el publicado hoy)
 //
 // Requisito (una sola vez): shopify store auth --store 539bc0.myshopify.com --scopes read_content,write_content
+// IMPORTANTE: el push lleva siempre --nodelete. Con --only "assets/*" Shopify borra del tema todo asset que no esté en la
+// carpeta local; sin --nodelete se llevaría los assets originales del tema (pasó el 30/10/2026 y hubo que restaurarlos).
 // Solo AÑADE o reemplaza archivos de la web (assets/*, las plantillas page.obra* y el snippet obra-manifesto); no toca el
 // resto del tema. Procedimiento completo: scripts/shopify/LEEME.md
 import { spawnSync } from "node:child_process";
@@ -37,7 +39,7 @@ if (ensayo) {
 paso(
   `2/3 Subir los archivos al tema ${tema}`,
   "shopify",
-  ["theme", "push", "--store", TIENDA, "--theme", tema, "--allow-live", "--only", '"assets/*"', "--only", '"templates/page.obra*.liquid"', "--only", '"snippets/obra-manifesto.liquid"', "--path", "."],
+  ["theme", "push", "--store", TIENDA, "--theme", tema, "--allow-live", "--nodelete", "--only", '"assets/*"', "--only", '"templates/page.obra*.liquid"', "--only", '"snippets/obra-manifesto.liquid"', "--path", "."],
   join(raiz, "shopify-tema"),
 );
 if (sinPaginas) {
