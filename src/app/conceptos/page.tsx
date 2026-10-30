@@ -32,7 +32,7 @@ const SIN_LICENCIA = new Set(["basquiat-untitled", "glenn", "cristo-de-san-juan-
 export default function ConceptosPage() {
   return (
     <div className={`mf-theme theme-selector ${cormorant.variable} ${gloock.variable} ${instrument.variable} ${shoulders.variable} ${bricolage.variable} ${plexMono.variable}`}>
-      <ConceptHeader />
+      <ConceptHeader marca />
       <main>
         <section className="cat-intro" aria-labelledby="cat-title">
           <p className="cat-intro__k">La exposición · {String(CONCEPTOS.length).padStart(2, "0")} obras</p>

@@ -131,7 +131,7 @@ export default function AvisoLegalPage() {
 
   return (
     <div className="mf-theme theme-selector">
-      <ConceptHeader />
+      <ConceptHeader marca />
       <main className="al">
         <header className="al-cab">
           <p className="al-k">MANIFESTO · Enciclopedia digital de arte</p>

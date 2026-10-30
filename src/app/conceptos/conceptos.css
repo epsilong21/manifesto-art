@@ -94,6 +94,105 @@ body:has(.mf-theme) { background: transparent; }
   letter-spacing: 0.04em;
   color: var(--c-muted);
 }
+/* ── Barras y cabecera de la marca (igual que la tienda) ── */
+
+.mf-aviso {
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  padding: 0.4rem 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.mf-aviso__pista {
+  display: flex;
+  width: max-content;
+  animation: mf-marquesina 36s linear infinite;
+}
+.mf-aviso__tanda {
+  display: flex;
+  flex: none;
+  gap: 1.25rem;
+  padding-right: 1.25rem;
+}
+.mf-aviso b { color: var(--c-accent); font-weight: 700; }
+@keyframes mf-marquesina {
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mf-aviso { text-align: center; }
+  .mf-aviso__pista { width: auto; justify-content: center; animation: none; }
+  .mf-aviso__tanda[aria-hidden="true"] { display: none; }
+  .mf-aviso__tanda > :nth-child(n + 4) { display: none; }
+  .mf-aviso__tanda { padding-right: 0; }
+}
+.mf-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 2rem;
+  padding: 0.35rem var(--mf-gutter);
+  background: #000;
+  border-bottom: 1px solid rgb(187 187 187 / 0.4);
+  font-size: 0.8125rem;
+  color: #e1e1e1;
+}
+.mf-topbar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: inherit;
+  text-decoration: none;
+}
+@media (hover: hover) { .mf-topbar a:hover { color: var(--c-accent); } }
+@media (max-width: 39.99rem) { .mf-topbar { justify-content: center; } }
+
+.mf-header--marca {
+  padding: max(1.25rem, env(safe-area-inset-top)) var(--mf-gutter) 1.25rem;
+  background: #000;
+}
+.mf-header--marca .mf-mark__word {
+  font-weight: 800;
+  font-size: clamp(1.35rem, 1.1rem + 1vw, 1.75rem);
+  letter-spacing: 0.14em;
+}
+.mf-header--marca .mf-mark__sub { display: none; }
+.mf-nav { display: none; }
+@media (min-width: 48rem) {
+  .mf-header--marca { display: grid; grid-template-columns: auto 1fr auto; }
+  .mf-nav { display: flex; justify-content: center; gap: clamp(1.25rem, 3vw, 2.75rem); }
+  .mf-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+}
+@media (hover: hover) { .mf-nav a:hover { color: var(--c-accent); } }
+.mf-header--marca .mf-obras__btn {
+  border-radius: 0;
+  border-color: #fff;
+  background: transparent;
+  backdrop-filter: none;
+  padding-left: 1.1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.mf-header--marca .mf-obras__ico { border-radius: 0; background: transparent; }
+@media (hover: hover) {
+  .mf-header--marca .mf-obras__btn:hover { background: var(--c-accent); border-color: var(--c-accent); }
+}
+
 /* ── Selector de obras (cabecera) ── */
 
 .mf-obras {
@@ -260,44 +359,54 @@ body:has(.mf-theme) { background: transparent; }
   text-underline-offset: 0.25em;
 }
 
-/* Pie breve: portada y catálogo */
+/* Pie de la marca: portada, catálogo y páginas legales (fondo gris claro, texto negro, como la tienda) */
 .mf-sitefoot {
+  --c-ink: #000;
+  --c-muted: #5f5f5f;
+  --c-accent: #ce0909;
+  background: #f8f8f8;
+  color: #000;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+.mf-sitefoot__cols {
   display: grid;
-  gap: 0.75rem;
-  padding: clamp(2.5rem, 6vw, 4rem) var(--mf-gutter) max(2rem, env(safe-area-inset-bottom));
-  border-top: 1px solid var(--c-line);
-  color: var(--c-muted);
-  font-size: 0.875rem;
+  gap: 2rem;
+  padding: clamp(2.5rem, 6vw, 3.5rem) var(--mf-gutter);
+  border-bottom: 1px solid #e5e5e5;
 }
-.mf-sitefoot p {
-  margin: 0;
-  max-width: 44rem;
+@media (min-width: 48rem) {
+  .mf-sitefoot__cols { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 3rem; }
 }
-.mf-sitefoot__legal {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 1.5rem;
+.mf-sitefoot__h {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
-.mf-sitefoot__legal a {
+.mf-sitefoot address { font-style: normal; }
+.mf-sitefoot p { margin: 0 0 0.35rem; line-height: 1.55; }
+.mf-sitefoot address span { font-weight: 600; }
+.mf-sitefoot ul { margin: 0; padding: 0; list-style: none; }
+.mf-sitefoot a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: var(--c-ink);
-  text-decoration: underline;
-  text-decoration-color: var(--c-accent);
-  text-underline-offset: 0.25em;
+  color: #000;
+  text-decoration: none;
 }
-.mf-sitefoot .mf-mark__word {
-  margin-right: 0.6rem;
-  color: var(--c-ink);
-  font-size: 0.9375rem;
+.mf-sitefoot address a { min-height: 24px; }
+@media (hover: hover) { .mf-sitefoot a:hover { color: var(--c-accent); } }
+.mf-sitefoot .mf-mark__word { color: #000; font-size: 1.05rem; letter-spacing: 0.14em; }
+.mf-sitefoot__base {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem var(--mf-gutter) max(1.5rem, env(safe-area-inset-bottom));
+  color: #5f5f5f;
 }
-@media (min-width: 48rem) {
-  .mf-sitefoot {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 3rem;
-  }
-}
+.mf-sitefoot__base p { margin: 0; max-width: 60rem; }
+.mf-sitefoot__img { font-size: 0.75rem; }
 
 /* ── Etiqueta de obra (cartela + etiqueta de prenda) ── */
 

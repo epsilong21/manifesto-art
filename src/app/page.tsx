@@ -46,7 +46,7 @@ export default function Portada() {
   if (entradaSelector) return <ConceptosPage />;
   return (
     <div className={`mf-theme theme-selector hm ${bricolage.variable} ${plexMono.variable}`}>
-      <ConceptHeader />
+      <ConceptHeader marca />
       <main>
         <div className="hm-hero">
           <div className="hm-copy">
