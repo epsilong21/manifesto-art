@@ -95,7 +95,7 @@ const html = archivos.filter((a) => a.endsWith(".html"));
 for (const a of html) {
   const t = readFileSync(join(out, a), "utf8");
   if (/barca-de-dante/i.test(t)) errores.push(`${a} referencia a La barca de Dante`);
-  if (t.includes(`${base}${base}/`)) errores.push(`${a} contiene el prefijo ${base} duplicado`);
+  if (base && t.includes(`${base}${base}/`)) errores.push(`${a} contiene el prefijo ${base} duplicado`);
   // 4. Cada recurso local enlazado existe
   const refs = [...t.matchAll(/(?:src|href|imageSrcSet|srcSet|srcset|imagesrcset)="([^"]+)"/g)].flatMap((m) => m[1].split(",").map((s) => s.trim().split(/\s+/)[0]));
   for (const ref of refs) {

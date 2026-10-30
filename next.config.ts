@@ -46,9 +46,9 @@ const nextConfig: NextConfig = {
     ? {
         output: "export",
         basePath,
-        // Fuera robots.ts y sitemap.ts (las únicas rutas .ts): bajo un subdirectorio no
-        // sirven
-        pageExtensions: ["tsx"],
+        // Bajo un subdirectorio, robots.ts y sitemap.ts (las únicas rutas .ts) no sirven: se excluyen. En la raíz de un
+        // dominio propio (basePath vacío) sí, y se publican.
+        ...(basePath ? { pageExtensions: ["tsx"] } : {}),
         // /conceptos/ → conceptos/index.html: GitHub Pages lo sirve al abrir o recargar
         trailingSlash: true,
         images: { loader: "custom", loaderFile: "./src/lib/imagenEstatica.ts", qualities: [70, 80] },

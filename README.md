@@ -46,3 +46,24 @@ El workflow `.github/workflows/pages.yml` ejecuta lint, typecheck y esta exporta
 Consulta [`CREDITOS.md`](CREDITOS.md). *Los elefantes* de Dalí es una obra protegida y su reproducción no forma parte de este repositorio. Sin ella, la página muestra una composición gráfica propia y los cinco capítulos como texto.
 
 *Untitled* y *Glenn* de Basquiat también están protegidas y no hay licencia de reproducción: el repositorio no incluye las pinturas y las páginas no las muestran.
+
+## Publicación y dominio propio
+
+Cada `push` a `main` publica la web sola (GitHub Actions → GitHub Pages, ~1–2 min). No hay que desplegar nada a mano:
+modificar la web «en vivo» es hacer un commit en `main`. Si el despliegue falla por una descarga de fuentes de Google en el
+servidor de GitHub, basta relanzarlo (`gh run rerun <id> --failed`).
+
+Hoy se sirve en `https://epsilong21.github.io/manifesto-art/`. Para servirla en un subdominio de la tienda
+(p. ej. `obras.manifestocol.com`):
+
+1. **DNS** (donde se administra `manifestocol.com`): crear un registro `CNAME` con nombre `obras` apuntando a
+   `<dueño-del-repositorio>.github.io` (hoy `epsilong21.github.io`). No tocar los registros de Shopify.
+2. **GitHub** → Settings → Pages → *Custom domain*: escribir el subdominio y, cuando el certificado esté listo, activar
+   *Enforce HTTPS*. Lo hace quien tenga rol de administrador del repositorio.
+3. **Código**: crear `public/CNAME` con solo el nombre del subdominio (una línea) y hacer `push`. Al existir ese archivo,
+   `npm run build:pages` construye para la raíz del dominio (sin el prefijo `/manifesto-art`), con las URL canónicas, el
+   `sitemap.xml` y el `robots.txt` del nuevo dominio. Borrar el archivo vuelve al modo actual.
+4. **Tienda**: cambiar `base_url` en `snippets/obra-manifesto.liquid` (tema) por el nuevo dominio y añadir «Obras» al
+   menú principal de Shopify (Contenido → Menús).
+
+`npm run tienda:actualizar` refresca las prendas de cada obra desde el catálogo público de la tienda.

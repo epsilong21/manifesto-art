@@ -15,7 +15,7 @@
 // - Genera las variantes WebP de las obras que usa src/lib/imagenEstatica.ts.
 // - Quita de out/ todo /obras (originales y Dante): solo se publican variantes.
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 import { elegirReproduccion as elegirBasquiat, REPRODUCCIONES as REPRODUCCIONES_BASQUIAT } from "../basquiat/reproduccion.mjs";
@@ -24,8 +24,11 @@ import { elegirReproduccion as elegirGlenn, REPRODUCCIONES as REPRODUCCIONES_GLE
 
 const raiz = process.cwd();
 const out = join(raiz, "out");
-// Destino por defecto: https://epsilong21.github.io/manifesto-art/
-const base = process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art";
+// Destino por defecto: https://epsilong21.github.io/manifesto-art/ (bajo un subdirectorio).
+// Con un dominio propio, `public/CNAME` lleva solo su nombre (p. ej. obras.manifestocol.com): la web se construye
+// para la raíz de ese dominio (sin prefijo) y las URL canónicas, el mapa del sitio y robots.txt usan ese dominio.
+const dominio = existsSync(join(raiz, "public/CNAME")) ? readFileSync(join(raiz, "public/CNAME"), "utf8").trim() : "";
+const base = dominio ? "" : (process.env.MANIFESTO_BASE_PATH ?? "/manifesto-art");
 const publicacion = esPublicacion();
 
 // Los elefantes: la misma elección que hará next.config.ts dentro del build
@@ -99,7 +102,7 @@ const env = {
   MANIFESTO_BASE_PATH: base,
   // La entrada es la portada de las diez obras; MANIFESTO_ENTRADA=selector devuelve el catálogo como entrada
   MANIFESTO_ENTRADA: process.env.MANIFESTO_ENTRADA ?? "portada",
-  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? `https://epsilong21.github.io${base}`,
+  NEXT_PUBLIC_SITE_URL: dominio ? `https://${dominio}` : (process.env.NEXT_PUBLIC_SITE_URL ?? `https://epsilong21.github.io${base}`),
 };
 
 const OBRAS = ["medusa.jpg", "medusa-stuck.jpg", "noche-estrellada.jpg", ...(elegida ? [elegida.archivo] : []), ...(basquiat.elegida ? [basquiat.elegida.archivo] : []), ...(glenn.elegida ? [glenn.elegida.archivo] : [])];
@@ -126,15 +129,15 @@ rmSync(join(out, "obras"), { recursive: true, force: true });
 // Next 16.4 antepone basePath a las imágenes Open Graph por archivo aunque
 // metadataBase ya incluya esa ruta (…/manifesto/manifesto/…). Las canónicas
 // se componen bien, así que solo se corrige el prefijo duplicado.
-const doble = new RegExp(`(https?://[^/"]+)${base}${base}/`, "g");
+const doble = base ? new RegExp(`(https?://[^/"]+)${base}${base}/`, "g") : null;
 const corrige = (dir) => {
   for (const n of readdirSync(dir)) {
     const p = join(dir, n);
     if (statSync(p).isDirectory()) corrige(p);
     else if (/\.(html|txt)$/.test(n)) {
       const t = readFileSync(p, "utf8");
-      if (doble.test(t)) writeFileSync(p, t.replace(doble, `$1${base}/`));
-      doble.lastIndex = 0;
+      if (doble?.test(t)) writeFileSync(p, t.replace(doble, `$1${base}/`));
+      if (doble) doble.lastIndex = 0;
     }
   }
 };
