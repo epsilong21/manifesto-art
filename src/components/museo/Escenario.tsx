@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { imagenProducto, urlProducto } from "@/content/tienda";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 
 export type ObraEscena = {
@@ -14,6 +15,8 @@ export type ObraEscena = {
   pregunta: string;
   /** false: la imagen es una composición de MANIFESTO, no la pintura. */
   pintura: boolean;
+  /** Prenda de la tienda inspirada en la obra. */
+  prenda?: { handle: string; titulo: string; imagen: string };
 };
 
 const PERIODO = 6500;
@@ -121,6 +124,18 @@ export function Escenario({ obras, laminas, tiras }: { obras: ObraEscena[]; lami
             <b>{a.gesto}.</b> {a.pregunta}
           </p>
           {!a.pintura ? <p className="hm-rotulo__nota">Composición de MANIFESTO, no la pintura.</p> : null}
+          {a.prenda ? (
+            <a className="hm-prenda" href={urlProducto(a.prenda.handle)} target="_blank" rel="noopener noreferrer">
+              {/* Imagen del CDN de la tienda: no pasa por el optimizador de next/image */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={imagenProducto(a.prenda.imagen, 160)} alt="" width={56} height={84} loading="lazy" decoding="async" />
+              <span className="hm-prenda__txt">
+                <small>La prenda</small>
+                <b>{a.prenda.titulo}</b>
+              </span>
+              <svg aria-hidden="true" width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="M0 5h16M12 1l4 4-4 4" stroke="currentColor" strokeWidth="1.4" /></svg>
+            </a>
+          ) : null}
         </div>
         <div className="hm-mandos">
           <button type="button" className="hm-flecha" onClick={() => setI((i + n - 1) % n)} aria-label="Obra anterior">

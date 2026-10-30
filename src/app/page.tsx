@@ -5,6 +5,7 @@ import { Distribuidores } from "@/components/concepts/Distribuidores";
 import { Escenario, type ObraEscena } from "@/components/museo/Escenario";
 import { ImagenObra, esPintura } from "@/components/museo/ImagenObra";
 import { CONCEPTOS } from "@/content/conceptos";
+import { PRODUCTOS, imagenProducto } from "@/content/tienda";
 import { bricolage } from "@/lib/fonts/bricolage";
 import { plexMono } from "@/lib/fonts/plexmono";
 import ConceptosPage, { metadata as metadataSelector } from "./conceptos/page";
@@ -35,6 +36,7 @@ const OBRAS: ObraEscena[] = CONCEPTOS.map((c) => ({
   gesto: c.gesto,
   pregunta: c.pregunta,
   pintura: esPintura(c.slug),
+  prenda: PRODUCTOS[c.slug],
 }));
 
 const PASOS = [
@@ -95,6 +97,11 @@ export default function Portada() {
                 <Link href={`/conceptos/${c.slug}`} prefetch={false}>
                   <span className="hm-tile__img">
                     <ImagenObra slug={c.slug} uid="hm-g" sizes="(min-width: 48rem) 25vw, 50vw" />
+                    {PRODUCTOS[c.slug] ? (
+                      // Al pasar el cursor, la tarjeta muestra la prenda de la tienda (como el cambio de foto de producto)
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img className="hm-tile__prenda" src={imagenProducto(PRODUCTOS[c.slug].imagen, 640)} alt="" width={640} height={960} loading="lazy" decoding="async" />
+                    ) : null}
                     <span className="hm-tile__n">{c.numero}</span>
                   </span>
                   <span className="hm-tile__t">{c.titulo}</span>

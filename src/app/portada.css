@@ -191,6 +191,17 @@
 .hm-rotulo__g { margin-top: 0.4rem; font-size: 0.9375rem; line-height: 1.4; color: var(--c-ink); }
 .hm-rotulo__g b { color: var(--a); font-weight: 600; }
 .hm-rotulo__nota { font-size: 0.75rem; color: var(--c-muted); font-style: italic; }
+.hm-prenda {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.85rem;
+  margin-top: 0.9rem; padding: 0.5rem 0.9rem 0.5rem 0.5rem; max-width: 26rem;
+  border: 1px solid rgb(255 255 255 / 0.28); color: var(--c-ink); text-decoration: none;
+  transition: border-color 0.25s, background-color 0.25s;
+}
+.hm-prenda img { display: block; width: 3.5rem; height: 5.25rem; object-fit: cover; background: #a8a8a8; }
+.hm-prenda__txt { display: grid; gap: 0.15rem; min-width: 0; }
+.hm-prenda small { font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-muted); }
+.hm-prenda b { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-size: 0.8125rem; font-weight: 500; line-height: 1.25; }
+@media (hover: hover) { .hm-prenda:hover { border-color: var(--c-accent); background: rgb(255 0 0 / 0.1); } }
 .hm-mandos { display: flex; align-items: center; gap: 0.5rem; }
 @media (min-width: 64rem) { .hm-mandos { grid-column: 2; grid-row: 2; } }
 .hm-flecha, .hm-pausa {
@@ -285,7 +296,13 @@
   filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.3));
 }
 .hm-tile__img > svg { aspect-ratio: 800 / 640; width: 78%; }
-.hm-tile a[href$="/medusa"] .hm-tile__img > img, .hm-tile a[href$="/medusa/"] .hm-tile__img > img { border-radius: 50%; }
+.hm-tile a[href$="/medusa"] .hm-tile__img > img:first-child, .hm-tile a[href$="/medusa/"] .hm-tile__img > img:first-child { border-radius: 50%; }
+.hm-tile__img > img.hm-tile__prenda {
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover;
+  filter: none; opacity: 0; transition: opacity 0.35s;
+}
+@media (hover: hover) { .hm-tile a:hover .hm-tile__prenda { opacity: 1; } }
+.hm-tile a:focus-visible .hm-tile__prenda { opacity: 1; }
 .hm-tile__n {
   position: absolute; top: 0.6rem; left: 0.6rem; padding: 0.2rem 0.55rem; background: #000; color: #fff;
   font-size: 0.75rem; font-weight: 500; font-variant-numeric: tabular-nums;
