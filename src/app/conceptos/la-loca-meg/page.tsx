@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { ConceptHeader } from "@/components/concepts/ConceptChrome";
 import { Cartografia } from "@/components/loca-meg/Cartografia";
 import { Cuadro } from "@/components/loca-meg/Cuadro";
+import { Gabinete } from "@/components/loca-meg/Gabinete";
+import { InterpretacionGabinete } from "@/components/loca-meg/InterpretacionGabinete";
 import { Restauracion } from "@/components/loca-meg/Restauracion";
 import { Ficha } from "@/components/sprint/Ficha";
 import { PieObra } from "@/components/sprint/PieObra";
@@ -10,6 +12,7 @@ import { instrument } from "@/lib/fonts/instrument";
 import "../sprint.css";
 import "./loca-meg.css";
 import "./cartografia.css";
+import "./gabinete.css";
 import "../pulido.css";
 import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
@@ -47,6 +50,8 @@ export default function LocaMegPage() {
         <Cartografia />
         <Restauracion />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
+        <InterpretacionGabinete />
+        <Gabinete />
       </main>
       <PieObra actual="la-loca-meg" {...CREDITOS} />
     </div>

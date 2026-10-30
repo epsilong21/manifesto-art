@@ -1,0 +1,236 @@
+/* ─────────────────────────────────────────────────────────────
+   08 · V7.2 «El gabinete de lo imposible»
+   Después de la ficha: un umbral editorial breve y una sala oscura, verde-negra,
+   con tres objetos colgados de una viga. Instrument Serif en títulos; ámbar y turquesa
+   (los de la carta) como únicos colores de luz.
+   Móvil: cabecera, escena y pie en filas. Escritorio y horizontal: texto a la izquierda,
+   la escena ocupa el resto de la sala.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Umbral: lo que se ve en la tabla / interpretación de MANIFESTO ── */
+.gb-transicion {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(3rem, 9vw, 6rem) var(--mf-gutter) clamp(2rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--c-line);
+}
+.gb-transicion h2 {
+  margin: 0;
+  font-size: clamp(1.9rem, 1.2rem + 3vw, 3.6rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.gb-transicion__entrada {
+  margin: 0;
+  max-width: 36rem;
+  color: var(--c-muted);
+  font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+  line-height: 1.5;
+}
+.gb-transicion__cols { display: grid; gap: 1.25rem; max-width: 64rem; margin-top: 0.5rem; }
+.gb-transicion__cols > div { padding-top: 0.9rem; border-top: 1px solid var(--c-line); }
+.gb-transicion__cols > div[data-tipo="sala"] { border-top-color: rgb(127 179 166 / 0.6); }
+.gb-transicion__tipo {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+[data-tipo="sala"] .gb-transicion__tipo { color: var(--c-cielo); }
+.gb-transicion h3 { margin: 0 0 0.4rem; font-size: 1.4rem; line-height: 1.1; }
+.gb-transicion__cols p:last-child { margin: 0; max-width: 34rem; color: var(--c-muted); line-height: 1.55; text-wrap: pretty; }
+/* Una cuerda baja del umbral a la sala */
+.gb-transicion::after {
+  content: "";
+  justify-self: center;
+  width: 1px;
+  height: clamp(2.5rem, 8vw, 4.5rem);
+  margin-top: clamp(1rem, 4vw, 2.5rem);
+  background: linear-gradient(rgb(127 179 166 / 0), rgb(127 179 166 / 0.7));
+}
+@media (min-width: 48rem) {
+  .gb-transicion__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem; }
+}
+
+/* ── La sala ── */
+.gb-sala {
+  --gb-fondo: #050908;
+  --gb-marfil: #efe6d3;
+  --gb-ambar: #e0793a;
+  --gb-turq: #7fb3a6;
+  --gb-tenue: #a9b3ab;
+  --gb-linea: rgb(239 230 211 / 0.16);
+  --gb-col: 22rem;
+  --gb-d: 80px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "cabeza" "escena" "pie";
+  height: 100svh;
+  min-height: 40rem;
+  max-height: 68rem;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--gb-marfil);
+  background: var(--gb-fondo);
+}
+.gb-cabeza { grid-area: cabeza; z-index: 2; padding: clamp(0.9rem, 3svh, 1.5rem) var(--mf-gutter) 0; }
+.gb-ante {
+  margin: 0 0 0.3rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gb-turq);
+}
+.gb-cabeza h2 {
+  margin: 0;
+  font-size: clamp(1.75rem, 1.1rem + 3vw, 3.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.gb-lema { margin: 0.5rem 0 0; max-width: 24rem; color: var(--gb-tenue); font-size: 0.9375rem; line-height: 1.4; }
+
+/* ── Escena ── */
+.gb-escena {
+  grid-area: escena;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  background: radial-gradient(ellipse 60% 55% at 50% 45%, #0d1a17, var(--gb-fondo));
+}
+.gb-lienzo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease-cine);
+}
+.gb-sala[data-listo="true"] .gb-lienzo { opacity: 1; }
+.gb-capa { position: absolute; inset: 0; pointer-events: none; }
+
+/* Mandos: un anillo del tamaño del objeto, con su número. Se agarra por cualquier punto */
+.gb-mando {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--gb-d);
+  height: var(--gb-d);
+  margin: calc(var(--gb-d) / -2) 0 0 calc(var(--gb-d) / -2);
+  border-radius: 50%;
+  outline: none;
+  visibility: hidden;
+  pointer-events: auto;
+  cursor: grab;
+}
+.gb-mando[data-eje="v"] { touch-action: pan-x; cursor: ns-resize; }
+.gb-mando[data-eje="h"] { touch-action: pan-y; cursor: ew-resize; }
+.gb-sala[data-listo="true"] .gb-mando { visibility: visible; }
+.gb-mando::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgb(239 230 211 / 0.28);
+  border-radius: 50%;
+  transition: border-color 0.3s, transform 0.35s var(--ease-cine), background-color 0.3s;
+}
+.gb-mando span {
+  position: absolute;
+  left: 50%;
+  bottom: -0.15rem;
+  translate: -50% 100%;
+  font-family: var(--f-display);
+  font-size: 0.9375rem;
+  line-height: 1;
+  color: var(--gb-marfil);
+  text-shadow: 0 1px 6px #000, 0 0 2px #000;
+  pointer-events: none;
+}
+.gb-mando[data-activo="true"]::before { border-style: solid; border-color: rgb(127 179 166 / 0.6); }
+.gb-mando[data-sel="true"]::before { border-style: solid; border-color: var(--gb-marfil); background: rgb(127 179 166 / 0.1); }
+.gb-mando:focus-visible::before { outline: 2px solid var(--gb-marfil); outline-offset: 4px; }
+@media (hover: hover) { .gb-mando:hover::before { border-color: rgb(239 230 211 / 0.7); } }
+
+/* ── Pie: estado, acciones y pista ── */
+.gb-pie { grid-area: pie; z-index: 2; display: grid; gap: 0.75rem; padding: 0.75rem var(--mf-gutter) 1rem; }
+.gb-texto { min-height: 7rem; }
+.gb-texto h3 { margin: 0 0 0.3rem; font-size: clamp(1.35rem, 1.1rem + 1.5vw, 2.4rem); line-height: 1.02; text-wrap: balance; }
+.gb-texto p { margin: 0; max-width: 34rem; color: var(--gb-tenue); font-size: 0.9375rem; line-height: 1.45; text-wrap: pretty; }
+.gb-acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.gb-acciones button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 1.05rem;
+  border: 1px solid var(--gb-linea);
+  border-radius: 999px;
+  background: none;
+  color: var(--gb-marfil);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+.gb-acciones .gb-restaurar span { font-size: 1.05rem; color: var(--gb-ambar); }
+.gb-acciones button:focus-visible { outline: 2px solid var(--gb-marfil); outline-offset: 3px; }
+@media (hover: hover) { .gb-acciones button:hover { border-color: var(--gb-turq); background: rgb(127 179 166 / 0.1); } }
+.gb-pista { margin: 0; max-width: 34rem; font-size: 0.8125rem; color: var(--gb-tenue); }
+.gb-nota { margin: 0; max-width: 34rem; font-size: 0.75rem; line-height: 1.45; color: rgb(169 179 171 / 0.8); }
+
+.gb-nojs { display: none; }
+html:not(.js) :is(.gb-escena, .gb-pie) { display: none; }
+html:not(.js) .gb-nojs { grid-row: 2 / -1; display: grid; gap: 0.8rem; align-content: start; padding: 1rem var(--mf-gutter) 2rem; color: var(--gb-tenue); }
+html:not(.js) .gb-sala { height: auto; }
+
+/* Móvil: el pie se compacta para dejar sitio a la escena */
+@media (max-width: 39.99rem) {
+  .gb-lema { display: none; }
+  /* La escena se acota por proporción: sin vacío arriba ni abajo, y la sala crece lo que haga falta */
+  .gb-sala { height: auto; min-height: 0; max-height: none; grid-template-rows: auto auto auto; }
+  .gb-escena { aspect-ratio: 1 / 0.95; }
+  .gb-pie { gap: 0.5rem; padding-bottom: 0.8rem; }
+  .gb-texto { min-height: 5.6rem; }
+  .gb-texto h3 { font-size: 1.25rem; }
+  .gb-texto p { font-size: 0.8125rem; line-height: 1.4; }
+  .gb-pista { font-size: 0.75rem; line-height: 1.35; }
+  .gb-nota { font-size: 0.6875rem; line-height: 1.35; }
+}
+
+@media (min-width: 56rem), (orientation: landscape) and (min-width: 40rem) {
+  .gb-sala {
+    grid-template-columns: var(--gb-col) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "cabeza escena" "pie escena";
+  }
+  .gb-lema { display: block; }
+  .gb-cabeza { padding: clamp(1.25rem, 6svh, 4rem) 0 0 var(--mf-gutter); }
+  .gb-pie { align-content: end; gap: 1rem; padding: 1rem 0 clamp(1.25rem, 6svh, 4rem) var(--mf-gutter); }
+  .gb-texto { min-height: 0; }
+  .gb-texto p { font-size: 1rem; }
+}
+@media (min-width: 90rem) {
+  .gb-sala { --gb-col: 26rem; }
+}
+/* Horizontal bajo: lo secundario sigue ahí para lectores de pantalla, solo se oculta a la vista */
+@media (orientation: landscape) and (max-height: 32rem) {
+  .gb-sala { min-height: 0; }
+  .gb-cabeza h2 { font-size: 1.5rem; }
+  .gb-lema { display: none; }
+  .gb-texto h3 { font-size: 1.15rem; }
+  .gb-texto p { font-size: 0.8125rem; line-height: 1.35; }
+  .gb-pista, .gb-nota {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .gb-pie { gap: 0.4rem; padding-bottom: 0.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gb-lienzo, .gb-mando::before { transition: none; }
+}
