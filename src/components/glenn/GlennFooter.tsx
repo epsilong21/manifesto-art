@@ -6,7 +6,6 @@ export function GlennFooter({ conImagen }: { conImagen: boolean }) {
   const { credito } = OBRA_GLENN;
   return (
     <ConceptFooter
-      current="glenn"
       sources={FUENTES_GLENN}
       rights={
         <>

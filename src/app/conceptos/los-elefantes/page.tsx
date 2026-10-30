@@ -122,7 +122,6 @@ export default function ElefantesPage() {
       </main>
 
       <ConceptFooter
-        current="los-elefantes"
         sources={[
           { label: "Fundació Gala-Salvador Dalí: derechos e imagen", href: "https://www.salvador-dali.org/en/dali-foundation/services/rights-and-image/" },
           { label: "Fundació Gala-Salvador Dalí: catálogo razonado de pintura", href: "https://catalogues.salvador-dali.org/catalogues/en/catalogue-raisonne-paintings/" },

@@ -95,7 +95,6 @@ export default function NochePage() {
       </main>
 
       <ConceptFooter
-        current="noche-estrellada"
         sources={[
           { label: "MoMA: The Starry Night (472.1941)", href: "https://www.moma.org/collection/works/79802" },
           { label: "Historia Arte: La noche estrellada", href: "https://historia-arte.com/obras/noche-estrellada-van-gogh" },

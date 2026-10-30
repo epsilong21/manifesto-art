@@ -27,8 +27,6 @@ export const metadata: Metadata = {
   description:
     "MANIFESTO es una plataforma cultural para descubrir obras de arte, sus símbolos y sus historias mediante experiencias interactivas: Medusa de Caravaggio, La noche estrellada de Van Gogh, Los elefantes de Dalí, y Untitled y Glenn de Basquiat, y cinco más: El Bosco, Rubens, Bruegel y Dalí otra vez.",
   alternates: { canonical: "/" },
-  // Vista previa para el cliente en GitHub Pages: fuera de los buscadores
-  ...(process.env.MANIFESTO_DESTINO === "pages" ? { robots: { index: false, follow: false } } : {}),
   openGraph: {
     type: "website",
     locale: "es_ES",

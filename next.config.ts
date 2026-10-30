@@ -47,7 +47,7 @@ const nextConfig: NextConfig = {
         output: "export",
         basePath,
         // Fuera robots.ts y sitemap.ts (las únicas rutas .ts): bajo un subdirectorio no
-        // sirven y la vista previa no se indexa
+        // sirven
         pageExtensions: ["tsx"],
         // /conceptos/ → conceptos/index.html: GitHub Pages lo sirve al abrir o recargar
         trailingSlash: true,

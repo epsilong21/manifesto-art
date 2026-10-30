@@ -52,7 +52,7 @@ export default function PecadosPage() {
         <Mesa />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
-      <PieObra actual="los-siete-pecados-capitales" {...CREDITOS} />
+      <PieObra {...CREDITOS} />
     </div>
   );
 }

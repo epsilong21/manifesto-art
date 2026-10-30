@@ -2,10 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FijarCabecera } from "@/components/concepts/FijarCabecera";
 import { ObrasMenu } from "@/components/concepts/ObrasMenu";
-import { CONCEPTOS, type Concepto } from "@/content/conceptos";
-
-/** Publicación simplificada: el selector es la entrada, no hay otra portada. */
-const ENTRADA_SELECTOR = process.env.NEXT_PUBLIC_MANIFESTO_ENTRADA === "selector";
+import type { Concepto } from "@/content/conceptos";
 
 /** Logotipo oficial de MANIFESTO (blanco, el mismo de la tienda): va sobre la cabecera negra. */
 export function ManifestoMark({ href = "/" }: { href?: string }) {
@@ -106,44 +103,23 @@ export function ConceptHeader({ actual, superpuesta = false }: { actual?: Concep
 
 type Source = { label: string; href: string };
 
-export function ConceptFooter({
-  current,
-  sources,
-  rights,
-}: {
-  current: Concepto["slug"];
-  sources: Source[];
-  rights: React.ReactNode;
-}) {
-  const i = CONCEPTOS.findIndex((c) => c.slug === current);
-  const next = CONCEPTOS[(i + 1) % CONCEPTOS.length];
-  const relacionada = CONCEPTOS.find((c) => c.slug === CONCEPTOS[i].relacionada);
+/**
+ * Fuentes y derechos de una obra, con el estilo de la marca (fondo blanco). El paso a la obra siguiente y a la
+ * relacionada no va aquí: lo pinta `SiguienteObra` desde el layout de /conceptos, igual en las diez obras.
+ */
+export function ConceptFooter({ sources, rights }: { sources: Source[]; rights: React.ReactNode }) {
   return (
     <footer className="mf-footer">
-      <Link href={`/conceptos/${next.slug}`} className="mf-footer__next">
-        <span className="mf-footer__label">
-          Siguiente obra · {next.numero} / {String(CONCEPTOS.length).padStart(2, "0")}
-        </span>
-        <span className="mf-footer__title">{next.titulo}</span>
-        <span className="mf-footer__meta">
-          {next.autor}, {next.anio}
-          {relacionada?.slug === next.slug ? " · obra relacionada" : null}
-        </span>
-      </Link>
-      {relacionada && relacionada.slug !== next.slug ? (
-        <p className="mf-footer__rel">
-          <span className="mf-footer__label">
-            Obra relacionada · {relacionada.numero} / {String(CONCEPTOS.length).padStart(2, "0")}
-          </span>{" "}
-          <Link href={`/conceptos/${relacionada.slug}`}>
-            {relacionada.titulo}, {relacionada.autor}, {relacionada.anio}
-          </Link>
-        </p>
-      ) : null}
-
+      <h2 className="mf-footer__t">
+        <span>Fuentes y derechos</span>
+      </h2>
       <div className="mf-footer__cols">
         <div>
-          <h2 className="mf-footer__h">Fuentes</h2>
+          <h3 className="mf-footer__h">Imagen y derechos</h3>
+          <div className="mf-footer__rights">{rights}</div>
+        </div>
+        <div>
+          <h3 className="mf-footer__h">Fuentes</h3>
           <ul>
             {sources.map((s) => (
               <li key={s.href}>
@@ -153,32 +129,6 @@ export function ConceptFooter({
               </li>
             ))}
           </ul>
-        </div>
-        <div>
-          <h2 className="mf-footer__h">Imagen y derechos</h2>
-          <div className="mf-footer__rights">{rights}</div>
-          <ul>
-            <li>
-              <Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link>
-            </li>
-            <li>
-              <Link href="/politica-de-privacidad">Política de tratamiento de datos personales</Link>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h2 className="mf-footer__h">MANIFESTO</h2>
-          <ul>
-            <li>
-              <Link href={ENTRADA_SELECTOR ? "/" : "/conceptos"} prefetch={false}>Diez obras, diez universos</Link>
-            </li>
-            {ENTRADA_SELECTOR ? null : (
-              <li>
-                <Link href="/" prefetch={false}>Portada</Link>
-              </li>
-            )}
-          </ul>
-          <p className="mf-footer__note">Plataforma cultural y educativa. No es una tienda.</p>
         </div>
       </div>
     </footer>

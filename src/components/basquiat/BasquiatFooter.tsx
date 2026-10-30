@@ -6,7 +6,6 @@ export function BasquiatFooter({ conImagen }: { conImagen: boolean }) {
   const { credito } = OBRA_BASQUIAT;
   return (
     <ConceptFooter
-      current="basquiat-untitled"
       sources={FUENTES_BASQUIAT}
       rights={
         <>

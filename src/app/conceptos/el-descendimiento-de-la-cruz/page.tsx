@@ -51,7 +51,7 @@ export default function DescendimientoPage() {
         <Interpretacion />
         <Gravedad />
       </main>
-      <PieObra actual="el-descendimiento-de-la-cruz" {...CREDITOS} />
+      <PieObra {...CREDITOS} />
     </div>
   );
 }

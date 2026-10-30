@@ -46,7 +46,7 @@ export default function EmpireoPage() {
         <Umbral />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
-      <PieObra actual="ascension-al-empireo" {...CREDITOS} />
+      <PieObra {...CREDITOS} />
     </div>
   );
 }

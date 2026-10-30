@@ -55,7 +55,7 @@ export default function CristoDaliPage() {
         <Imposible />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
       </main>
-      <PieObra actual="cristo-de-san-juan-de-la-cruz" {...CREDITOS} />
+      <PieObra {...CREDITOS} />
     </div>
   );
 }

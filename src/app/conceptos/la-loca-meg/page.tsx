@@ -53,7 +53,7 @@ export default function LocaMegPage() {
         <InterpretacionGabinete />
         <Gabinete />
       </main>
-      <PieObra actual="la-loca-meg" {...CREDITOS} />
+      <PieObra {...CREDITOS} />
     </div>
   );
 }

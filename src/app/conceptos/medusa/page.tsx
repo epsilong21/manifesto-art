@@ -143,7 +143,6 @@ export default function MedusaPage() {
       </main>
 
       <ConceptFooter
-        current="medusa"
         sources={[
           { label: "Gallerie degli Uffizi (ficha en Google Arts & Culture)", href: "https://artsandculture.google.com/asset/medusa/FAFPqU12CekL8Q" },
           { label: "Gallerie degli Uffizi", href: "https://www.uffizi.it/" },
