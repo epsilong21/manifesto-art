@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ConceptHeader, SiteFooter } from "@/components/concepts/ConceptChrome";
+import { ConceptHeader, WhatsAppFlotante, SiteFooter } from "@/components/concepts/ConceptChrome";
 import { ACTUALIZACION, CONTACTO_LEGAL, CREDITOS_URL, DATOS_PENDIENTES, RESPONSABLE, SECCIONES_AVISO, TELEFONO_HREF } from "@/content/aviso-legal";
 import { BASQUIAT, DERECHOS_BASQUIAT, OBRA_BASQUIAT } from "@/content/basquiat";
 import { DERECHOS_DALI, ELEFANTES, OBRA_ELEFANTES } from "@/content/elefantes";
@@ -132,6 +132,7 @@ export default function AvisoLegalPage() {
   return (
     <div className="mf-theme theme-selector">
       <ConceptHeader />
+      <WhatsAppFlotante />
       <main className="al">
         <header className="al-cab">
           <p className="al-k">MANIFESTO · Enciclopedia digital de arte</p>

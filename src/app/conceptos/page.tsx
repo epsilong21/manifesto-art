@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ConceptHeader } from "@/components/concepts/ConceptChrome";
+import { ConceptHeader, WhatsAppFlotante } from "@/components/concepts/ConceptChrome";
 import { CintaObras } from "@/components/museo/CintaObras";
 import { ImagenObra, esPintura, proporcion } from "@/components/museo/ImagenObra";
 import { CONCEPTOS } from "@/content/conceptos";
@@ -33,6 +33,7 @@ export default function ConceptosPage() {
   return (
     <div className={`mf-theme theme-selector ${cormorant.variable} ${gloock.variable} ${instrument.variable} ${shoulders.variable} ${bricolage.variable} ${plexMono.variable}`}>
       <ConceptHeader />
+      <WhatsAppFlotante />
       <main>
         <section className="cat-intro" aria-labelledby="cat-title">
           <p className="cat-intro__k">La exposición · {String(CONCEPTOS.length).padStart(2, "0")} obras</p>

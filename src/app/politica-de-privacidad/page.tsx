@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ConceptHeader, SiteFooter } from "@/components/concepts/ConceptChrome";
+import { ConceptHeader, WhatsAppFlotante, SiteFooter } from "@/components/concepts/ConceptChrome";
 import { CONTACTO_LEGAL, RESPONSABLE, TELEFONO_HREF } from "@/content/aviso-legal";
 import { AREA_ATENCION, ENTRADA_EN_VIGENCIA, PROVEEDORES, SECCIONES_POLITICA } from "@/content/politica-privacidad";
 import "../conceptos/conceptos.css";
@@ -53,6 +53,7 @@ export default function PoliticaPrivacidadPage() {
   return (
     <div className="mf-theme theme-selector">
       <ConceptHeader />
+      <WhatsAppFlotante />
       <main className="al">
         <header className="al-cab">
           <p className="al-k">MANIFESTO · Enciclopedia digital de arte</p>

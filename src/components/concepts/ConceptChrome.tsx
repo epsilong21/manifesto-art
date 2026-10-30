@@ -32,52 +32,70 @@ const CONTACTO = {
   email: "manifesto.msto@gmail.com",
   instagram: "https://www.instagram.com/manifesto_msto",
   instagramUsuario: "@manifesto_msto",
+  tienda: "https://manifestocol.com",
+  whatsapp: "https://wa.me/573173086100",
 };
 
-/** Barra de anuncio con marquesina y barra de contacto, como en la cabecera de la tienda. */
-export function MarcaBarras() {
+/** Anuncio negro con marquesina, como el de la tienda. */
+export function BarraAnuncio() {
   const anuncio = (
-    <>
-      <span>
-        Envíos <b>Gratis</b> a Colombia
-      </span>
-      <span aria-hidden="true">|</span>
-      <span>Pago Contraentrega</span>
-      <span aria-hidden="true">|</span>
-    </>
+    <span>
+      Envíos <b>Gratis</b> a Colombia | Pago Contraentrega
+    </span>
   );
   return (
-    <>
-      <div className="mf-aviso">
-        <div className="mf-aviso__pista">
-          <div className="mf-aviso__tanda">{anuncio}{anuncio}{anuncio}</div>
-          <div className="mf-aviso__tanda" aria-hidden="true">{anuncio}{anuncio}{anuncio}</div>
-        </div>
+    <div className="mf-aviso">
+      <div className="mf-aviso__pista">
+        <div className="mf-aviso__tanda">{anuncio}{anuncio}{anuncio}{anuncio}</div>
+        <div className="mf-aviso__tanda" aria-hidden="true">{anuncio}{anuncio}{anuncio}{anuncio}</div>
       </div>
-      <div className="mf-topbar">
-        <a href={`tel:${CONTACTO.tel}`}>{CONTACTO.telefono}</a>
-        <a href={`mailto:${CONTACTO.email}`}>{CONTACTO.email}</a>
-      </div>
-    </>
+    </div>
+  );
+}
+
+/** Icono de Instagram de la marca (enlace a su perfil). */
+function InstagramIcono({ className }: { className?: string }) {
+  return (
+    <a href={CONTACTO.instagram} target="_blank" rel="noopener noreferrer" className={className} aria-label="Instagram de MANIFESTO">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <circle cx="12" cy="12" r="4.2" />
+    <circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none" />
+  </svg>
+    </a>
+  );
+}
+
+/** Botón flotante de WhatsApp de la tienda. Solo en las páginas propias de la marca, nunca sobre una obra. */
+export function WhatsAppFlotante() {
+  return (
+    <a href={CONTACTO.whatsapp} target="_blank" rel="noopener noreferrer" className="mf-wa" aria-label="Escribir a MANIFESTO por WhatsApp">
+      <svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.9L2 22l5.25-1.37A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.1.81.83-3.02-.2-.31a8.2 8.2 0 1 1 6.95 3.84Zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.23-.09-.39-.12-.56.12-.16.25-.64.8-.78.97-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.33-2.9c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.42-.06-.12-.56-1.35-.76-1.85-.2-.48-.4-.42-.56-.43h-.47c-.16 0-.43.06-.65.3-.23.25-.86.84-.86 2.05s.88 2.38 1 2.55c.12.16 1.73 2.64 4.2 3.7 1.56.67 2.17.73 2.95.62.48-.07 1.46-.6 1.67-1.17.2-.58.2-1.07.14-1.17-.06-.1-.22-.16-.47-.28Z" />
+      </svg>
+    </a>
   );
 }
 
 /**
- * Cabecera común de la marca: barras superiores, logotipo, menú de la tienda y selector de obras con la
- * obra actual. Va encima de cada página, fuera del universo de la obra.
+ * Cabecera común de la marca: anuncio negro y cabecera blanca con el menú de la tienda a la izquierda, el logotipo
+ * al centro y el selector de obras a la derecha. Va encima de cada página, fuera del universo de la obra.
  */
 export function ConceptHeader({ actual }: { actual?: Concepto["slug"] }) {
   return (
     <>
-      <MarcaBarras />
+      <BarraAnuncio />
       <header className="mf-header mf-header--marca">
-        <ManifestoMark />
         <nav className="mf-nav" aria-label="Principal">
           <Link href="/" prefetch={false}>Inicio</Link>
           <Link href="/conceptos" prefetch={false}>Exposición</Link>
-          <a href={CONTACTO.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href={CONTACTO.tienda} target="_blank" rel="noopener noreferrer">Tienda</a>
         </nav>
-        <ObrasMenu actual={actual} />
+        <ManifestoMark />
+        <div className="mf-acciones">
+          <ObrasMenu actual={actual} />
+          <InstagramIcono className="mf-ig" />
+        </div>
       </header>
     </>
   );
@@ -167,50 +185,49 @@ export function ConceptFooter({
 /** Fuera de una publicación, el catálogo y la portada muestran la reproducción de referencia de las obras protegidas (src/lib/miniaturas.ts) */
 const PUBLICACION = process.env.MANIFESTO_PUBLICACION === "1";
 
-/** Pie de la portada, del catálogo y de las páginas legales: tres columnas y franja inferior, como el de la tienda. */
+/** Pie de la portada, del catálogo y de las obras (igual que el de la tienda): contacto, políticas y la marca. */
 export function SiteFooter() {
   return (
     <footer className="mf-sitefoot">
       <div className="mf-sitefoot__cols">
+        <address>
+          <p><span>Dirección :</span> {CONTACTO.direccion}</p>
+          <p><span>Tel:</span> <a href={`tel:${CONTACTO.tel}`}>{CONTACTO.telefono}</a></p>
+          <p><span>Email:</span> <a href={`mailto:${CONTACTO.email}`}>{CONTACTO.email}</a></p>
+          <p><span>Instagram:</span> <a href={CONTACTO.instagram} target="_blank" rel="noopener noreferrer">{CONTACTO.instagramUsuario}</a></p>
+        </address>
+        <ul>
+          <li><Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link></li>
+          <li><Link href="/politica-de-privacidad">Política de tratamiento de datos personales</Link></li>
+          <li><a href={CONTACTO.tienda} target="_blank" rel="noopener noreferrer">Tienda MANIFESTO</a></li>
+        </ul>
         <div>
-          <h2 className="mf-sitefoot__h">Contacto</h2>
-          <address>
-            <p><span>Dirección:</span> {CONTACTO.direccion}</p>
-            <p><span>Tel:</span> <a href={`tel:${CONTACTO.tel}`}>{CONTACTO.telefono}</a></p>
-            <p><span>Email:</span> <a href={`mailto:${CONTACTO.email}`}>{CONTACTO.email}</a></p>
-            <p><span>Instagram:</span> <a href={CONTACTO.instagram} target="_blank" rel="noopener noreferrer">{CONTACTO.instagramUsuario}</a></p>
-          </address>
-        </div>
-        <div>
-          <h2 className="mf-sitefoot__h">Políticas</h2>
-          <ul>
-            <li><Link href="/aviso-legal">Aviso legal y derechos de reproducción</Link></li>
-            <li><Link href="/politica-de-privacidad">Política de tratamiento de datos personales</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h2 className="mf-sitefoot__h">
-            <Image
-              src="/marca/logo-manifesto-blanco.png"
-              alt="MANIFESTO"
-              width={1297}
-              height={228}
-              sizes="160px"
-              className="mf-sitefoot__logo"
-            />
-          </h2>
+          <h2 className="mf-sitefoot__h">MANIFESTO</h2>
           <p>Plataforma cultural y educativa sobre historia del arte. No es una tienda.</p>
+          <div className="mf-sitefoot__social">
+            <InstagramIcono />
+          </div>
         </div>
       </div>
       <div className="mf-sitefoot__base">
-        <p className="mf-sitefoot__copy">Copyright © 2026 MANIFESTO. Todos los derechos reservados.</p>
-        <p className="mf-sitefoot__img">
-          Las reproducciones de Medusa y La noche estrellada son de obras en dominio público; las de las obras 06 a 09, de pinturas
-          antiguas cuyas condiciones de imagen figuran en cada página.{" "}
-          {PUBLICACION
-            ? "La imagen de Los elefantes es una composición gráfica de MANIFESTO, no la pintura de Dalí. Las de Untitled, Glenn y Cristo de San Juan de la Cruz reproducen obras protegidas sin licencia de reproducción."
-            : "En esta versión local, las imágenes de Los elefantes, Untitled y Glenn son reproducciones sin licencia; en la versión publicada, la de Los elefantes es una composición gráfica de MANIFESTO."}
-        </p>
+        <div>
+          <p className="mf-sitefoot__copy">Copyright © 2026 MANIFESTO. Todos los derechos reservados.</p>
+          <p className="mf-sitefoot__img">
+            Las reproducciones de Medusa y La noche estrellada son de obras en dominio público; las de las obras 06 a 09, de pinturas
+            antiguas cuyas condiciones de imagen figuran en cada página.{" "}
+            {PUBLICACION
+              ? "La imagen de Los elefantes es una composición gráfica de MANIFESTO, no la pintura de Dalí. Las de Untitled, Glenn y Cristo de San Juan de la Cruz reproducen obras protegidas sin licencia de reproducción."
+              : "En esta versión local, las imágenes de Los elefantes, Untitled y Glenn son reproducciones sin licencia; en la versión publicada, la de Los elefantes es una composición gráfica de MANIFESTO."}
+          </p>
+        </div>
+        <Image
+          src="/marca/logo-manifesto-blanco.png"
+          alt="MANIFESTO"
+          width={1297}
+          height={228}
+          sizes="200px"
+          className="mf-sitefoot__logo"
+        />
       </div>
     </footer>
   );

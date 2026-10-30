@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ConceptHeader, SiteFooter } from "@/components/concepts/ConceptChrome";
+import { ConceptHeader, SiteFooter, WhatsAppFlotante } from "@/components/concepts/ConceptChrome";
 import { Escenario, type ObraEscena } from "@/components/museo/Escenario";
 import { ImagenObra, esPintura } from "@/components/museo/ImagenObra";
 import { CONCEPTOS } from "@/content/conceptos";
@@ -47,6 +47,7 @@ export default function Portada() {
   return (
     <div className={`mf-theme theme-selector hm ${bricolage.variable} ${plexMono.variable}`}>
       <ConceptHeader />
+      <WhatsAppFlotante />
       <main>
         <div className="hm-hero">
           <div className="hm-copy">
@@ -82,16 +83,18 @@ export default function Portada() {
         </div>
 
         <section className="hm-indice" id="hm-indice" aria-labelledby="hm-indice-t">
-          <h2 id="hm-indice-t" className="hm-h2">Índice de la exposición</h2>
-          <p className="hm-indice__intro">MANIFESTO es una plataforma cultural para descubrir obras de arte desde dentro: sus símbolos, sus historias y lo que no se ve a primera vista.</p>
-          <ol className="hm-lista">
+          <h2 id="hm-indice-t" className="hm-h2"><span>La exposición</span></h2>
+          <ol className="hm-grid">
             {CONCEPTOS.map((c) => (
-              <li key={c.slug} style={{ "--ta": c.acento } as React.CSSProperties}>
+              <li key={c.slug} className="hm-tile">
                 <Link href={`/conceptos/${c.slug}`} prefetch={false}>
-                  <span className="hm-lista__n">{c.numero}</span>
-                  <span className="hm-lista__t">{c.titulo}</span>
-                  <span className="hm-lista__a">{c.autor}, {c.anio}</span>
-                  <span className="hm-lista__g">{c.gesto}</span>
+                  <span className="hm-tile__img">
+                    <ImagenObra slug={c.slug} uid="hm-g" sizes="(min-width: 48rem) 25vw, 50vw" />
+                    <span className="hm-tile__n">{c.numero}</span>
+                  </span>
+                  <span className="hm-tile__t">{c.titulo}</span>
+                  <span className="hm-tile__a">{c.autor}, {c.anio}</span>
+                  <span className="hm-tile__g">{c.gesto}</span>
                 </Link>
               </li>
             ))}
@@ -100,7 +103,7 @@ export default function Portada() {
         </section>
 
         <section className="hm-metodo" aria-labelledby="hm-metodo-t">
-          <h2 id="hm-metodo-t" className="hm-h2">Cómo se recorre una obra</h2>
+          <h2 id="hm-metodo-t" className="hm-h2"><span>Cómo se recorre una obra</span></h2>
           <ol className="hm-pasos">
             {PASOS.map((p) => (
               <li key={p.titulo}>
@@ -109,6 +112,13 @@ export default function Portada() {
               </li>
             ))}
           </ol>
+        </section>
+
+        <section className="hm-ig" aria-labelledby="hm-ig-t">
+          <h2 id="hm-ig-t" className="hm-h2 hm-h2--ig"><span>Síguenos en Instagram</span></h2>
+          <a className="hm-ig__enlace" href="https://www.instagram.com/manifesto_msto" target="_blank" rel="noopener noreferrer">
+            @manifesto_msto
+          </a>
         </section>
       </main>
       <SiteFooter />
