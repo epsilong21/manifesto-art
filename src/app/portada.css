@@ -185,11 +185,11 @@
 @media (min-width: 64rem) { .hm-rotulo { grid-column: 2; grid-row: 1; align-self: end; } }
 .hm-rotulo p { margin: 0; }
 .hm-rotulo__n { font-variation-settings: "wdth" 80; font-size: 0.8125rem; letter-spacing: 0.14em; color: var(--c-muted); }
-.hm-rotulo__n span { color: color-mix(in srgb, var(--a) 45%, #000); font-weight: 700; }
+.hm-rotulo__n span { color: var(--a); font-weight: 700; }
 .hm-rotulo__t { font-family: var(--font-display); font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2.1rem); line-height: 1.05; text-wrap: balance; }
 .hm-rotulo__a { font-variation-settings: "wdth" 85; color: var(--c-muted); font-size: 0.9375rem; }
 .hm-rotulo__g { margin-top: 0.4rem; font-size: 0.9375rem; line-height: 1.4; color: var(--c-ink); }
-.hm-rotulo__g b { color: color-mix(in srgb, var(--a) 45%, #000); font-weight: 600; }
+.hm-rotulo__g b { color: var(--a); font-weight: 600; }
 .hm-rotulo__nota { font-size: 0.75rem; color: var(--c-muted); font-style: italic; }
 .hm-mandos { display: flex; align-items: center; gap: 0.5rem; }
 @media (min-width: 64rem) { .hm-mandos { grid-column: 2; grid-row: 2; } }
@@ -231,10 +231,29 @@
 .hm-friso a[href$="/medusa"] img, .hm-friso a[href$="/medusa/"] img { border-radius: 50%; }
 .hm-tira__img img, .hm-tira__img svg { display: block; height: 100%; width: auto; max-width: none; }
 .hm-tira__img svg { aspect-ratio: 800 / 640; }
-.hm-tira__n { font-variation-settings: "wdth" 80; font-size: 0.75rem; font-weight: 700; color: color-mix(in srgb, var(--ta) 45%, #000); font-variant-numeric: tabular-nums; }
+.hm-tira__n { font-variation-settings: "wdth" 80; font-size: 0.75rem; font-weight: 700; color: var(--ta); font-variant-numeric: tabular-nums; }
 @media (min-width: 64rem) { .hm-friso a { opacity: 0.55; } }
 .hm-friso a:focus-visible { outline-offset: 4px; }
 @media (hover: hover) { .hm-friso a:hover { opacity: 1; color: var(--c-ink); } }
+
+/* ── Hero oscuro (como el video de la tienda) y cinta de distribuidores ── */
+.hm-oscuro {
+  --c-bg: #000; --c-ink: #fff; --c-muted: #b3b3b3; --c-accent: #ff0000; --c-line: rgb(255 255 255 / 0.18);
+  background: var(--c-bg); color: var(--c-ink);
+  padding-top: 4.75rem;
+}
+.hm-dist { background: #fff; color: #000; padding: 2rem 0 1.5rem; overflow: hidden; }
+.hm-dist__t { margin: 0 0 1rem; text-align: center; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; }
+.hm-dist__pista { display: flex; width: max-content; animation: hm-dist 50s linear infinite; }
+.hm-dist:hover .hm-dist__pista { animation-play-state: paused; }
+.hm-dist__tanda { display: flex; flex: none; align-items: center; gap: 4rem; margin: 0; padding: 0 4rem 0 0; list-style: none; }
+.hm-dist__tanda img { display: block; width: auto; height: 6rem; }
+@keyframes hm-dist { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .hm-dist__pista { width: auto; flex-wrap: wrap; justify-content: center; animation: none; }
+  .hm-dist__tanda[aria-hidden="true"] { display: none; }
+  .hm-dist__tanda { flex-wrap: wrap; justify-content: center; padding: 0 var(--mf-gutter); }
+}
 
 /* ── Exposición: tarjetas como las de producto de la tienda (fondo gris con viñeta, nombre y detalle centrados) ── */
 .hm-indice, .hm-metodo, .hm-ig {

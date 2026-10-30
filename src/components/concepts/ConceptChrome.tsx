@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { FijarCabecera } from "@/components/concepts/FijarCabecera";
 import { ObrasMenu } from "@/components/concepts/ObrasMenu";
 import { CONCEPTOS, type Concepto } from "@/content/conceptos";
 
@@ -80,12 +81,14 @@ export function WhatsAppFlotante() {
 /**
  * Cabecera común de la marca: anuncio negro y cabecera blanca con el menú de la tienda a la izquierda, el logotipo
  * al centro y el selector de obras a la derecha. Va encima de cada página, fuera del universo de la obra.
+ * Con `superpuesta` (portada) es transparente sobre el hero y se vuelve blanca y fija al bajar.
  */
-export function ConceptHeader({ actual }: { actual?: Concepto["slug"] }) {
+export function ConceptHeader({ actual, superpuesta = false }: { actual?: Concepto["slug"]; superpuesta?: boolean }) {
   return (
     <>
       <BarraAnuncio />
-      <header className="mf-header mf-header--marca">
+      {superpuesta ? <FijarCabecera /> : null}
+      <header className={superpuesta ? "mf-header mf-header--marca mf-header--superpuesta" : "mf-header mf-header--marca"}>
         <nav className="mf-nav" aria-label="Principal">
           <Link href="/" prefetch={false}>Inicio</Link>
           <Link href="/conceptos" prefetch={false}>Exposición</Link>

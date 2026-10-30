@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ConceptHeader, SiteFooter, WhatsAppFlotante } from "@/components/concepts/ConceptChrome";
+import { Distribuidores } from "@/components/concepts/Distribuidores";
 import { Escenario, type ObraEscena } from "@/components/museo/Escenario";
 import { ImagenObra, esPintura } from "@/components/museo/ImagenObra";
 import { CONCEPTOS } from "@/content/conceptos";
@@ -46,9 +47,10 @@ export default function Portada() {
   if (entradaSelector) return (<><ConceptosPage /><SiteFooter /></>);
   return (
     <div className={`mf-theme theme-selector hm ${bricolage.variable} ${plexMono.variable}`}>
-      <ConceptHeader />
+      <ConceptHeader superpuesta />
       <WhatsAppFlotante />
       <main>
+        <div className="hm-oscuro">
         <div className="hm-hero">
           <div className="hm-copy">
             <p className="hm-kicker">Experimental Art Journal · diez obras</p>
@@ -81,6 +83,9 @@ export default function Portada() {
             ))}
           />
         </div>
+        </div>
+
+        <Distribuidores />
 
         <section className="hm-indice" id="hm-indice" aria-labelledby="hm-indice-t">
           <h2 id="hm-indice-t" className="hm-h2"><span>La exposición</span></h2>
