@@ -34,7 +34,6 @@ npm run preview:pages  # http://localhost:4010/manifesto-art/
 - una exportación estática bajo `/manifesto-art` (se cambia con `MANIFESTO_BASE_PATH`);
 - la entrada directa al selector de las cinco obras;
 - variantes WebP de las imágenes (hasta 2048 px);
-- páginas con `noindex`;
 - *Los elefantes* completo (pintura, cinco capítulos y guías) solo si su reproducción está en `public/obras/` al exportar y tiene derechos de reutilización; este repositorio no la incluye, así que la publicación usa la alternativa informativa.
 - *Untitled* (Basquiat) con la pintura solo si hay en `public/obras/` una reproducción con licencia registrada en `src/content/basquiat-reproducciones.json`; hoy no existe, así que la publicación usa la lámina vacía y las capas como texto.
 - *Glenn* (Basquiat), igual: con la pintura solo si hay una reproducción con licencia registrada en `src/content/glenn-reproducciones.json`; hoy no existe, así que la publicación usa el esquema propio de MANIFESTO.
