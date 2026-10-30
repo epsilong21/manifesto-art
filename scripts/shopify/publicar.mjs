@@ -13,11 +13,13 @@ const raiz = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const args = process.argv.slice(2);
 const TIENDA = "manifestocol.myshopify.com";
 const tema = args.includes("--tema") ? args[args.indexOf("--tema") + 1] : "182672720169";
-const shell = process.platform === "win32";
+const ensayo = args.includes("--ensayo"); // solo empaqueta; muestra lo que haría después, sin tocar la tienda
+// En Windows `shopify` es un .cmd y necesita shell; Node no (su ruta suele llevar espacios y el shell la rompería)
+const necesitaShell = (comando) => process.platform === "win32" && comando === "shopify";
 
 function paso(titulo, comando, argumentos, cwd = raiz) {
   console.log(`\n▶ ${titulo}`);
-  const r = spawnSync(comando, argumentos, { cwd, stdio: "inherit", shell });
+  const r = spawnSync(comando, argumentos, { cwd, stdio: "inherit", shell: necesitaShell(comando) });
   if (r.status !== 0) {
     console.error(`\n✗ Se detuvo en: ${titulo}`);
     process.exit(r.status ?? 1);
@@ -25,6 +27,12 @@ function paso(titulo, comando, argumentos, cwd = raiz) {
 }
 
 paso("1/3 Empaquetar la web para Shopify", process.execPath, [join(raiz, "scripts/shopify/empaquetar.mjs")]);
+if (ensayo) {
+  console.log(String.fromCharCode(10) + "(ensayo) No se sube nada ni se crean páginas. Con `npm run shopify:publicar` se haría:");
+  console.log(`  · shopify theme push --theme ${tema} --allow-live  (assets/*, templates/page.obra*, snippets/obra-manifesto)`);
+  console.log("  · crear o corregir las 14 páginas (npm run shopify:crear-paginas -- --mostrar las lista)");
+  process.exit(0);
+}
 paso(
   `2/3 Subir los archivos al tema ${tema}`,
   "shopify",
