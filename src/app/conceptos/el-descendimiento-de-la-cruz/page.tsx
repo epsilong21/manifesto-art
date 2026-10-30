@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { ConceptHeader } from "@/components/concepts/ConceptChrome";
+import { Gravedad } from "@/components/descendimiento/Gravedad";
+import { Interpretacion } from "@/components/descendimiento/Interpretacion";
 import { Panel } from "@/components/descendimiento/Panel";
 import { PesoDeLaLuz } from "@/components/descendimiento/PesoDeLaLuz";
 import { Ficha } from "@/components/sprint/Ficha";
@@ -9,6 +11,7 @@ import { gloock } from "@/lib/fonts/gloock";
 import "../sprint.css";
 import "./descendimiento.css";
 import "./peso.css";
+import "./gravedad.css";
 import "../pulido.css";
 import { FundidoEstados } from "@/components/museo/FundidoEstados";
 
@@ -45,6 +48,8 @@ export default function DescendimientoPage() {
         </section>
         <PesoDeLaLuz />
         <Ficha documentado={DOCUMENTADO} interpretacion={INTERPRETACION} />
+        <Interpretacion />
+        <Gravedad />
       </main>
       <PieObra actual="el-descendimiento-de-la-cruz" {...CREDITOS} />
     </div>

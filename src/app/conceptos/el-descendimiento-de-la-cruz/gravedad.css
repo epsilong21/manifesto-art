@@ -1,0 +1,282 @@
+/* ─────────────────────────────────────────────────────────────
+   07 · V7 «La gravedad invisible»
+   Después de la ficha: un umbral editorial breve y una sala oscura con la escultura.
+   Negro profundo, marfil de la tela, bronce envejecido; Gloock en títulos.
+   Móvil: cabecera, escena y pie en filas. Escritorio y horizontal: la escena ocupa la sala
+   y el texto vive en una columna a la derecha.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Umbral: análisis de la tabla / interpretación de MANIFESTO ── */
+/* Alineada con la ficha de arriba: mismo margen, misma medida de columnas y una línea que la separa */
+.gv-transicion {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(3rem, 9vw, 6rem) var(--mf-gutter) clamp(2rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--c-line);
+}
+.gv-transicion h2 {
+  margin: 0;
+  font-size: clamp(1.9rem, 1.2rem + 3vw, 3.6rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.gv-transicion__entrada {
+  margin: 0;
+  max-width: 36rem;
+  color: var(--c-muted);
+  font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+  line-height: 1.5;
+}
+.gv-transicion__cols { display: grid; gap: 1.25rem; max-width: 64rem; margin-top: 0.5rem; }
+.gv-transicion__cols > div { padding-top: 0.9rem; border-top: 1px solid var(--c-line); }
+.gv-transicion__cols > div[data-tipo="sala"] { border-top-color: rgb(192 138 82 / 0.55); }
+.gv-transicion__tipo {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+[data-tipo="sala"] .gv-transicion__tipo { color: #d1a06c; }
+.gv-transicion h3 { margin: 0 0 0.4rem; font-size: 1.4rem; line-height: 1.1; }
+.gv-transicion__cols p:last-child { margin: 0; max-width: 32rem; color: var(--c-muted); line-height: 1.55; text-wrap: pretty; }
+/* Una cuerda baja del umbral a la sala */
+.gv-transicion::after {
+  content: "";
+  justify-self: center;
+  width: 1px;
+  height: clamp(2.5rem, 8vw, 4.5rem);
+  margin-top: clamp(1rem, 4vw, 2.5rem);
+  background: linear-gradient(rgb(192 138 82 / 0), rgb(192 138 82 / 0.7));
+}
+@media (min-width: 48rem) {
+  .gv-transicion__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem; }
+}
+
+/* ── La sala ── */
+.gv-sala {
+  --gv-negro: #050302;
+  --gv-marfil: #f2e8d9;
+  --gv-bronce: #c99560;
+  --gv-tenue: #b9ab9a;
+  --gv-linea: rgb(242 232 217 / 0.16);
+  --gv-col: 25rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "cabeza" "escena" "pie";
+  height: 100svh;
+  min-height: 40rem;
+  max-height: 68rem;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--gv-marfil);
+  background: var(--gv-negro);
+}
+
+.gv-cabeza { grid-area: cabeza; z-index: 2; padding: clamp(0.9rem, 3svh, 1.5rem) var(--mf-gutter) 0; }
+.gv-ante {
+  margin: 0 0 0.3rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gv-bronce);
+}
+.gv-cabeza h2 {
+  margin: 0;
+  font-size: clamp(1.75rem, 1.1rem + 3vw, 3.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+/* ── Escena ── */
+.gv-escena {
+  grid-area: escena;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  outline: none;
+  cursor: grab;
+  touch-action: pan-y;
+  background: radial-gradient(ellipse 60% 55% at 45% 45%, #17110d, var(--gv-negro));
+}
+.gv-escena:active { cursor: grabbing; }
+.gv-escena:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  z-index: 5;
+  outline: 2px solid var(--gv-marfil);
+  pointer-events: none;
+}
+.gv-lienzo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease-cine);
+}
+.gv-sala[data-listo="true"] .gv-lienzo { opacity: 1; }
+.gv-capa { position: absolute; inset: 0; pointer-events: none; }
+
+/* Los apoyos: un anillo de 44 px sobre cada ojal de la tela */
+.gv-apoyo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  outline: none;
+  visibility: hidden;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: ns-resize;
+}
+.gv-apoyo::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1.5px solid rgb(242 232 217 / 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(5 3 2 / 0.5), 0 0 14px rgb(242 232 217 / 0.22);
+  transition: transform 0.35s var(--ease-cine), background-color 0.3s, border-color 0.3s;
+}
+.gv-apoyo span {
+  position: absolute;
+  top: 1px;
+  left: 33px;
+  font-family: var(--f-display);
+  font-size: 0.8125rem;
+  line-height: 1;
+  color: var(--gv-marfil);
+  text-shadow: 0 1px 4px var(--gv-negro), 0 0 2px var(--gv-negro);
+  pointer-events: none;
+}
+.gv-apoyo[data-sel="true"]::before { transform: scale(1.3); border-color: var(--gv-marfil); background: rgb(201 149 96 / 0.4); }
+.gv-apoyo[data-suelta="true"]::before { border-style: dashed; border-color: rgb(242 232 217 / 0.55); background: none; }
+.gv-apoyo:focus-visible::before { outline: 2px solid var(--gv-marfil); outline-offset: 5px; }
+@media (hover: hover) { .gv-apoyo:hover::before { transform: scale(1.25); } }
+
+/* ── Pie: estado, reparto y acciones ── */
+.gv-pie { grid-area: pie; z-index: 2; display: grid; gap: 0.75rem; padding: 0.75rem var(--mf-gutter) 1rem; }
+.gv-texto { min-height: 7.5rem; }
+.gv-texto h3 { margin: 0 0 0.3rem; font-size: clamp(1.35rem, 1.1rem + 1.5vw, 2.6rem); line-height: 1.02; text-wrap: balance; }
+.gv-texto p { margin: 0; max-width: 34rem; color: var(--gv-tenue); font-size: 0.9375rem; line-height: 1.45; text-wrap: pretty; }
+.gv-texto p.gv-dato { margin-top: 0.45rem; color: var(--gv-marfil); font-size: 0.8125rem; }
+
+.gv-reparto > p {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gv-tenue);
+}
+.gv-reparto > div { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.5rem; }
+.gv-reparto > div > span {
+  display: grid;
+  justify-items: start;
+  gap: 0.15rem;
+  font-size: 0.75rem;
+  color: var(--gv-tenue);
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.4s;
+}
+.gv-reparto__via { display: flex; align-items: flex-end; width: 100%; height: 2rem; border-bottom: 1px solid var(--gv-linea); }
+.gv-reparto__via span {
+  display: block;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(var(--gv-marfil), var(--gv-bronce));
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.2s linear;
+}
+.gv-reparto b { font-family: var(--f-display); font-size: 0.9375rem; font-weight: 400; color: var(--gv-marfil); }
+.gv-reparto span[data-suelta="true"] { opacity: 0.4; }
+.gv-reparto span[data-sel="true"] b { color: var(--gv-bronce); }
+
+.gv-acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.gv-acciones button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 1.05rem;
+  border: 1px solid var(--gv-linea);
+  border-radius: 999px;
+  background: none;
+  color: var(--gv-marfil);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+.gv-acciones button:disabled { opacity: 0.45; cursor: not-allowed; }
+.gv-acciones .gv-restaurar span { font-size: 1.05rem; color: var(--gv-bronce); }
+@media (hover: hover) {
+  .gv-acciones button:not(:disabled):hover { border-color: var(--gv-bronce); background: rgb(201 149 96 / 0.1); }
+}
+.gv-pista { margin: 0; font-size: 0.8125rem; color: var(--gv-tenue); }
+.gv-nota { margin: 0; max-width: 34rem; font-size: 0.75rem; line-height: 1.45; color: rgb(185 171 154 / 0.8); }
+
+.gv-nojs { display: none; }
+html:not(.js) :is(.gv-escena, .gv-pie) { display: none; }
+html:not(.js) .gv-nojs { grid-row: 2 / -1; display: grid; gap: 0.8rem; align-content: start; padding: 1rem var(--mf-gutter) 2rem; color: var(--gv-tenue); }
+html:not(.js) .gv-sala { height: auto; }
+
+/* Móvil estrecho: el pie se compacta para dejar sitio a la escultura */
+@media (max-width: 39.99rem) {
+  .gv-pie { gap: 0.55rem; padding-bottom: 0.85rem; }
+  .gv-texto { min-height: 0; }
+  .gv-texto h3 { font-size: 1.3rem; }
+  .gv-texto p { font-size: 0.875rem; line-height: 1.4; }
+  .gv-reparto > p { display: none; }
+  .gv-reparto__via { height: 1.25rem; }
+  .gv-pista { display: none; }
+  .gv-nota { font-size: 0.6875rem; }
+}
+
+/* Muy estrecho: la sala crece por debajo de la pantalla para que la escultura no se encoja */
+@media (max-width: 22.5rem) {
+  .gv-sala { height: auto; max-height: none; grid-template-rows: auto 20rem auto; }
+}
+
+@media (min-width: 56rem), (orientation: landscape) and (min-width: 40rem) {
+  .gv-sala {
+    grid-template-columns: minmax(0, 1fr) var(--gv-col);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "escena cabeza" "escena pie";
+  }
+  .gv-cabeza { padding: clamp(1.25rem, 6svh, 4rem) var(--mf-gutter) 0 0; }
+  .gv-pie { align-content: end; gap: 1rem; padding: 1rem var(--mf-gutter) clamp(1.25rem, 6svh, 4rem) 0; }
+  .gv-texto { min-height: 0; }
+  .gv-texto p { font-size: 1rem; }
+}
+@media (min-width: 90rem) {
+  .gv-sala { --gv-col: 27rem; }
+}
+@media (orientation: landscape) and (max-height: 32rem) {
+  .gv-sala { min-height: 0; }
+  .gv-cabeza h2 { font-size: 1.5rem; }
+  .gv-texto h3 { font-size: 1.15rem; }
+  .gv-texto p { font-size: 0.8125rem; line-height: 1.35; }
+  .gv-reparto > p { display: none; }
+  /* Ocultos a la vista, no a las tecnologías de asistencia */
+  .gv-texto > p:not(.gv-dato), .gv-pista, .gv-nota {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .gv-reparto__via { height: 1rem; }
+  .gv-pie { gap: 0.4rem; padding-bottom: 0.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gv-lienzo, .gv-apoyo::before, .gv-reparto__via span { transition: none; }
+}
