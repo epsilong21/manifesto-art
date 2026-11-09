@@ -457,21 +457,23 @@
     --bq-lamina-ancho: min(calc((100svh - var(--bq-reserva-capas)) * var(--bq-r)), 921px);
     --bq-hueco: clamp(2rem, 4vw, 4rem);
   }
-  /* Encabezado del ancho de su bloque (lámina + panel): título en una línea y entrada al lado */
+  /* Encabezado del ancho de su bloque (lámina + panel): título en su propia fila y la entrada debajo */
   .bq-capas > .bq-capas__head {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 24rem);
     grid-template-areas:
-      "k ."
-      "t i";
+      "k k"
+      "t t"
+      "i .";
     align-items: end;
     column-gap: 2.5rem;
+    row-gap: 0.75rem;
     max-width: calc(var(--bq-lamina-ancho) + var(--bq-hueco) + 26rem);
     margin-bottom: 1.5rem;
   }
   .bq-capas > .bq-capas__head .bq-capas__k { grid-area: k; }
-  .bq-capas > .bq-capas__head .bq-capas__t { grid-area: t; font-size: clamp(2.5rem, 4.4vw, 4.5rem); white-space: nowrap; }
-  .bq-capas > .bq-capas__head .bq-capas__intro { grid-area: i; margin: 0; font-size: 0.9375rem; }
+  .bq-capas > .bq-capas__head .bq-capas__t { grid-area: t; font-size: clamp(2.5rem, 4.4vw, 4.5rem); }
+  .bq-capas > .bq-capas__head .bq-capas__intro { grid-area: i; margin: 0; max-width: 36rem; font-size: 0.9375rem; }
   .bq-mesa {
     /* La primera columna mide lo que la lámina: lámina y panel juntos, el sobrante al final */
     grid-template-columns: minmax(0, var(--bq-lamina-ancho)) minmax(18rem, 26rem);
