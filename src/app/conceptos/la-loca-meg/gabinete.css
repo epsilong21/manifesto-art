@@ -207,10 +207,12 @@ html:not(.js) .gb-sala { height: auto; }
     grid-template-columns: var(--gb-col) minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-areas: "cabeza escena" "pie escena";
+    /* Aire entre la lectura y la escena, fluido con el ancho */
+    column-gap: clamp(1.25rem, 2.5vw, 3rem);
   }
   .gb-lema { display: block; }
-  .gb-cabeza { padding: clamp(1.25rem, 6svh, 4rem) 0 0 var(--mf-gutter); }
-  .gb-pie { align-content: end; gap: 1rem; padding: 1rem 0 clamp(1.25rem, 6svh, 4rem) var(--mf-gutter); }
+  .gb-cabeza { padding: clamp(1.25rem, 6svh, 4rem) clamp(0.5rem, 1.5vw, 1.5rem) 0 var(--mf-gutter); }
+  .gb-pie { align-content: end; gap: 1rem; padding: 1rem clamp(0.5rem, 1.5vw, 1.5rem) clamp(1.25rem, 6svh, 4rem) var(--mf-gutter); }
   .gb-texto { min-height: 0; }
   .gb-texto p { font-size: 1rem; }
 }
