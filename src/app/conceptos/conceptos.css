@@ -183,6 +183,17 @@ body:has(.mf-theme) { background: transparent; }
   .mf-header--marca .mf-obras__btn:hover { color: #ff0000; }
 }
 .mf-header--marca .mf-obras__panel { box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.35); }
+/* Cabecera blanca: el rótulo de la obra (p. ej. «La noche estrellada») no cabe junto al logotipo y al
+   icono en 417–800 px; sin esto, las acciones sobresalían ~33 px del viewport (y .nc-top, absoluto,
+   escapa del recorte de <body>). Las acciones pueden encogerse y el rótulo se abrevia solo si no cabe. */
+.mf-header--marca .mf-acciones { min-width: 0; }
+.mf-header--marca .mf-obras { flex: 0 1 auto; min-width: 0; }
+.mf-header--marca .mf-obras__btn { max-width: 100%; }
+.mf-header--marca .mf-obras__n { white-space: nowrap; }
+.mf-header--marca .mf-obras__t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (min-width: 48rem) {
+  .mf-header--marca { grid-template-columns: minmax(0, 1fr) auto minmax(max-content, 1fr); }
+}
 
 /* Botón flotante de WhatsApp (como en la tienda) */
 .mf-wa {

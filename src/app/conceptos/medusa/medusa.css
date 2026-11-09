@@ -694,3 +694,15 @@ html.js .md-file:not(.is-active) {
 .md-shield .md-detail.is-ready {
   opacity: 1;
 }
+
+/* Respaldo de compatibilidad (sin `overflow: clip`: Safari < 16, Chrome < 90): el resplandor del escudo
+   (.md-stage::before/::after, inset -12%) sobresale del viewport en móvil y solo lo recortaba <body>.
+   Se recorta en la sección, a ancho completo, y solo bajo 64rem: en escritorio el escudo es `sticky`
+   y `overflow` en un ancestro lo desactivaría. En navegadores actuales no cambia nada. */
+@supports not (overflow: clip) {
+  @media (max-width: 63.999rem) {
+    .md-section {
+      overflow-x: hidden;
+    }
+  }
+}

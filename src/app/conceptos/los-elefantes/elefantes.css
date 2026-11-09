@@ -2091,3 +2091,13 @@
     padding: 0;
   }
 }
+
+/* Respaldo de compatibilidad (sin `overflow: clip`: Safari < 16, Chrome < 90): las capas del escenario
+   (niebla, cielo, rayos) son más anchas que el viewport; sin recorte, el documento se desplazaría en
+   horizontal. `hidden` solo se aplica donde `clip` no existe; en navegadores actuales no cambia nada. */
+@supports not (overflow: clip) {
+  .ds,
+  .ds-world {
+    overflow: hidden;
+  }
+}

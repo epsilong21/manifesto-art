@@ -1971,3 +1971,13 @@ html:not(.js) .nc-cards > .nc-card + .nc-card {
     transition: none !important;
   }
 }
+
+/* Respaldo para navegadores sin `overflow: clip` (Safari < 16, Chrome < 90): los halos del cielo y la
+   capa de arte del hero sobresalen unos píxeles del borde; sin recorte, el documento se desplazaría en
+   horizontal. `hidden` solo se aplica si `clip` no existe, así que en navegadores actuales no cambia nada. */
+@supports not (overflow: clip) {
+  .nc-hero,
+  .nc-stage {
+    overflow: hidden;
+  }
+}
