@@ -287,7 +287,7 @@ export const VENTANA = {
       id: "memoria",
       num: "02",
       nombre: "Memoria",
-      escena: "Al pasar a Noche, el paisaje no se oscurece: se recompone. Aparece el pueblo, el ciprés se acerca y el cielo se mueve.",
+      escena: "Al pasar a la noche, el paisaje no se oscurece: se recompone. Aparece el pueblo, el ciprés se acerca y el cielo se mueve.",
       hecho:
         "En el dormitorio no le dejaban pintar: allí dibujaba a tinta o a carbón. Pintaba en un taller de la planta baja, y la escena nocturna se hizo en varias sesiones durante el día. El pueblo no se veía desde la ventana: sale de un dibujo hecho desde una colina sobre Saint-Rémy.",
       lectura:
