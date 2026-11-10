@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ANCIANO_IMG as I } from "@/content/anciano";
 import { rutaPublica } from "@/lib/rutaPublica";
-import { AMPLIADO_V5, DURACION_V5, FRAGMENTOS_V5, TRAMOS_V5 } from "@/content/anciano-v5";
+import { AMPLIADO_V5, DURACION_V5, ESPECIFICO_DESDE, FRAGMENTOS_V5, TRAMOS_V5 } from "@/content/anciano-v5";
 import { CENTRO, FOCO_COMPAS, FOCO_URIZEN, clamp, mezcla, suave } from "../limiteGeom";
 import { PUNTA_DER, crearMundo, pintarActo, pintarPrologo, type Mundo } from "./mundo3d";
 
@@ -55,6 +55,9 @@ export function EscenaV5() {
 
   const [tramo, setTramo] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [reposo, setReposo] = useState(false);
+  /** El mando propio del tramo (inclinar / abrir / desplazar el plano) ya tiene un efecto comprensible */
+  const [espec, setEspec] = useState(false);
+  const giroIn = useRef<HTMLInputElement>(null);
   const [frag, setFrag] = useState(0);
   const [mando, setMando] = useState(false);
   const [manual, setManual] = useState(false);
@@ -114,7 +117,8 @@ export function EscenaV5() {
     setTramo(tr);
     const fr = FRAGMENTOS_V5.reduce((acc, fg, i) => (fg.tramo === tr && fg.desde <= local ? i : acc), FRAGMENTOS_V5.findIndex((fg) => fg.tramo === tr));
     setFrag(fr);
-    const hayMando = (tr === 2 && local > 0.42) || tr >= 3;
+    const hayMando = (tr === 2 && local > 0.55) || tr >= 3;
+    setEspec(tr === 3 ? local >= ESPECIFICO_DESDE[3] : tr === 4 ? local >= ESPECIFICO_DESDE[4] : true);
     arrastrable.current = (tr === 2 && local > 0.2) || tr >= 3;
     setMando(hayMando);
     setReposo(tr === 5 && local > 0.8);
@@ -339,7 +343,13 @@ export function EscenaV5() {
     dibujar(progreso.current);
   };
 
+  /* Si el mando propio deja de estar disponible mientras tiene el foco (p. ej. al retroceder), el foco pasa a «Girar la vista» */
+  useEffect(() => {
+    if (!espec && document.activeElement?.closest("[data-esp]")) giroIn.current?.focus();
+  }, [espec]);
+
   const f = FRAGMENTOS_V5[frag];
+  const ocultoEsp = espec ? undefined : "v5-oculto";
   const final = frag === FRAGMENTOS_V5.length - 1;
 
   return (
@@ -380,6 +390,7 @@ export function EscenaV5() {
           <div className="an-fragmento" key={frag}>
             <p className={`an-etiqueta an-etiqueta--${f.tipo}`}>{f.etiqueta}</p>
             <p className="an-principal">{f.texto}</p>
+            {f.ayuda && <p className="an-ayuda">{f.ayuda}</p>}
           </div>
           <details className="an-mas">
             <summary>Comprender lo que estoy viendo</summary>
@@ -407,12 +418,12 @@ export function EscenaV5() {
         {mando && (
           <div className="v5-mando" role="group" aria-label="Explorar la estructura">
           {tramo === 5 ? null : tramo === 4 ? (
-            <label>
+            <label data-esp className={ocultoEsp} aria-hidden={!espec || undefined}>
               <span>Desplazar el plano</span>
               <input type="range" min={0} max={100} step={1} value={Math.round(planoUI * 100)} onChange={(e) => cambiarPlano(Number(e.target.value) / 100)} aria-valuetext={`plano al ${Math.round(planoUI * 100)} por ciento de su recorrido`} />
             </label>
           ) : tramo === 3 ? (
-            <label>
+            <label data-esp className={ocultoEsp} aria-hidden={!espec || undefined}>
               <span>Abrir la arquitectura</span>
               <input type="range" min={0} max={100} step={1} value={Math.round(abreUI * 100)} onChange={(e) => cambiarAbre(Number(e.target.value) / 100)} aria-valuetext={`${Math.round(abreUI * 100)} por ciento abierta`} />
             </label>
@@ -424,18 +435,18 @@ export function EscenaV5() {
           )}
           <label>
             <span>Girar la vista</span>
-            <input type="range" min={-100} max={100} step={1} value={Math.round(giroUI * 100)} onChange={(e) => cambiarGiro(Number(e.target.value) / 100)} aria-valuetext={`${Math.round(giroUI * 100)} por ciento`} />
+            <input ref={giroIn} type="range" min={-100} max={100} step={1} value={Math.round(giroUI * 100)} onChange={(e) => cambiarGiro(Number(e.target.value) / 100)} aria-valuetext={`${Math.round(giroUI * 100)} por ciento`} />
           </label>
           <div className="v5-mando__botones">
             {tramo === 3 && (
-              <button type="button" className="an-btn" onClick={() => cambiarAbre(abreUI > 0.5 ? 0 : 1)}>{abreUI > 0.5 ? "Cerrar" : "Abrir"}</button>
+              <button type="button" data-esp className={`an-btn${espec ? "" : " v5-oculto"}`} aria-hidden={!espec || undefined} onClick={() => cambiarAbre(abreUI > 0.5 ? 0 : 1)}>{abreUI > 0.5 ? "Cerrar" : "Abrir"}</button>
             )}
             {tramo === 4 && (
-              <button type="button" className="an-btn" onClick={() => cambiarPlano(Math.abs(planoUI - 0.5) < 0.25 ? 1 : 0.5)}>{Math.abs(planoUI - 0.5) < 0.25 ? "Desplazar" : "Volver"}</button>
+              <button type="button" data-esp className={`an-btn${espec ? "" : " v5-oculto"}`} aria-hidden={!espec || undefined} onClick={() => cambiarPlano(Math.abs(planoUI - 0.5) < 0.25 ? 1 : 0.5)}>{Math.abs(planoUI - 0.5) < 0.25 ? "Desplazar" : "Volver"}</button>
             )}
             <button type="button" className="an-btn" onClick={restablecer}>{tramo === 5 ? <><span className="v5-corto">Restablecer</span><span className="v5-largo">Restablecer la vista</span></> : "Restablecer la vista"}</button>
           </div>
-          <p className="v5-pista-texto">{tramo === 5 ? "Gira la vista: las piezas se alinean y se separan. También puedes arrastrar sobre la escena." : tramo === 4 ? "Un gesto pequeño, un cambio imposible. También puedes arrastrar sobre la escena." : "También puedes arrastrar sobre la escena."}</p>
+          <p className="v5-pista-texto">{tramo === 5 ? "Gira la vista: las piezas se alinean y se separan. También puedes arrastrar sobre la escena." : "También puedes arrastrar sobre la escena."}</p>
         </div>
         )}
 

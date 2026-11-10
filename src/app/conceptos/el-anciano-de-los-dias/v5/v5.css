@@ -174,5 +174,10 @@
   .v5-texto .an-fin--epilogo { display: flex; flex-wrap: wrap; }
 }
 
+/* Mando propio del tramo aún no disponible: conserva su sitio (sin saltos de layout) pero ni se ve, ni se enfoca, ni se anuncia */
+.v5-oculto { visibility: hidden; }
+/* Instrucción contextual: discreta, bajo el texto principal */
+.v5-texto .an-ayuda { margin: 0; font-size: 0.8125rem; line-height: 1.4; font-style: italic; color: var(--c-accent); }
+
 /* Orientación en móvil: el menú muestra el nombre del acto en curso (el resto queda en su número) */
 .v5-pie .an-nav button[aria-current="step"] .an-nav__t { display: inline; }

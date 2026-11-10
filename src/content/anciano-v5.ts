@@ -25,7 +25,12 @@ export type FragmentoV5 = {
   etiqueta: string;
   momento: string;
   texto: string;
+  /** Instrucción contextual: solo aparece cuando el control que menciona ya está disponible */
+  ayuda?: string;
 };
+
+/** Progreso local del tramo desde el que el mando específico (Abrir la arquitectura / Desplazar el plano) está disponible: cuando su efecto ya se ve. */
+export const ESPECIFICO_DESDE = { 3: 0.5, 4: 0.55 } as const;
 
 export const FRAGMENTOS_V5: FragmentoV5[] = [
   { tramo: 1, desde: 0, tipo: "doc", etiqueta: "Documentado", momento: "El despertar", texto: "Un anciano de barba y cabellos blancos se inclina desde un disco de luz y extiende un compás hacia la oscuridad. Es el frontispicio de Europe: a Prophecy, un libro ilustrado de William Blake de 1794." },
@@ -35,19 +40,19 @@ export const FRAGMENTOS_V5: FragmentoV5[] = [
   { tramo: 2, desde: 0, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El vacío recibe luz", texto: "En la lámina el compás está quieto. Aquí, MANIFESTO lo imagina trazando: la oscuridad recibe su primera línea." },
   { tramo: 2, desde: 0.1, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El primer círculo", texto: "Una punta se queda fija y la otra gira. Medir es dibujar un límite." },
   { tramo: 2, desde: 0.3, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La profundidad", texto: "El círculo no estaba solo. Detrás aparecen otros, cada vez más lejos: la medida no es un plano, es un espacio." },
-  { tramo: 2, desde: 0.55, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El observatorio", texto: "Ejes, planos suspendidos y órbitas se levantan alrededor del primer trazo: una arquitectura gigantesca que nadie construyó. Es una creación visual de MANIFESTO, no una escena de Blake." },
+  { tramo: 2, desde: 0.55, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El observatorio", texto: "Ejes, planos suspendidos y órbitas se levantan alrededor del primer trazo: una arquitectura gigantesca que nadie construyó. Es una creación visual de MANIFESTO, no una escena de Blake.", ayuda: "Ya puedes inclinar los anillos o girar la vista con los mandos de abajo." },
   { tramo: 2, desde: 0.84, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Contemplación", texto: "Todo queda en suspenso. Inclina los anillos o gira la vista: la estructura cambia según desde dónde se mida." },
   { tramo: 3, desde: 0, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El observatorio despierta", texto: "Lo que parecía quieto empieza a girar. Los anillos no se mueven al azar: cada uno obedece a los demás." },
   { tramo: 3, desde: 0.2, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La maquinaria del orden", texto: "La cámara avanza entre anillos cada vez mayores. Lo que se veía era solo una parte: forman un sistema mucho más grande." },
-  { tramo: 3, desde: 0.5, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El centro de la medida", texto: "Todo se organiza alrededor de un núcleo. Abre la arquitectura y verás cómo se sostiene: cada nivel depende del centro." },
+  { tramo: 3, desde: 0.5, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El centro de la medida", texto: "Todo se organiza alrededor de un núcleo: cada nivel de la arquitectura depende del centro.", ayuda: "Abre la arquitectura y observa cómo se separan los niveles alrededor del núcleo." },
   { tramo: 3, desde: 0.76, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El límite del orden", texto: "Es el momento de mayor perfección: nada sobra y todo encaja. Y, sin embargo, algo empieza a tensarse." },
-  { tramo: 4, desde: 0, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La primera contradicción", texto: "Un anillo gira en un sentido que no le corresponde. Los ejes dejan de alinearse y la luz empieza a comportarse de otra manera." },
-  { tramo: 4, desde: 0.25, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La geometría desobedece", texto: "Los anillos se atraviesan sin romperse y los planos se pliegan hacia donde no hay espacio. Cada figura es posible por separado; juntas, no." },
-  { tramo: 4, desde: 0.55, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El espacio imposible", texto: "Una puerta de luz contiene más espacio del que la rodea. Desplaza el plano: un gesto mínimo cambia por completo lo que hay dentro." },
-  { tramo: 4, desde: 0.82, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El límite de la medida", texto: "Desde un único punto de vista todo encaja. Desde cualquier otro, no. La medida llega hasta aquí." },
+  { tramo: 4, desde: 0, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La primera contradicción", texto: "Un anillo gira en un sentido que no le corresponde. Los ejes dejan de alinearse y la luz empieza a comportarse de otra manera.", ayuda: "Gira la vista: mira el anillo que invierte su giro y el eje que se curva." },
+  { tramo: 4, desde: 0.25, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La geometría desobedece", texto: "Los anillos se atraviesan sin romperse y los planos se pliegan hacia donde no hay espacio. Cada figura es posible por separado; juntas, no.", ayuda: "Busca los planos que se doblan por una línea brillante." },
+  { tramo: 4, desde: 0.55, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El espacio imposible", texto: "Una puerta de luz contiene más espacio del que la rodea: dentro está el mismo universo, visto desde otro lado.", ayuda: "Desplaza el plano y observa cómo cambia el universo dentro del portal." },
+  { tramo: 4, desde: 0.82, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El límite de la medida", texto: "Desde un único punto de vista todo encaja. Desde cualquier otro, no. La medida llega hasta aquí.", ayuda: "Gira la vista: el triángulo solo se cierra desde un punto de vista." },
   { tramo: 5, desde: 0, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La última perspectiva", texto: "La cámara se retira. Lo que parecía el mundo entero es un solo trazo y, por encima, en la oscuridad, aparece un punto de luz." },
   { tramo: 5, desde: 0.36, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El límite de la creación", texto: "Dos brazos descienden hasta el círculo del principio: es el gesto del compás, a la escala de un universo. Pero la punta no llega a tocarlo." },
-  { tramo: 5, desde: 0.66, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Lo que permanece", texto: "Nada se apaga. Todo lo medido sigue ahí, completo y extraordinario; y aun así queda un hueco que ninguna medida alcanza." },
+  { tramo: 5, desde: 0.66, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Lo que permanece", texto: "Nada se apaga. Todo lo medido sigue ahí, completo y extraordinario; y aun así queda un hueco que ninguna medida alcanza.", ayuda: "Gira la vista para ver cómo las piezas se alinean y se separan." },
   { tramo: 5, desde: 0.9, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Fin", texto: "Blake pintó a quien mide el mundo. MANIFESTO imaginó un universo que crece hasta no caber en su propia medida." },
 ];
 
@@ -82,7 +87,11 @@ export const AMPLIADO_V5: Record<1 | 2 | 3 | 4 | 5, { documentado: string[]; int
       "Según Anthony Blunt (citado por Glasgow), Blake critica un orden racional que reduce lo infinito a lo finito. Es una lectura de especialistas, no un hecho cerrado.",
     ],
     interpretacion: [
-      "El triángulo que solo se cierra desde un punto de vista (inspirado en las figuras imposibles, como el triángulo de Penrose), el nudo, los planos plegados y el portal son geometrías creadas por MANIFESTO. No están en la lámina de Blake ni son una lectura documentada de ella.",
+      "Qué ves: tras el orden perfecto del Acto II, la misma arquitectura empieza a desobedecerse. Un anillo gira al revés, el eje central se curva y una segunda luz carmesí llega del lado opuesto al núcleo.",
+      "Los planos se doblan por una bisagra hacia donde no hay espacio y un anillo se atraviesa a sí mismo formando un nudo. Cada pieza es posible por separado; juntas, no.",
+      "El portal es una puerta de luz que contiene la misma arquitectura vista desde otro lado y a otra escala. Al desplazar su plano, el interior cambia mucho más que el gesto: hay más espacio dentro que fuera.",
+      "El triángulo solo se cierra desde un punto de vista (se inspira en las figuras imposibles, como el triángulo de Penrose). Al girar la vista se abre: la continuidad depende de desde dónde se mire.",
+      "Todo esto, el triángulo, el nudo, los planos plegados y el portal, son geometrías creadas por MANIFESTO. No están en la lámina de Blake ni son una lectura documentada de ella.",
     ],
   },
   5: {

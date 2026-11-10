@@ -527,7 +527,9 @@ export function pintarActo(m: Mundo, e: Acto) {
   // Luz del núcleo: intensidad por momento (calma → concentración → inquietud) y foco en pantalla
   const luzB = suave(b / 0.15);
   const nu0 = suave((b - 0.46) / 0.16);
-  const ci = nu0 * (0.7 + 0.3 * suave((b - 0.55) / 0.2)) * (1 + 0.08 * Math.sin(b * 50)) * (1 + 0.5 * e.rx) * (1 - 0.12 * suave(e.d / 0.4));
+  const ciBruta = nu0 * (0.7 + 0.3 * suave((b - 0.55) / 0.2)) * (1 + 0.08 * Math.sin(b * 50)) * (1 + (e.c > 0 ? 0.1 : 0.5) * e.rx) * (1 - 0.12 * suave(e.d / 0.4));
+  // Tope en el Acto III (cámara pegada al núcleo): el centro sigue siendo lo más luminoso, pero nunca tapa la geometría
+  const ci = e.c > 0 ? Math.min(ciBruta, 1.12) : ciBruta;
   FOCO.ok = false;
   FOCO.ci = ci;
   if (b > 0) { proyectar(e, cam, 0, 0, NUCLEO_Z); FOCO.x = P[0]; FOCO.y = P[1]; FOCO.s = P[2]; FOCO.ok = P[2] > 0; }
@@ -873,9 +875,11 @@ function pintarActoII(m: Mundo, e: Acto, cam: Cam, n: number, spin: number, tens
     // Reacción a la apertura: las órbitas se encienden mientras el visitante mueve el control
     if (e.rx > 0.03 && b > 0.3) {
       const hd = b * TAU * 3;
-      pulso(ctx, h, e, cam, GA, hd, 1.0, e.rx, 2);
-      pulso(ctx, h, e, cam, GB, -hd, 1.0, e.rx, 0);
-      pulso(ctx, h, e, cam, GC, hd * 0.7, 0.9, e.rx * 0.8, 2);
+      // (en el Acto III, con la cámara pegada al núcleo, la reacción es más contenida para no saturar)
+      const rxP = e.c > 0 ? e.rx * 0.4 : e.rx;
+      pulso(ctx, h, e, cam, GA, hd, 1.0, rxP, 2);
+      pulso(ctx, h, e, cam, GB, -hd, 1.0, rxP, 0);
+      pulso(ctx, h, e, cam, GC, hd * 0.7, 0.9, rxP * 0.8, 2);
     }
     // El límite del orden: un pulso se entrecorta y la luz deja de ser simétrica
     u = ven(b, 0.8, 1.0);
@@ -977,7 +981,7 @@ function pintarActoII(m: Mundo, e: Acto, cam: Cam, n: number, spin: number, tens
         halo(ctx, spr.halo, gx, gy2, R0 * 0.38, Math.min(1, 0.72 * ci * f));
         // Partículas de energía: se dispersan hacia fuera con la apertura
         const mt = m.motas;
-        const vivo = nu * (0.25 + 0.75 * e.abre + e.rx);
+        const vivo = nu * (0.25 + 0.75 * e.abre + (e.c > 0 ? 0.25 : 1) * e.rx);
         if (vivo > 0.05) {
           for (let i = 0; i < mt.length; i += 5) {
             const rad = 0.3 + mt[i + 3] * (0.5 + 2.8 * e.abre) + 0.12 * Math.sin(b * 9 + i);
@@ -1426,7 +1430,7 @@ function pintarActoIII(m: Mundo, e: Acto, cam: Cam, spin: number, tens: number, 
       ctx.save();
       ctx.translate(P[0], P[1]);
       ctx.rotate(-c * 1.6 - 0.4);
-      ctx.globalAlpha = 0.32 * k * (1 + 0.5 * e.rx);
+      ctx.globalAlpha = 0.32 * k * (1 + 0.12 * e.rx);
       ctx.drawImage(spr.rayos2 ?? spr.rayos, -R0 * 3, -R0 * 3, R0 * 6, R0 * 6);
       ctx.restore();
       halo(ctx, spr.halo, P[0], P[1], R0 * 1.4, 0.35 * k);
