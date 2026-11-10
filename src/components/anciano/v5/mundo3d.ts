@@ -1634,5 +1634,79 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam) {
         halo(ctx, h, P[0], P[1], (6 + 5 * f) * clamp(P[2] * 2, 0.8, 1.8), kT * (0.3 + 0.7 * f) * nb);
       }
     }
+    const kV = suave((d - 0.62) / 0.3);
+    if (kV > 0.02) vidaDeFondo(m, e, cam, kV);
+  }
+}
+
+/** Motas lejanas del fondo del epílogo: posiciones fijas (x, y, z, fase, tamaño) repartidas en un volumen amplio alrededor de la composición. */
+const MOTAS_FONDO: number[] = (() => {
+  const r = rng(5501), o: number[] = [];
+  for (let i = 0; i < 28; i++) {
+    const a = r() * TAU, rad = 3.5 + r() * 8;
+    o.push(Math.cos(a) * rad * 0.9 + 0.4, -1.5 + (r() - 0.5) * 9, Math.sin(a) * rad * 0.7 + 1.5, r() * TAU, 0.5 + r() * 0.5);
+  }
+  return o;
+})();
+const ORB_CA: OrbitaP = { r: 4.2, rx: 1.35, ry: 0.2, cz: 3.2, rz: 0.15 };
+const ORB_CB: OrbitaP = { r: 6, rx: 1.45, ry: -0.25, cz: 5, rz: -0.1 };
+const ORB_GIG: OrbitaP = { r: 11, rx: 1.45, ry: 0.1, cz: -4, rz: 0 };
+
+/**
+ * Vida del fondo en el reposo final: pocos efectos, espaciados y de baja intensidad (todo con sprites ya creados).
+ * Dos velos que respiran en las zonas oscuras, motas lejanas que laten a ritmos distintos, una luz que recorre por turnos los
+ * anillos colosales, un destello ocasional en las graduaciones de los brazos y brillos del anillo mayor que solo se descubren al girar.
+ */
+function vidaDeFondo(m: Mundo, e: Acto, cam: Cam, k: number) {
+  const { ctx, t } = e;
+  const spr = m.sprites;
+  if (!spr) return;
+  const h = spr.halo;
+  const resp = 0.5 + 0.5 * Math.sin(t * 0.35);
+  // Respiración: velos cálidos (uno ámbar, otro carmesí) a los lados de la composición
+  for (const [lx, ly, lz, rad, a, ph] of [[-4.5, -0.5, 1, 4.2, 0.19, 0], [6.5, -2.5, -1.5, 4.6, 0.15, 2.1]] as number[][]) {
+    proyectar(e, cam, lx, ly, lz);
+    if (P[2]) halo(ctx, h, P[0], P[1], e.R * P[2] * rad, a * k * (0.65 + 0.35 * Math.sin(t * 0.3 + ph)));
+  }
+  proyectar(e, cam, 5, 3.5, 3);
+  if (P[2] && spr.rayos2) {
+    const R0 = e.R * P[2] * 3.2;
+    ctx.save();
+    ctx.translate(P[0], P[1]);
+    ctx.rotate(t * 0.02 + 0.6);
+    ctx.globalAlpha = 0.16 * k * (0.5 + 0.5 * resp);
+    ctx.drawImage(spr.rayos2, -R0, -R0, R0 * 2, R0 * 2);
+    ctx.restore();
+  }
+  // Motas lejanas: laten a ritmos distintos (nunca todas a la vez)
+  const NM = m.denso ? 28 : 14;
+  for (let i = 0; i < NM; i++) {
+    const j = i * 5;
+    proyectar(e, cam, MOTAS_FONDO[j], MOTAS_FONDO[j + 1], MOTAS_FONDO[j + 2]);
+    if (!P[2] || P[0] < -8 || P[1] < -8 || P[0] > e.w + 8 || P[1] > e.h + 8) continue;
+    const lat = Math.pow(0.5 + 0.5 * Math.sin(t * (0.25 + (i % 5) * 0.07) + MOTAS_FONDO[j + 3]), 3);
+    halo(ctx, h, P[0], P[1], (5 + 5.5 * MOTAS_FONDO[j + 4]) * clamp(P[2] * 2, 0.9, 1.8), k * (0.3 + 0.6 * lat) * Math.max(0.55, niebla(P[3], cam, e.R)));
+  }
+  // Una luz recorre por turnos cada anillo colosal (ciclos de ~34 s desfasados, activos un tercio del tiempo)
+  [ORB_CA, ORB_CB, ORB_GIG].forEach((o, i) => {
+    const u = ven(((t / 34 + i * 0.33) % 1), 0, 0.36);
+    if (u > 0) pulso(ctx, h, e, cam, o, u * TAU * 0.7 + i * 2.2, 0.9, campana(u) * 0.95 * k, i === 1 ? 0 : 2);
+  });
+  // Destello ocasional en una graduación de un brazo (uno cada ~7 s, alternando)
+  const ciclo = t / 7, n = Math.floor(ciclo), f = campana(ciclo - n);
+  if (f > 0.05) {
+    const u = 0.25 + 0.6 * ((n * 0.382) % 1), tip = n % 2 ? TIP_D : TIP_I;
+    destello(ctx, h, e, cam, mezcla(APICE[0], tip[0], u), mezcla(APICE[1], tip[1], u), mezcla(APICE[2], tip[2], u), f * k);
+  }
+  // Brillos del anillo mayor: se descubren al girar la vista
+  const g = suave(Math.abs(e.giro) * 2.2);
+  if (g > 0.03) {
+    for (let i = 0; i < 6; i++) {
+      anillo(i * 1.05 + 0.4, ORB_GIG.r, ORB_GIG.rx, ORB_GIG.ry, 0, 0, ORB_GIG.cz, L, 0);
+      proyectar(e, cam, L[0], L[1], L[2]);
+      if (!P[2]) continue;
+      const f2 = 0.55 + 0.45 * Math.sin(t * 0.6 + i * 1.7);
+      halo(ctx, h, P[0], P[1], 7 * clamp(P[2] * 2, 0.8, 1.6), g * f2 * 0.9 * k);
+    }
   }
 }

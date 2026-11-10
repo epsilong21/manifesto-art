@@ -52,7 +52,7 @@ export const FRAGMENTOS_V5: FragmentoV5[] = [
   { tramo: 4, desde: 0.82, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El límite de la medida", texto: "Desde un único punto de vista todo encaja. Desde cualquier otro, no. La medida llega hasta aquí.", ayuda: "Gira la vista: el triángulo solo se cierra desde un punto de vista." },
   { tramo: 5, desde: 0, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La última perspectiva", texto: "La cámara se retira. Lo que parecía el mundo entero es un solo trazo y, por encima, en la oscuridad, aparece un punto de luz." },
   { tramo: 5, desde: 0.36, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El límite de la creación", texto: "Dos brazos descienden hasta el círculo del principio: es el gesto del compás, a la escala de un universo. Pero la punta no llega a tocarlo." },
-  { tramo: 5, desde: 0.66, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Lo que permanece", texto: "Nada se apaga. Todo lo medido sigue ahí, completo y extraordinario; y aun así queda un hueco que ninguna medida alcanza.", ayuda: "Gira la vista para ver cómo las piezas se alinean y se separan." },
+  { tramo: 5, desde: 0.66, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Lo que permanece", texto: "Nada se apaga. Toda esta estructura es la huella del gesto de medir: completa y extraordinaria, y aun así queda un hueco que ninguna medida alcanza.", ayuda: "Gira la vista para ver cómo las piezas se alinean y se separan." },
   { tramo: 5, desde: 0.9, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Fin", texto: "Blake pintó a quien mide el mundo. MANIFESTO imaginó un universo que crece hasta no caber en su propia medida." },
 ];
 
