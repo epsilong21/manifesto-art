@@ -1,0 +1,233 @@
+.theme-anciano {
+  --c-bg: #090a0d;
+  --c-deep: #29212a;
+  --c-accent: #c78d43;
+  --c-luz: #e8cc98;
+  --c-sangre: #e3a08a;
+  --c-ink: #ece3d2;
+  --c-muted: #aaa196;
+  --c-line: rgb(232 204 152 / 0.18);
+  --f-display: var(--font-cormorant), Georgia, serif;
+  --an-cab: 3.75rem;
+}
+html:has(.theme-anciano) { background: #090a0d; }
+.theme-anciano :where(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; }
+
+.an-cab { position: absolute; inset: 0 0 auto 0; z-index: 30; }
+
+/* ── Pista y escenario: un solo escenario fijo; el scroll mide el progreso ── */
+.an-pista { position: relative; height: calc(var(--an-pant, 11) * 100svh); }
+.an-pista--manual { height: auto; }
+.an-escenario {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 30rem;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: minmax(0, 55fr) minmax(0, 45fr) auto;
+  padding-top: var(--an-cab);
+  background: var(--c-bg);
+  isolation: isolate;
+}
+.an-pista--manual .an-escenario { position: relative; }
+
+.an-ambiente {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 30%, rgb(199 141 67 / 0.2), transparent 70%),
+    radial-gradient(ellipse 90% 70% at 50% 100%, rgb(41 33 42 / 0.7), transparent 70%);
+  animation: an-aparece 2.4s ease 0.2s backwards;
+}
+
+/* La ventana es la «cámara»: la lámina se mueve dentro, nunca se recorta de forma permanente */
+.an-ventana {
+  position: relative;
+  overflow: hidden;
+  animation: an-revela 2.4s ease 0.7s backwards;
+  /* Sin fondo propio: los bordes se funden con la sala en lugar de recortarse (móvil: abajo; escritorio: a la izquierda) */
+  mask-image: linear-gradient(to top, transparent, #000 14%);
+}
+.an-fig {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  height: 100%;
+  aspect-ratio: 1400 / 1934;
+  transform-origin: 50% 50%;
+  transition: transform 0.3s ease-out;
+  box-shadow: 0 0 5rem rgb(199 141 67 / 0.18);
+}
+.an-fig {
+  --an-borde: 0%;
+  mask-image:
+    linear-gradient(to bottom, #000 calc(100% - var(--an-borde)), transparent),
+    linear-gradient(to top, #000 calc(100% - var(--an-borde)), transparent),
+    linear-gradient(to right, #000 calc(100% - var(--an-borde)), transparent),
+    linear-gradient(to left, #000 calc(100% - var(--an-borde)), transparent);
+  mask-composite: intersect;
+}
+.an-fig img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.an-fig--mirando { transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.an-lienzo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* El dibujo se desvanece antes de llegar al borde del lienzo: las hebras no terminan contra un recorte recto */
+  mask-image:
+    linear-gradient(to right, transparent, #000 14%, #000 86%, transparent),
+    linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  mask-composite: intersect;
+}
+
+/* ── Texto ── */
+.an-texto {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  padding: 0.75rem var(--mf-gutter) 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-accent) transparent;
+  animation: an-sube 1.2s ease 1.6s backwards;
+}
+.an-kicker { margin: 0; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent); }
+.an-titulo { margin: 0; font-size: clamp(2.1rem, 1.2rem + 4.6vw, 4.4rem); line-height: 0.98; font-weight: 600; text-wrap: balance; color: var(--c-luz); }
+.an-titulo--escena { font-size: clamp(1.8rem, 1.1rem + 3.4vw, 3.4rem); }
+.an-autor { margin: 0; font-size: 0.8125rem; letter-spacing: 0.06em; color: var(--c-muted); }
+.an-fragmento { display: grid; gap: 0.35rem; max-width: 34rem; animation: an-fade 0.55s ease; }
+.an-etiqueta { margin: 0; font-family: inherit; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.an-etiqueta--doc { color: var(--c-accent); }
+.an-etiqueta--int { color: var(--c-sangre); font-style: italic; }
+.an-principal { margin: 0; font-size: clamp(0.98rem, 0.92rem + 0.35vw, 1.15rem); line-height: 1.5; color: var(--c-ink); text-wrap: pretty; }
+.an-principal--pregunta { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.7rem, 1.1rem + 2.4vw, 2.8rem); line-height: 1.1; color: var(--c-luz); }
+
+.an-mas { max-width: 34rem; border-top: 1px solid var(--c-line); }
+.an-mas summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--c-luz);
+  list-style: none;
+}
+.an-mas summary::-webkit-details-marker { display: none; }
+.an-mas summary::before { content: "+"; display: inline-grid; place-items: center; width: 1.25rem; margin-right: 0.5rem; color: var(--c-accent); }
+.an-mas[open] summary::before { content: "–"; }
+.an-mas__cuerpo { display: grid; gap: 0.5rem; padding-bottom: 0.75rem; }
+.an-mas__cuerpo p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--c-muted); }
+.an-mas__cuerpo h3 { margin-top: 0.4rem; }
+
+.an-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 1px solid var(--c-accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--c-luz);
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: none;
+  cursor: pointer;
+  justify-self: start;
+}
+.an-btn--solido { background: var(--c-accent); color: #090a0d; font-weight: 600; }
+.an-btn:focus-visible, .an-nav button:focus-visible, .an-mas summary:focus-visible, .an-manual input:focus-visible { outline: 2px solid var(--c-luz); outline-offset: 3px; }
+@media (hover: hover) {
+  .an-btn:hover { background: rgb(199 141 67 / 0.2); }
+  .an-btn--solido:hover { background: var(--c-luz); }
+}
+.an-fin { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+/* ── Pie: escenas, barra de progreso y guía ── */
+.an-pie { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem; padding: 0.25rem var(--mf-gutter) max(0.4rem, env(safe-area-inset-bottom)); }
+.an-barra { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--c-accent); transform-origin: 0 50%; transform: scaleX(var(--an-p, 0)); opacity: 0.8; }
+.an-nav { display: flex; gap: 0.25rem; }
+.an-nav button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 0.6rem;
+  border: 0;
+  background: transparent;
+  color: var(--c-muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+.an-nav button[aria-current="step"] { color: var(--c-luz); }
+.an-nav button[aria-current="step"] span:first-child { color: var(--c-accent); }
+.an-nav__t { display: none; }
+.an-guia { margin: 0 0 0 auto; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-luz); animation: an-guia 1.8s ease 3.4s 3 backwards; }
+.an-manual { display: flex; align-items: center; gap: 0.75rem; font-size: 0.8125rem; color: var(--c-muted); flex: 1 1 14rem; }
+.an-manual input { flex: 1; min-height: 44px; accent-color: var(--c-accent); }
+
+/* ── Escritorio y móvil apaisado: texto a la izquierda, ventana a la derecha ── */
+@media (min-width: 56rem), (orientation: landscape) and (max-height: 32rem) {
+  .an-escenario { grid-template-columns: minmax(16rem, 5fr) minmax(0, 8fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .an-ventana { grid-column: 2; grid-row: 1; }
+  .an-texto { grid-column: 1; grid-row: 1; align-content: safe center; padding-top: 0; padding-bottom: 0; }
+  .an-ventana { mask-image: linear-gradient(to right, transparent, #000 14%); }
+  .an-pie { grid-column: 1 / -1; }
+  .an-nav__t { display: inline; }
+}
+@media (orientation: landscape) and (max-height: 32rem) {
+  .an-escenario { --an-cab: 0.5rem; min-height: 0; grid-template-columns: minmax(0, 6fr) minmax(0, 7fr); }
+  .an-cab, .theme-anciano.mu-sala .an-kicker, .an-autor { display: none; }
+  .an-texto { align-content: start; padding-top: 0.25rem; gap: 0.35rem; }
+  .an-titulo { font-size: clamp(1.5rem, 5vw, 2.2rem); }
+  .an-principal { font-size: 0.85rem; line-height: 1.35; }
+  .an-principal--pregunta { font-size: 1.35rem; }
+  .an-fin { gap: 0.4rem; }
+  .an-btn { padding: 0 0.8rem; }
+  .an-nav__t { display: none; }
+}
+@media (min-width: 56rem) { .an-texto { gap: 0.9rem; padding-left: max(var(--mf-gutter), env(safe-area-inset-left)); } }
+
+/* Móvil vertical: al abrir «Comprender lo que estoy viendo» el panel de texto gana altura para mostrar Documentado e Interpretación enteros */
+@media (max-width: 55.99rem) and (min-height: 32.01rem) {
+  .an-escenario:has(.an-mas[open]) { grid-template-rows: minmax(0, 24fr) minmax(0, 76fr) auto; }
+  .an-titulo { font-size: clamp(1.9rem, 1.1rem + 4.6vw, 2.6rem); }
+  .an-texto { gap: 0.4rem; padding-top: 0.6rem; padding-bottom: 0.25rem; }
+  .an-fin { gap: 0.4rem; }
+  .an-fin .an-btn { padding: 0 0.8rem; font-size: 0.8125rem; }
+}
+
+.an-ficha { scroll-margin-top: 1rem; }
+.an-pie-obra { position: relative; z-index: 1; }
+
+@keyframes an-aparece { from { opacity: 0; } }
+@keyframes an-revela { from { opacity: 0; filter: brightness(0.25); } }
+@keyframes an-sube { from { opacity: 0; transform: translateY(10px); } }
+@keyframes an-fade { from { opacity: 0; transform: translateY(6px); } }
+@keyframes an-guia { 50% { opacity: 0.75; } }
+
+/* Movimiento reducido: sin animaciones ni suavizado; el escenario no se fija y se avanza con el control */
+@media (prefers-reduced-motion: reduce) {
+  .theme-anciano *, .theme-anciano *::before, .theme-anciano *::after { animation: none !important; transition: none !important; }
+}
+
+/* Pantallas muy anchas: el texto crece con el escenario */
+@media (min-width: 1800px) {
+  .an-escenario { --an-cab: 5rem; }
+  .theme-anciano .an-kicker, .an-autor, .an-etiqueta { font-size: 0.95rem; }
+  .an-titulo { font-size: 5.5rem; }
+  .an-titulo--escena { font-size: 4.2rem; }
+  .an-principal { font-size: 1.5rem; }
+  .an-principal--pregunta { font-size: 3.4rem; }
+  .an-fragmento, .an-mas { max-width: 46rem; }
+  .an-mas summary, .an-mas__cuerpo p, .an-btn, .an-nav button { font-size: 1.05rem; }
+}
