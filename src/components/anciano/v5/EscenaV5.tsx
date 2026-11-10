@@ -77,6 +77,16 @@ export function EscenaV5() {
     const { e1, e2, e3, e4 } = limite.current;
     const tr: 1 | 2 | 3 | 4 | 5 = p < e1 ? 1 : p < e2 ? 2 : p < e3 ? 3 : p < e4 ? 4 : 5;
     const local = tr === 1 ? p / e1 : tr === 2 ? (p - e1) / (e2 - e1) : tr === 3 ? (p - e2) / (e3 - e2) : tr === 4 ? (p - e3) / (e4 - e3) : (p - e4) / (1 - e4);
+    // Política de los ajustes del visitante: se conservan, pero solo rigen donde sus mandos están disponibles
+    // (giro, cabeceo e inclinación desde ~55 % del Acto I; abrir la arquitectura desde ~50 % del Acto II). Fuera de ahí su
+    // efecto se desvanece con el scroll (sin saltos) y el prólogo restaura todo: así retroceder recupera la composición diseñada.
+    const vig = tr === 2 ? suave((local - 0.35) / 0.2) : tr >= 3 ? 1 : 0;
+    const vigAbre = tr === 3 ? suave((local - 0.35) / 0.15) : tr >= 4 ? 1 : 0;
+    if (tr === 1 && (giro.current.tgt || cabeceo.current.tgt || tilt.current.tgt || abre.current.tgt || plano.current.tgt !== 0.5)) {
+      for (const mnd of [giro.current, cabeceo.current, tilt.current, abre.current]) { mnd.cur = 0; mnd.tgt = 0; }
+      plano.current.cur = 0.5; plano.current.tgt = 0.5;
+      setGiroUI(0); setTiltUI(0); setAbreUI(0); setPlanoUI(0.5);
+    }
     let camX = 0, camY = 0, k = 1, opac = 1;
     const ctx = cv?.getContext("2d") ?? null;
     const cx = m.vx + m.vw / 2, cy = m.vy + m.vh / 2;
@@ -103,7 +113,7 @@ export function EscenaV5() {
       if (ctx && mundo.current) {
         pintarActo(mundo.current, {
           ctx, w: m.W, h: m.H, cx, cy: m.W < 640 ? cy - m.vh * 0.16 * suave((a - 0.1) / 0.5) : cy, c0x: m.c0x, c0y: m.c0y, R: m.R, th0: m.th0, f: m.f, rr: m.rr,
-          a, b, tilt: tilt.current.cur, giro: giro.current.cur, cabeceo: cabeceo.current.cur, abre: tr >= 3 ? abre.current.cur : 0,
+          a, b, tilt: tilt.current.cur * vig, giro: giro.current.cur * vig, cabeceo: cabeceo.current.cur * vig, abre: abre.current.cur * vigAbre,
           rx: tr === 3 ? Math.min(1, Math.abs(abre.current.tgt - abre.current.cur) * 4) : tr === 4 ? Math.min(1, Math.abs(plano.current.tgt - plano.current.cur) * 5) : 0,
           c, plano: plano.current.cur, d, t: reloj.current,
         });
@@ -119,7 +129,7 @@ export function EscenaV5() {
     setFrag(fr);
     const hayMando = (tr === 2 && local > 0.55) || tr >= 3;
     setEspec(tr === 3 ? local >= ESPECIFICO_DESDE[3] : tr === 4 ? local >= ESPECIFICO_DESDE[4] : true);
-    arrastrable.current = (tr === 2 && local > 0.2) || tr >= 3;
+    arrastrable.current = (tr === 2 && local > 0.45) || tr >= 3;
     setMando(hayMando);
     setReposo(tr === 5 && local > 0.8);
     barra.current?.style.setProperty("--an-p", p.toFixed(4));
