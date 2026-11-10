@@ -23,45 +23,21 @@ export function pDe(tr: Tramo, local: number, l: Limites): number {
   return a[tr - 1] + clamp(local) * (a[tr] - a[tr - 1]);
 }
 
-/** Un fragmento del guion: del instante t0 al t1 el progreso va de p0 a p1 (deriva lenta y, en la segunda parte, el viaje hasta el fragmento siguiente) */
-type Seg = { t0: number; t1: number; p0: number; p1: number; viaje: number; fr: number };
-export type Guion = { total: number; seg: Seg[] };
+/** Guion lineal: el progreso va de 0 a 1 a velocidad constante durante `total` segundos (a 1×) */
+export type Guion = { total: number };
 
-export function crearGuion(l: Limites): Guion {
-  const seg: Seg[] = [];
-  let t = 0;
-  FRAGMENTOS_V5.forEach((fg, i) => {
-    const sig = FRAGMENTOS_V5[i + 1];
-    const hasta = sig && sig.tramo === fg.tramo ? sig.desde : 1;
-    const d = PRESENTACION_V5.segundos[i] ?? 10;
-    seg.push({ t0: t, t1: t + d, p0: pDe(fg.tramo, fg.desde, l), p1: pDe(fg.tramo, hasta, l), viaje: PRESENTACION_V5.viaje, fr: i });
-    t += d;
-  });
-  return { total: t, seg };
-}
-
-/** Avance dentro de un fragmento: deriva muy lenta al principio (la escena respira mientras se lee) y viaje suave hasta el siguiente */
-function curva(u: number, viaje: number): number {
-  return 0.15 * u + 0.85 * suave((u - (1 - viaje)) / viaje);
+export function crearGuion(): Guion {
+  return { total: PRESENTACION_V5.duracion };
 }
 
 /** Progreso en el instante t (segundos a 1×) */
 export function pEn(g: Guion, t: number): number {
-  if (t <= 0) return g.seg[0].p0;
-  const s = g.seg.find((x) => t < x.t1);
-  if (!s) return g.seg[g.seg.length - 1].p1;
-  return s.p0 + (s.p1 - s.p0) * curva((t - s.t0) / (s.t1 - s.t0), s.viaje);
+  return clamp(t / g.total);
 }
 
-/** Instante en el que se alcanza el progreso p (inversa de `pEn`, por bisección) */
+/** Instante en el que se alcanza el progreso p (inversa de `pEn`) */
 export function tEn(g: Guion, p: number): number {
-  const s = g.seg.find((x) => p <= x.p1 + 1e-9) ?? g.seg[g.seg.length - 1];
-  let a = 0, b = 1;
-  for (let i = 0; i < 24; i++) {
-    const m = (a + b) / 2;
-    if (s.p0 + (s.p1 - s.p0) * curva(m, s.viaje) < p) a = m; else b = m;
-  }
-  return s.t0 + ((a + b) / 2) * (s.t1 - s.t0);
+  return clamp(p) * g.total;
 }
 
 /** Inicio (en progreso global) de cada fragmento: las «etapas» del recorrido por pasos con movimiento reducido */

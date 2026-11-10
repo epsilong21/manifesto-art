@@ -108,14 +108,14 @@ export const AMPLIADO_V5: Record<1 | 2 | 3 | 4 | 5, { documentado: string[]; int
 
 /**
  * Modo presentación («Ver presentación»): guion declarativo. Se ajusta aquí, sin tocar la lógica.
- * - segundos: duración de cada fragmento de FRAGMENTOS_V5 (mismo orden) a 1×; la presentación dura la suma (≈ 4 min 30 s).
+ * - duracion: segundos totales a 1× (60). El progreso avanza de forma lineal y constante, así que cada tramo ocupa un tiempo proporcional
+ *   a su duración narrativa (DURACION_V5), sin pausas ni aceleraciones entre actos.
  * - viaje: parte de cada fragmento (la final) dedicada al desplazamiento hasta el fragmento siguiente; antes, la escena deriva muy despacio.
  * - controles: coreografía de cada mando como puntos [q, valor], con q = (tramo − 1) + progreso local del tramo (0 = prólogo … 5 = fin).
  *   Cada mando solo se mueve cuando ya existe en la narrativa (Inclinar desde q 1,55; Abrir desde 2,5; Desplazar el plano desde 3,55).
  */
 export const PRESENTACION_V5 = {
-  segundos: [9, 11, 12, 10, 8, 9, 11, 13, 15, 11, 14, 17, 12, 13, 14, 19, 19, 12, 13, 14, 16],
-  viaje: 0.65,
+  duracion: 60,
   velocidades: [0.75, 1, 1.25] as const,
   controles: {
     // Acto I: los anillos se inclinan al presentarse el observatorio

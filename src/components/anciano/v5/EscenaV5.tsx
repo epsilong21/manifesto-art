@@ -206,7 +206,7 @@ export function EscenaV5() {
     const total = dur[0] + dur[1] + dur[2] + dur[3] + dur[4];
     limite.current = { e1: dur[0] / total, e2: (dur[0] + dur[1]) / total, e3: (dur[0] + dur[1] + dur[2]) / total, e4: (dur[0] + dur[1] + dur[2] + dur[3]) / total };
     pista.current?.style.setProperty("--v5-pant", String(total + 1));
-    guion.current = crearGuion(limite.current);
+    guion.current = crearGuion();
     dibujar(progreso.current);
   }, [dibujar, actualizarCab]);
 
@@ -451,9 +451,8 @@ export function EscenaV5() {
     if (verUI) presUiT.current = ahora;
     const cambioC = aplicarControles({ giro: mezcla(d.giro, c.giro, k), tilt: mezcla(d.tilt, c.tilt, k), abre: mezcla(d.abre, c.abre, k), plano: mezcla(d.plano, c.plano, k) }, verUI);
     progreso.current = p; objetivo.current = p;
-    const reposoZona = tr === 5 && local > 0.8;
-    // Ritmo de dibujo: pleno en escritorio; 30 fps en móvil o equipos modestos; 10 fps en el reposo final
-    const minDt = reposoZona ? 100 : mundo.current?.denso === false ? 33 : 0;
+    // Ritmo de dibujo: pleno en escritorio; 30 fps en móvil o equipos modestos
+    const minDt = mundo.current?.denso === false ? 33 : 0;
     if (fin || ((cambioC || p !== presP.current) && ahora - presDib.current >= minDt) || ahora - presDib.current > 100) {
       presDib.current = ahora; presP.current = p;
       dibujar(p);
@@ -481,7 +480,7 @@ export function EscenaV5() {
     cancelAnimationFrame(presRaf.current); presRaf.current = 0;
     peekP.current = null; peekAlLlegar.current = false; setMirando(false);
     reiniciarMandos();
-    const g = guion.current ?? crearGuion(limite.current);
+    const g = guion.current ?? crearGuion();
     guion.current = g;
     if (manualRef.current) {
       // Movimiento reducido: recorrido por etapas, sin desplazamientos automáticos
@@ -506,7 +505,7 @@ export function EscenaV5() {
 
   const reanudar = useCallback(() => {
     if (presRef.current === "finalizado") { comenzar(); return; }
-    const g = guion.current ?? crearGuion(limite.current);
+    const g = guion.current ?? crearGuion();
     guion.current = g;
     geoScroll();
     presT.current = tEn(g, objetivo.current);
@@ -729,7 +728,7 @@ export function EscenaV5() {
                   </svg>
                 </button>
                 <button type="button" className="v5-player__b" aria-label={`Velocidad ${String(vel).replace(".", ",")} por. Cambiar velocidad`} onClick={ciclarVel}>{String(vel).replace(".", ",")}×</button>
-                <span ref={presTiempo} className="v5-player__t" aria-hidden="true">0:00 / {guion.current ? fmt(guion.current.total) : "4:32"}</span>
+                <span ref={presTiempo} className="v5-player__t" aria-hidden="true">0:00 / {guion.current ? fmt(guion.current.total) : "1:00"}</span>
               </>
             )}
             <button type="button" className="v5-player__b v5-player__ico" aria-label="Salir de la presentación" onClick={salir}>
