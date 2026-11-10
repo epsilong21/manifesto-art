@@ -179,5 +179,45 @@
 /* Instrucción contextual: discreta, bajo el texto principal */
 .v5-texto .an-ayuda { margin: 0; font-size: 0.8125rem; line-height: 1.4; font-style: italic; color: var(--c-accent); }
 
+/* Modo presentación: reproductor mínimo arriba a la derecha (no cubre el texto ni la composición) */
+.v5-ver { gap: 0.45rem; padding: 0 0.9rem; color: var(--c-luz); }
+.v5-player.v5-player--ver { padding: 0.15rem 0.2rem; }
+.v5-player {
+  position: absolute;
+  z-index: 5;
+  top: calc(var(--v5-cab-vis, 0px) + max(0.5rem, env(safe-area-inset-top)));
+  right: max(var(--mf-gutter), env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.15rem 0.35rem 0.3rem;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  background: rgb(9 10 13 / 0.78);
+  color: var(--c-luz);
+  font-size: 0.8125rem;
+}
+.v5-player__b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.v5-player__b:disabled { opacity: 0.4; cursor: default; }
+.v5-player__b:focus-visible { outline: 2px solid var(--c-luz); outline-offset: -2px; }
+@media (hover: hover) { .v5-player__b:not(:disabled):hover { background: rgb(199 141 67 / 0.2); } }
+.v5-player__t { padding: 0 0.35rem; color: var(--c-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.v5-player__barra { position: absolute; left: 0.9rem; right: 0.9rem; bottom: 0.22rem; height: 2px; border-radius: 2px; background: rgb(199 141 67 / 0.25); overflow: hidden; }
+.v5-player__barra::after { content: ""; position: absolute; inset: 0; background: var(--c-accent); transform-origin: 0 50%; transform: scaleX(var(--pp, 0)); }
+@media (max-width: 22.5rem) { .v5-player__t { display: none; } }
+
 /* Orientación en móvil: el menú muestra el nombre del acto en curso (el resto queda en su número) */
 .v5-pie .an-nav button[aria-current="step"] .an-nav__t { display: inline; }

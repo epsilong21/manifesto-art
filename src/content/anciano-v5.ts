@@ -105,3 +105,32 @@ export const AMPLIADO_V5: Record<1 | 2 | 3 | 4 | 5, { documentado: string[]; int
     ],
   },
 };
+
+/**
+ * Modo presentación («Ver presentación»): guion declarativo. Se ajusta aquí, sin tocar la lógica.
+ * - segundos: duración de cada fragmento de FRAGMENTOS_V5 (mismo orden) a 1×; la presentación dura la suma (≈ 4 min 30 s).
+ * - viaje: parte de cada fragmento (la final) dedicada al desplazamiento hasta el fragmento siguiente; antes, la escena deriva muy despacio.
+ * - controles: coreografía de cada mando como puntos [q, valor], con q = (tramo − 1) + progreso local del tramo (0 = prólogo … 5 = fin).
+ *   Cada mando solo se mueve cuando ya existe en la narrativa (Inclinar desde q 1,55; Abrir desde 2,5; Desplazar el plano desde 3,55).
+ */
+export const PRESENTACION_V5 = {
+  segundos: [9, 11, 12, 10, 8, 9, 11, 13, 15, 11, 14, 17, 12, 13, 14, 19, 19, 12, 13, 14, 16],
+  viaje: 0.65,
+  velocidades: [0.75, 1, 1.25] as const,
+  controles: {
+    // Acto I: los anillos se inclinan al presentarse el observatorio
+    tilt: [[1.55, 0], [1.66, 0], [1.78, 0.95], [1.92, 0.3], [2.0, 0]] as const,
+    // Acto II: la arquitectura se abre y vuelve a cerrarse antes de la tensión final
+    abre: [[2.48, 0], [2.6, 1], [2.82, 1], [2.95, 0]] as const,
+    // Acto III: el plano del portal se desplaza cuando aparece el portal
+    plano: [[3.56, 0.5], [3.66, 1], [3.74, 0.12], [3.82, 0.5]] as const,
+    // Girar la vista: contemplación del Acto I, deriva del Acto II, primeras contradicciones, triángulo imposible y giro final del epílogo
+    giro: [
+      [1.8, 0], [1.92, 0.5], [2.0, 0],
+      [2.12, 0], [2.3, 0.4], [2.55, -0.3], [2.8, 0.25], [2.95, 0],
+      [3.08, 0], [3.24, 0.45], [3.42, -0.2], [3.54, 0],
+      [3.84, 0], [3.9, 0.8], [3.96, -0.7], [4.0, 0],
+      [4.1, 0], [4.35, 0.6], [4.65, -0.5], [4.9, 0.12], [5, 0.12],
+    ] as const,
+  },
+};

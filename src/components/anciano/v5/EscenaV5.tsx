@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ANCIANO_IMG as I } from "@/content/anciano";
 import { rutaPublica } from "@/lib/rutaPublica";
-import { AMPLIADO_V5, DURACION_V5, ESPECIFICO_DESDE, FRAGMENTOS_V5, TRAMOS_V5 } from "@/content/anciano-v5";
+import { AMPLIADO_V5, DURACION_V5, ESPECIFICO_DESDE, FRAGMENTOS_V5, PRESENTACION_V5, TRAMOS_V5 } from "@/content/anciano-v5";
+import { controlesEn, crearGuion, etapas, pEn, tEn, trLocal, type Controles, type Guion } from "./presentacion";
 import { CENTRO, FOCO_COMPAS, FOCO_URIZEN, clamp, mezcla, suave } from "../limiteGeom";
 import { PUNTA_DER, crearMundo, pintarActo, pintarPrologo, type Mundo } from "./mundo3d";
 
@@ -18,6 +19,8 @@ type Medidas = {
 
 /** Valores que el visitante modifica; cada uno tiene un objetivo (lo que pide) y un valor pintado (que lo sigue sin saltos). */
 type Mando = { cur: number; tgt: number };
+
+const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 /**
  * V5 · prólogo (la pintura), Actos I, II y III y epílogo. Un escenario fijo cuyo progreso lo marca el scroll (o un control con movimiento reducido).
@@ -68,6 +71,34 @@ export function EscenaV5() {
   const [tiltUI, setTiltUI] = useState(0);
   const [abreUI, setAbreUI] = useState(0);
   const [planoUI, setPlanoUI] = useState(0.5);
+
+  /* ── Modo presentación: reloj propio que escribe el progreso (única fuente de verdad) y la coreografía de los mandos ── */
+  type EstadoPres = "inactivo" | "reproduciendo" | "pausado" | "finalizado";
+  const [pres, setPres] = useState<EstadoPres>("inactivo");
+  const presRef = useRef<EstadoPres>("inactivo");
+  const [vel, setVel] = useState(1);
+  const velRef = useRef(1);
+  const [pasos, setPasos] = useState(false);
+  const [etapa, setEtapa] = useState(0);
+  const [aviso, setAviso] = useState("");
+  const guion = useRef<Guion | null>(null);
+  const presT = useRef(0);
+  const presUlt = useRef(0);
+  const presRaf = useRef(0);
+  const presY = useRef(0);
+  const presP = useRef(-1);
+  const presDib = useRef(0);
+  const presGeo = useRef({ y0: 0, dist: 1 });
+  const presFase = useRef<{ t: number; desde: Controles }>({ t: 0, desde: { giro: 0, tilt: 0, abre: 0, plano: 0.5 } });
+  const uiPres = useRef<Controles>({ giro: 0, tilt: 0, abre: 0, plano: 0.5 });
+  const presBarra = useRef<HTMLSpanElement>(null);
+  const presTiempo = useRef<HTMLSpanElement>(null);
+  const presSeg = useRef(-1);
+  const enfocar = useRef<"play" | "nav" | null>(null);
+  const cabAlto = useRef(0);
+  const presUiT = useRef(0);
+  const presScrollT = useRef(0);
+  const playBtn = useRef<HTMLButtonElement>(null);
 
   const dibujar = useCallback((p: number) => {
     const m = med.current;
@@ -135,9 +166,16 @@ export function EscenaV5() {
     barra.current?.style.setProperty("--an-p", p.toFixed(4));
   }, []);
 
+  /* La cabecera del sitio se superpone al comienzo de la escena: el reproductor se coloca justo debajo de su parte visible */
+  const actualizarCab = useCallback(() => {
+    escenario.current?.style.setProperty("--v5-cab-vis", `${Math.max(0, cabAlto.current - window.scrollY).toFixed(0)}px`);
+  }, []);
+
   const medir = useCallback(() => {
     const st = escenario.current, v = ventana.current, cv = lienzo.current, f = fig.current;
     if (!st || !v || !f) return;
+    cabAlto.current = document.querySelector<HTMLElement>(".an-cab")?.offsetHeight ?? 0;
+    actualizarCab();
     const W = st.clientWidth, H = st.clientHeight;
     const vw = v.clientWidth, vh = v.clientHeight;
     if (!W || !H || !vw || !vh) return;
@@ -168,8 +206,9 @@ export function EscenaV5() {
     const total = dur[0] + dur[1] + dur[2] + dur[3] + dur[4];
     limite.current = { e1: dur[0] / total, e2: (dur[0] + dur[1]) / total, e3: (dur[0] + dur[1] + dur[2]) / total, e4: (dur[0] + dur[1] + dur[2] + dur[3]) / total };
     pista.current?.style.setProperty("--v5-pant", String(total + 1));
+    guion.current = crearGuion(limite.current);
     dibujar(progreso.current);
-  }, [dibujar]);
+  }, [dibujar, actualizarCab]);
 
   /** Mantiene vivo el bucle solo mientras algún valor no haya alcanzado su objetivo. */
   const animar = useCallback(function tick() {
@@ -203,7 +242,7 @@ export function EscenaV5() {
 
   const leer = useCallback(() => {
     const t = pista.current;
-    if (!t || manualRef.current) return;
+    if (!t || manualRef.current || presRef.current === "reproduciendo") return;
     const r = t.getBoundingClientRect();
     const vh = escenario.current?.clientHeight ?? window.innerHeight;
     const dist = Math.max(1, r.height - vh);
@@ -253,6 +292,7 @@ export function EscenaV5() {
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) pedir(); }, { rootMargin: "20% 0px" });
     io.observe(t);
     window.addEventListener("scroll", pedir, { passive: true });
+    window.addEventListener("scroll", actualizarCab, { passive: true });
     window.addEventListener("resize", pedir, { passive: true });
     pedir();
     return () => {
@@ -262,9 +302,10 @@ export function EscenaV5() {
       ro.disconnect();
       io.disconnect();
       window.removeEventListener("scroll", pedir);
+      window.removeEventListener("scroll", actualizarCab);
       window.removeEventListener("resize", pedir);
     };
-  }, [medir, leer, manual]);
+  }, [medir, leer, manual, actualizarCab]);
 
   /* Reposo final del epílogo: un movimiento ambiental muy lento (10 fotogramas por segundo; 8 en móvil), solo mientras la escena es visible y hasta 90 s sin interacción */
   useEffect(() => {
@@ -277,7 +318,7 @@ export function EscenaV5() {
     function paso(ahora: number) {
       raf = 0;
       if (!visible || document.hidden || ahora > hasta) return;
-      if (ahora - ultimo >= intervalo) { ultimo = ahora; reloj.current = (ahora - t0) / 1000; dibujar(progreso.current); }
+      if (ahora - ultimo >= intervalo) { ultimo = ahora; reloj.current = (ahora - t0) / 1000; if (presRef.current !== "reproduciendo") dibujar(progreso.current); }
       raf = requestAnimationFrame(paso);
     }
     const arrancar = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(paso); };
@@ -353,6 +394,192 @@ export function EscenaV5() {
     dibujar(progreso.current);
   };
 
+  /* ── Modo presentación ── */
+  const geoScroll = useCallback(() => {
+    const t = pista.current;
+    if (!t) return;
+    const vh = escenario.current?.clientHeight ?? window.innerHeight;
+    presGeo.current = { y0: t.getBoundingClientRect().top + window.scrollY, dist: Math.max(1, t.offsetHeight - vh) };
+  }, []);
+  const cambiarPres = useCallback((e: EstadoPres) => { presRef.current = e; setPres(e); }, []);
+  /** Fija los mandos a los valores de la coreografía (los sliders visibles muestran siempre el valor real). Devuelve si algo cambió. */
+  const aplicarControles = useCallback((c: Controles, ui = true) => {
+    let cambio = false;
+    const fijar = (m: Mando, v: number) => { if (m.cur !== v || m.tgt !== v) { m.cur = v; m.tgt = v; cambio = true; } };
+    fijar(giro.current, c.giro); fijar(tilt.current, c.tilt); fijar(abre.current, c.abre); fijar(plano.current, c.plano);
+    if (!ui) return cambio;
+    const u = uiPres.current;
+    if (Math.abs(u.giro - c.giro) > 0.01) { u.giro = c.giro; setGiroUI(c.giro); }
+    if (Math.abs(u.tilt - c.tilt) > 0.01) { u.tilt = c.tilt; setTiltUI(c.tilt); }
+    if (Math.abs(u.abre - c.abre) > 0.01) { u.abre = c.abre; setAbreUI(c.abre); }
+    if (Math.abs(u.plano - c.plano) > 0.01) { u.plano = c.plano; setPlanoUI(c.plano); }
+    return cambio;
+  }, []);
+  /** Vuelca a los sliders visibles los valores reales de los mandos (al pausar, al terminar y a 10 Hz durante la reproducción) */
+  const volcarUI = useCallback(() => {
+    const v = { giro: giro.current.cur, tilt: tilt.current.cur, abre: abre.current.cur, plano: plano.current.cur };
+    aplicarControles(v, true);
+  }, [aplicarControles]);
+  const reiniciarMandos = useCallback(() => {
+    for (const mnd of [giro.current, cabeceo.current, tilt.current, abre.current]) { mnd.cur = 0; mnd.tgt = 0; }
+    plano.current.cur = 0.5; plano.current.tgt = 0.5;
+    uiPres.current = { giro: 0, tilt: 0, abre: 0, plano: 0.5 };
+    setGiroUI(0); setTiltUI(0); setAbreUI(0); setPlanoUI(0.5);
+  }, []);
+
+  const sincScroll = useCallback((p: number) => {
+    const y = Math.round(presGeo.current.y0 + p * presGeo.current.dist);
+    if (Math.abs(y - presY.current) >= 1) { window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior }); presY.current = window.scrollY; }
+  }, []);
+
+  /** Un fotograma de la presentación: el tiempo real (no los fps) decide el progreso; el scroll y el lienzo lo siguen */
+  const paso = useCallback(function tick(ahora: number) {
+    presRaf.current = 0;
+    if (presRef.current !== "reproduciendo") return;
+    const g = guion.current;
+    if (!g) return;
+    const dt = Math.min(0.1, Math.max(0, (ahora - presUlt.current) / 1000));
+    presUlt.current = ahora;
+    presT.current = Math.min(g.total, presT.current + dt * velRef.current);
+    const t = presT.current, fin = t >= g.total;
+    const p = fin ? 1 : pEn(g, t);
+    const { tr, local } = trLocal(p, limite.current);
+    const c = controlesEn(tr - 1 + local);
+    // tras reanudar, los mandos vuelven a la coreografía con un fundido (sin saltos)
+    const k = suave((ahora - presFase.current.t) / 800), d = presFase.current.desde;
+    const verUI = ahora - presUiT.current >= 100 || fin;
+    if (verUI) presUiT.current = ahora;
+    const cambioC = aplicarControles({ giro: mezcla(d.giro, c.giro, k), tilt: mezcla(d.tilt, c.tilt, k), abre: mezcla(d.abre, c.abre, k), plano: mezcla(d.plano, c.plano, k) }, verUI);
+    progreso.current = p; objetivo.current = p;
+    const reposoZona = tr === 5 && local > 0.8;
+    // Ritmo de dibujo: pleno en escritorio; 30 fps en móvil o equipos modestos; 10 fps en el reposo final
+    const minDt = reposoZona ? 100 : mundo.current?.denso === false ? 33 : 0;
+    if (fin || ((cambioC || p !== presP.current) && ahora - presDib.current >= minDt) || ahora - presDib.current > 100) {
+      presDib.current = ahora; presP.current = p;
+      dibujar(p);
+    }
+    // El scroll de la página acompaña al progreso (barra de desplazamiento, cabecera) a ~8 Hz: basta, y evita forzar el layout en cada fotograma
+    if (!manualRef.current && (fin || ahora - presScrollT.current >= 120)) { presScrollT.current = ahora; sincScroll(p); }
+    presBarra.current?.style.setProperty("--pp", (t / g.total).toFixed(4));
+    const seg = Math.floor(t);
+    if (seg !== presSeg.current && presTiempo.current) { presSeg.current = seg; presTiempo.current.textContent = `${fmt(t)} / ${fmt(g.total)}`; }
+    if (fin) { cambiarPres("finalizado"); setAviso("Presentación finalizada. La composición queda suspendida."); return; }
+    presRaf.current = requestAnimationFrame(tick);
+  }, [dibujar, aplicarControles, cambiarPres, sincScroll]);
+
+  const pausar = useCallback((gesto?: string) => {
+    if (presRef.current !== "reproduciendo") return;
+    cancelAnimationFrame(presRaf.current); presRaf.current = 0;
+    // El progreso exacto vuelve al scroll y los sliders al valor real, para continuar en modo manual sin saltos
+    if (!manualRef.current && gesto === "exacto") { const y = Math.round(presGeo.current.y0 + objetivo.current * presGeo.current.dist); window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior }); presY.current = window.scrollY; }
+    volcarUI();
+    cambiarPres("pausado");
+    setAviso("Presentación en pausa. Puedes seguir en modo manual o reanudarla desde este punto.");
+  }, [cambiarPres, volcarUI]);
+
+  const comenzar = useCallback(() => {
+    cancelAnimationFrame(presRaf.current); presRaf.current = 0;
+    peekP.current = null; peekAlLlegar.current = false; setMirando(false);
+    reiniciarMandos();
+    const g = guion.current ?? crearGuion(limite.current);
+    guion.current = g;
+    if (manualRef.current) {
+      // Movimiento reducido: recorrido por etapas, sin desplazamientos automáticos
+      setPasos(true); setEtapa(0); setPManual(etapas(limite.current)[0]); cambiarPres("inactivo");
+      setAviso("Recorrido por etapas. Usa Siguiente y Anterior para avanzar.");
+      enfocar.current = "play";
+      return;
+    }
+    geoScroll();
+    progreso.current = 0; objetivo.current = 0; presP.current = -1;
+    window.scrollTo({ top: presGeo.current.y0, behavior: "instant" as ScrollBehavior });
+    presY.current = window.scrollY;
+    dibujar(0);
+    presT.current = 0; presSeg.current = -1;
+    presFase.current = { t: performance.now() - 1000, desde: { giro: 0, tilt: 0, abre: 0, plano: 0.5 } };
+    presUlt.current = performance.now(); presDib.current = 0;
+    cambiarPres("reproduciendo");
+    setAviso("Presentación iniciada.");
+    enfocar.current = "play";
+    presRaf.current = requestAnimationFrame(paso);
+  }, [dibujar, paso, reiniciarMandos, cambiarPres, geoScroll]);
+
+  const reanudar = useCallback(() => {
+    if (presRef.current === "finalizado") { comenzar(); return; }
+    const g = guion.current ?? crearGuion(limite.current);
+    guion.current = g;
+    geoScroll();
+    presT.current = tEn(g, objetivo.current);
+    presFase.current = { t: performance.now(), desde: { giro: giro.current.cur, tilt: tilt.current.cur, abre: abre.current.cur, plano: plano.current.cur } };
+    presY.current = window.scrollY; presP.current = -1;
+    uiPres.current = { giro: 9, tilt: 9, abre: 9, plano: 9 };
+    presUlt.current = performance.now();
+    cambiarPres("reproduciendo");
+    setAviso("Presentación reanudada.");
+    presRaf.current = requestAnimationFrame(paso);
+  }, [comenzar, paso, cambiarPres, geoScroll]);
+
+  const salir = useCallback(() => {
+    cancelAnimationFrame(presRaf.current); presRaf.current = 0;
+    cambiarPres("inactivo"); setPasos(false);
+    setAviso("Presentación cerrada. Recorrido manual.");
+    enfocar.current = "nav";
+  }, [cambiarPres]);
+
+  const ciclarVel = () => {
+    const v = PRESENTACION_V5.velocidades;
+    const sig = v[(v.indexOf(velRef.current as (typeof v)[number]) + 1) % v.length];
+    velRef.current = sig; setVel(sig);
+    setAviso(`Velocidad ${String(sig).replace(".", ",")} por.`);
+  };
+  const irEtapa = (i: number) => {
+    const lista = etapas(limite.current);
+    const n = Math.max(0, Math.min(lista.length - 1, i));
+    const { tr, local } = trLocal(lista[n], limite.current);
+    aplicarControles(controlesEn(tr - 1 + local));
+    setEtapa(n); setPManual(lista[n]); progreso.current = lista[n]; objetivo.current = lista[n];
+    dibujar(lista[n]);
+  };
+
+  /* Mientras reproduce, cualquier gesto del visitante (rueda, tacto, teclas de desplazamiento, pulsar la escena o un mando,
+     o un scroll que no escribió el reproductor) pausa la presentación y deja el control en sus manos; Escape la cierra. */
+  useEffect(() => {
+    if (pres !== "reproduciendo") return;
+    const st = escenario.current;
+    const alScroll = () => { if (Math.abs(window.scrollY - presY.current) > 8) pausar(); };
+    const alTecla = (e: KeyboardEvent) => {
+      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key) && !(e.target as Element | null)?.closest?.(".v5-player")) pausar();
+    };
+    const alBajar = (e: PointerEvent) => { if (!(e.target as Element | null)?.closest?.(".v5-player")) pausar("exacto"); };
+    const alOcultar = () => { if (document.hidden) pausar("exacto"); };
+    const alGesto = () => pausar();
+    window.addEventListener("wheel", alGesto, { passive: true });
+    window.addEventListener("touchmove", alGesto, { passive: true });
+    window.addEventListener("scroll", alScroll, { passive: true });
+    window.addEventListener("keydown", alTecla);
+    document.addEventListener("visibilitychange", alOcultar);
+    st?.addEventListener("pointerdown", alBajar);
+    return () => {
+      window.removeEventListener("wheel", alGesto);
+      window.removeEventListener("touchmove", alGesto);
+      window.removeEventListener("scroll", alScroll);
+      window.removeEventListener("keydown", alTecla);
+      document.removeEventListener("visibilitychange", alOcultar);
+      st?.removeEventListener("pointerdown", alBajar);
+    };
+  }, [pres, pausar]);
+  useEffect(() => {
+    if (pres === "inactivo" && !pasos) return;
+    const alTecla = (e: KeyboardEvent) => { if (e.key === "Escape") salir(); };
+    window.addEventListener("keydown", alTecla);
+    return () => window.removeEventListener("keydown", alTecla);
+  }, [pres, pasos, salir]);
+  useEffect(() => () => cancelAnimationFrame(presRaf.current), []);
+  useEffect(() => {
+    if (enfocar.current === "play") { enfocar.current = null; playBtn.current?.focus(); }
+    else if (enfocar.current === "nav" && pres === "inactivo" && !pasos) { enfocar.current = null; document.querySelector<HTMLElement>(".v5-pie .an-nav [aria-current]")?.focus(); }
+  });
+
   /* Si el mando propio deja de estar disponible mientras tiene el foco (p. ej. al retroceder), el foco pasa a «Girar la vista» */
   useEffect(() => {
     if (!espec && document.activeElement?.closest("[data-esp]")) giroIn.current?.focus();
@@ -411,7 +638,7 @@ export function EscenaV5() {
               {AMPLIADO_V5[tramo].interpretacion.map((t) => <p key={t}>{t}</p>)}
             </div>
           </details>
-          {tramo === 1 && (frag > 0 || mirando) && (
+          {tramo === 1 && (frag > 0 || mirando) && pres !== "reproduciendo" && (
             <button type="button" className="an-btn" aria-pressed={mirando} onClick={alternarMirar}>
               {mirando ? "Volver al recorrido" : "Ver la pintura completa"}
             </button>
@@ -476,8 +703,42 @@ export function EscenaV5() {
               <input type="range" min={0} max={1000} value={Math.round(pManual * 1000)} onChange={(e) => setPManual(Number(e.target.value) / 1000)} />
             </label>
           )}
-          {!manual && tramo === 1 && frag === 0 && <p className="an-guia" aria-hidden="true">Desplaza para acercarte</p>}
+          {!manual && tramo === 1 && frag === 0 && pres === "inactivo" && <p className="an-guia" aria-hidden="true">Desplaza para acercarte</p>}
         </div>
+        {tramo === 1 && frag === 0 && pres === "inactivo" && !pasos && !mirando && (
+          <div className="v5-player v5-player--ver">
+            <button type="button" className="v5-player__b v5-ver" onClick={comenzar}>
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="currentColor"><path d="M4 2.5v11l9-5.5z" /></svg>
+              Ver presentación
+            </button>
+          </div>
+        )}
+        {(pres !== "inactivo" || pasos) && (
+          <div className="v5-player" role="group" aria-label="Presentación">
+            {pasos ? (
+              <>
+                <button type="button" ref={playBtn} className="v5-player__b" onClick={() => irEtapa(etapa - 1)} disabled={etapa <= 0}>Anterior</button>
+                <span className="v5-player__t" aria-hidden="true">{etapa + 1} / {FRAGMENTOS_V5.length}</span>
+                <button type="button" className="v5-player__b" onClick={() => irEtapa(etapa + 1)} disabled={etapa >= FRAGMENTOS_V5.length - 1}>Siguiente</button>
+              </>
+            ) : (
+              <>
+                <button type="button" ref={playBtn} className="v5-player__b v5-player__ico" aria-label={pres === "reproduciendo" ? "Pausar presentación" : pres === "finalizado" ? "Repetir presentación" : "Reanudar presentación"} onClick={() => (pres === "reproduciendo" ? pausar("exacto") : reanudar())}>
+                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="currentColor">
+                    {pres === "reproduciendo" ? <path d="M4 3h3v10H4zM9 3h3v10H9z" /> : pres === "finalizado" ? <path d="M8 2a6 6 0 1 0 6 6h-2a4 4 0 1 1-1.2-2.8L9 7h5V2l-1.8 1.8A6 6 0 0 0 8 2z" /> : <path d="M4 2.5v11l9-5.5z" />}
+                  </svg>
+                </button>
+                <button type="button" className="v5-player__b" aria-label={`Velocidad ${String(vel).replace(".", ",")} por. Cambiar velocidad`} onClick={ciclarVel}>{String(vel).replace(".", ",")}×</button>
+                <span ref={presTiempo} className="v5-player__t" aria-hidden="true">0:00 / {guion.current ? fmt(guion.current.total) : "4:32"}</span>
+              </>
+            )}
+            <button type="button" className="v5-player__b v5-player__ico" aria-label="Salir de la presentación" onClick={salir}>
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 3l10 10M13 3L3 13" /></svg>
+            </button>
+            {!pasos && <span ref={presBarra} className="v5-player__barra" aria-hidden="true" />}
+          </div>
+        )}
+        <p className="sr-only" role="status">{aviso}</p>
         <p className="sr-only" role="status">{`${TRAMOS_V5[tramo - 1].kicker}: ${TRAMOS_V5[tramo - 1].titulo}`}</p>
       </section>
     </div>
