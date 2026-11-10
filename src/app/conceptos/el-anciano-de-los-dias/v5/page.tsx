@@ -9,10 +9,10 @@ import "../anciano.css";
 import "../../pulido.css";
 import "./v5.css";
 
-/** Prototipo interno del Acto I: sin indexar y fuera del catálogo, el menú y el sitemap. */
+/** Ruta experimental (prólogo, tres actos y epílogo): sin indexar y fuera del catálogo, el menú y el sitemap. */
 export const metadata: Metadata = {
-  title: "El anciano de los días · V5, prototipo del Acto I — MANIFESTO",
-  description: "Prototipo del Acto I de la V5: el nacimiento de la medida.",
+  title: "El anciano de los días · V5, recorrido experimental — MANIFESTO",
+  description: "Versión experimental de El anciano de los días, de William Blake: tres actos y un epílogo sobre la medida y sus límites.",
   robots: { index: false, follow: false },
 };
 

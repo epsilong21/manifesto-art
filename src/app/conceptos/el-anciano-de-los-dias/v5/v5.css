@@ -1,4 +1,4 @@
-/* El anciano de los días · V5 (prototipo del Acto I). Reutiliza los tokens y la tipografía de ../anciano.css. */
+/* El anciano de los días · V5. Reutiliza los tokens y la tipografía de ../anciano.css. */
 .v5-pista { position: relative; height: calc(var(--v5-pant, 9) * 100svh); }
 .v5-pista--manual { height: auto; }
 .v5-escenario {
@@ -12,6 +12,8 @@
   isolation: isolate;
 }
 .v5-pista--manual .v5-escenario { position: relative; }
+/* Con movimiento reducido el pie suma el control manual de progreso: en anchos estrechos ocupa dos filas */
+@media (max-width: 40rem) { .v5-pista--manual .v5-escenario { --v5-pie: 6.25rem; } }
 .v5-fondo {
   position: absolute;
   inset: 0;
@@ -140,6 +142,36 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .v5-ventana, .v5-texto { animation: none !important; }
+}
+
+/* Epílogo: tres acciones finales, siempre visibles al pie del panel de texto (no dependen de desplazarlo). Etiqueta corta en pantallas pequeñas y completa en las anchas */
+.v5-texto .an-fin--epilogo {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  gap: 0.5rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 0.5rem 0 0.2rem;
+  background: linear-gradient(to top, var(--c-bg) 72%, transparent);
+}
+/* Móvil vertical: en el epílogo la banda de mando es de una sola fila (deslizador y botón) y no tapa la escena */
+@media (max-width: 55.99rem) and (min-height: 32.01rem) {
+  .v5-escenario[data-tramo="5"] .v5-mando { grid-template-columns: minmax(0, 1fr) auto; background: transparent; }
+  .v5-escenario[data-tramo="5"] .v5-mando__botones { grid-column: auto; }
+}
+/* Móvil vertical bajo (p. ej. 320×640): título del epílogo más compacto para que el texto y las acciones quepan juntos */
+@media (max-width: 55.99rem) and (max-height: 44rem) and (min-height: 32.01rem) {
+  .v5-escenario[data-tramo="5"] .v5-texto .an-titulo { font-size: 1.55rem; }
+  .v5-escenario[data-tramo="5"] .v5-texto { gap: 0.3rem; top: 45%; }
+  .v5-escenario[data-tramo="5"] .v5-mando { top: calc(45% - 4.6rem); }
+}
+.v5-largo { display: none; }
+@media (min-width: 56rem) {
+  .v5-corto { display: none; }
+  .v5-largo { display: inline; }
+  .v5-texto .an-fin--epilogo { display: flex; flex-wrap: wrap; }
 }
 
 /* Orientación en móvil: el menú muestra el nombre del acto en curso (el resto queda en su número) */

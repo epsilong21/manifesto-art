@@ -279,6 +279,9 @@ export type Acto = {
   /** Progreso del Acto III, 0–1 (0 antes de él) y posición del plano del portal (0–1) */
   c: number;
   plano: number;
+  /** Progreso del epílogo, 0–1 (0 antes de él; durante él, `c` vale 1) y reloj ambiental en segundos (solo avanza en el reposo final) */
+  d: number;
+  t: number;
 };
 
 type Cam = { tx: number; ty: number; tz: number; cy: number; sy: number; cp: number; sp: number; dist: number; ct: number; st: number; ex: number; fz: number };
@@ -304,10 +307,12 @@ function proyectar(e: Acto, c: Cam, lx: number, ly: number, lz: number) {
 /** Atenuación por profundidad. En el Acto II añade una «profundidad de campo luminosa»: lo que está en el plano de atención brilla más. */
 const niebla = (zc: number, c: Cam, R: number) => {
   const base = clamp(1.2 - (zc - c.dist) / (R * 5.2));
-  if (!c.fz) return base;
+  if (!c.fz) return base * GAN;
   const d = (zc - c.dist) / (R * 2.4);
-  return base * (1 - c.fz * (1 - Math.exp(-d * d)));
+  return base * (1 - c.fz * (1 - Math.exp(-d * d))) * GAN;
 };
+/** Ganancia de brillo del epílogo: al alejarse la cámara las líneas se adelgazan y necesitan algo más de luz (1 fuera del epílogo). */
+let GAN = 1;
 
 /** Punto de un anillo de radio r, girado rx (sobre x) y ry (sobre y), precesión rz, con centro (ox, oy, cz). */
 function anillo(t: number, r: number, rx: number, ry: number, ox: number, oy: number, cz: number, out: number[], rz = 0) {
@@ -486,13 +491,31 @@ export function pintarActo(m: Mundo, e: Acto) {
       cam.tz = e.R * cc(1.5, 1.7, 2.2, 2.6, 2.0);
     }
   }
+  GAN = 1 + 0.35 * suave(e.d / 0.4);
+  if (e.d > 0) {
+    // Epílogo: desde el punto de vista de referencia → la cámara se retira y sube → encuadra el compás → reposo
+    const s1 = suave(e.d / 0.42), s2 = suave((e.d - 0.3) / 0.36), s3 = suave((e.d - 0.62) / 0.38);
+    const ee = (v0: number, v1: number, v2: number, v3: number) => mezcla(mezcla(mezcla(v0, v1, s1), v2, s2), v3, s3);
+    // Distancia final: que el compás entero (unas seis medidas de alto) quepa en la parte libre de la escena
+    // (el texto va debajo de la escena en anchos < 896 px salvo en apaisado bajo)
+    const apilado = e.w < 896 && !(e.w > e.h && e.h <= 512);
+    const libre = apilado ? 0.44 * e.h : 0.8 * e.h;
+    const fin = clamp((0.28 * Math.min(e.w, e.h)) / (libre / 5.6), 1.4, 3.4);
+    yaw = ee(0.42, 0.38, 0.28, 0.3);
+    pitch = ee(0.18, 0.15, 0.12, 0.14);
+    cam.dist = dist1 * ee(1, 0.76 * fin, fin, fin * 0.98);
+    cam.tz = e.R * ee(2.0, 1.8, 1.4, 1.4);
+    const kt = suave(e.d / 0.55), cth = Math.cos(e.th0), sth = Math.sin(e.th0);
+    cam.tx = e.c0x + kt * e.R * (0.45 * cth + 1.5 * sth);
+    cam.ty = e.c0y + kt * e.R * (0.45 * sth - 1.5 * cth);
+  }
   yaw += e.giro * 0.6;
   pitch += e.cabeceo * 0.35;
   cam.cy = Math.cos(yaw); cam.sy = Math.sin(yaw); cam.cp = Math.cos(pitch); cam.sp = Math.sin(pitch);
   // Luz del núcleo: intensidad por momento (calma → concentración → inquietud) y foco en pantalla
   const luzB = suave(b / 0.15);
   const nu0 = suave((b - 0.46) / 0.16);
-  const ci = nu0 * (0.7 + 0.3 * suave((b - 0.55) / 0.2)) * (1 + 0.08 * Math.sin(b * 50)) * (1 + 0.5 * e.rx);
+  const ci = nu0 * (0.7 + 0.3 * suave((b - 0.55) / 0.2)) * (1 + 0.08 * Math.sin(b * 50)) * (1 + 0.5 * e.rx) * (1 - 0.4 * suave(e.d / 0.4));
   FOCO.ok = false;
   FOCO.ci = ci;
   if (b > 0) { proyectar(e, cam, 0, 0, NUCLEO_Z); FOCO.x = P[0]; FOCO.y = P[1]; FOCO.s = P[2]; FOCO.ok = P[2] > 0; }
@@ -527,7 +550,7 @@ export function pintarActo(m: Mundo, e: Acto) {
   }
 
   // En el Acto II lo ya construido cede protagonismo (la composición se mantiene legible): se atenúa de forma global
-  ctx.globalAlpha = 1 - 0.55 * suave((b - 0.2) / 0.3) + 0.2 * suave((b - 0.72) / 0.2);
+  ctx.globalAlpha = 1 - 0.55 * suave((b - 0.2) / 0.3) + 0.2 * suave((b - 0.72) / 0.2) + 0.08 * suave(e.d / 0.4);
 
   // Haces de luz: de la punta del compás hacia el fondo
   const haz = suave((a - 0.52) / 0.3);
@@ -689,6 +712,7 @@ export function pintarActo(m: Mundo, e: Acto) {
   ctx.globalAlpha = 1;
   if (b > 0) pintarActoII(m, e, cam, n, spin, tens, ci);
   if (e.c > 0) pintarActoIII(m, e, cam, spin, tens, tilt, dist1);
+  if (e.d > 0) pintarEpilogo(m, e, cam);
 
   // Polvo en suspensión: da escala y profundidad con el paralaje de la cámara
   const pv = m.polvo;
@@ -719,7 +743,7 @@ export function pintarActo(m: Mundo, e: Acto) {
   }
   ctx.globalCompositeOperation = "source-over";
   if (e.c > 0) sombras(ctx, e, cam);
-  if (b > 0) vineta(ctx, e, luzB, tens);
+  if (b > 0) vineta(ctx, e, luzB, tens * (1 - 0.6 * suave(e.d / 0.5)));
 }
 
 /** Dibuja un sprite de luz precalculado (barato: una sola llamada de imagen, sin crear gradientes por fotograma). */
@@ -1419,5 +1443,174 @@ function sombras(ctx: CanvasRenderingContext2D, e: Acto, cam: Cam) {
     g.addColorStop(1, "rgba(14,6,4,0)");
     ctx.fillStyle = g;
     ctx.fillRect(x - mn * r, y - mn * r, mn * r * 2, mn * r * 2);
+  }
+}
+
+/* ───────────────────────── Epílogo · Lo que no puede medirse ───────────────────────── */
+
+/** Punto de luz de donde parten los dos brazos (algo desplazado del eje) y puntas del compás gigante (la derecha queda por dentro del círculo). */
+const APICE = [0.36, -3.5, 0.3];
+const TIP_I = [0, 0, 0];
+const TIP_D = [0.87, 0.02, 0];
+const ORB_BASE: OrbitaP = { r: 1, rx: 0, ry: 0, cz: 0, rz: 0 };
+
+/**
+ * El observatorio resulta ser la huella de un compás gigantesco: arriba un disco de luz (como el de la pintura), de él bajan dos
+ * brazos graduados hasta el círculo del principio. La punta derecha no llega a tocarlo. Reutiliza sprites y funciones del motor:
+ * no crea geometría nueva por fotograma salvo dos brazos y sus marcas.
+ */
+function pintarEpilogo(m: Mundo, e: Acto, cam: Cam) {
+  const { ctx, d, t } = e;
+  const spr = m.sprites;
+  const kL = suave((d - 0.08) / 0.2);
+  if (kL <= 0.003) return;
+  proyectar(e, cam, APICE[0], APICE[1], APICE[2]);
+  if (!P[2]) return;
+  const ax = P[0], ay = P[1], Rd = e.R * P[2] * 0.5;
+  const kEst = suave((d - 0.72) / 0.2);
+  const resp = 1 + 0.05 * Math.sin(t * 0.9);
+
+  // Cono de luz: del disco hacia la arquitectura
+  const cono = suave((d - 0.3) / 0.3);
+  proyectar(e, cam, 0.5, 0.2, 1.2);
+  if (cono > 0.01 && P[2]) {
+    const bx = P[0], by = P[1], bs = P[2];
+    const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+    const w0 = Rd * 0.45, w1 = e.R * bs * 1.8;
+    const g = ctx.createLinearGradient(ax, ay, bx, by);
+    g.addColorStop(0, `rgba(${COL[2]},${0.2 * cono})`);
+    g.addColorStop(1, `rgba(${COL[0]},0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(ax + nx * w0, ay + ny * w0);
+    ctx.lineTo(bx + nx * w1, by + ny * w1);
+    ctx.lineTo(bx - nx * w1, by - ny * w1);
+    ctx.lineTo(ax - nx * w0, ay - ny * w0);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Brazos graduados. Cada uno desciende desde el disco; el derecho llega un poco después.
+  const brazo = (tip: number[], grow: number, i: number) => {
+    if (grow <= 0.002) return;
+    proyectar(e, cam, tip[0], tip[1], tip[2]);
+    if (!P[2]) return;
+    const px = P[0], py = P[1], ps = P[2];
+    const ex = mezcla(ax, px, grow), ey = mezcla(ay, py, grow);
+    let g = ctx.createLinearGradient(ax, ay, ex, ey);
+    g.addColorStop(0, `rgba(${COL[0]},0.05)`);
+    g.addColorStop(1, `rgba(${COL[2]},0.26)`);
+    ctx.strokeStyle = g;
+    ctx.lineWidth = 7 * clamp(ps * 2, 0.8, 1.6);
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.stroke();
+    g = ctx.createLinearGradient(ax, ay, ex, ey);
+    g.addColorStop(0, `rgba(${COL[2]},0.3)`);
+    g.addColorStop(1, `rgba(${COL[2]},0.92)`);
+    ctx.strokeStyle = g;
+    ctx.lineWidth = 1.5 * clamp(ps * 2, 0.8, 1.6);
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.stroke();
+    // Graduación del brazo: la medida convertida en instrumento
+    const dx = px - ax, dy = py - ay, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+    const NT = 26;
+    ctx.beginPath();
+    for (let k = 2; k < NT; k++) {
+      const u = k / NT;
+      if (u > grow) break;
+      const l = (k % 5 === 0 ? 0.075 : 0.036) * Rd * 2;
+      const x = mezcla(ax, px, u), y = mezcla(ay, py, u);
+      ctx.moveTo(x - nx * l, y - ny * l);
+      ctx.lineTo(x + nx * l, y + ny * l);
+    }
+    ctx.strokeStyle = `rgba(${COL[0]},${0.55 * kL})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // La luz desciende por el brazo: una vez al aparecer el compás y, ya en reposo, de forma lenta y espaciada
+    const u1 = ven(d, 0.38 + i * 0.05, 0.56 + i * 0.05);
+    let u = u1, fu = campana(u1);
+    if (u1 < 0 && kEst > 0.01) { u = (t * 0.1 + i * 0.5) % 1; fu = campana(u) * 0.5 * kEst; }
+    if (fu > 0.03 && u > 0) {
+      const hx = mezcla(ax, px, u), hy = mezcla(ay, py, u), ux = mezcla(ax, px, Math.max(0, u - 0.2)), uy = mezcla(ay, py, Math.max(0, u - 0.2));
+      ctx.strokeStyle = `rgba(${COL[2]},${0.8 * fu})`;
+      ctx.lineWidth = 2.6;
+      ctx.beginPath(); ctx.moveTo(ux, uy); ctx.lineTo(hx, hy); ctx.stroke();
+      if (spr) halo(ctx, spr.halo, hx, hy, 15 * clamp(ps * 2, 0.8, 1.8), fu);
+    }
+  };
+  brazo(TIP_I, suave((d - 0.16) / 0.3), 0);
+  brazo(TIP_D, suave((d - 0.22) / 0.3), 1);
+
+  if (spr) {
+    // Disco de luz y rayos: la fuerza creadora de la pintura, ahora lejana
+    ctx.save();
+    ctx.translate(ax, ay);
+    ctx.rotate(d * 0.9 + t * 0.03);
+    ctx.globalAlpha = 0.36 * kL;
+    ctx.drawImage(spr.rayos, -Rd * 3.6, -Rd * 3.6, Rd * 7.2, Rd * 7.2);
+    ctx.rotate(-d * 1.6 - t * 0.05 + 1);
+    ctx.globalAlpha = 0.16 * kL;
+    ctx.drawImage(spr.rayos2 ?? spr.rayos, -Rd * 2.8, -Rd * 2.8, Rd * 5.6, Rd * 5.6);
+    ctx.restore();
+    halo(ctx, spr.halo, ax, ay, Rd * 3.2, 0.28 * kL * resp);
+    halo(ctx, spr.halo, ax, ay, Rd * 1.6, 0.5 * kL * resp);
+    halo(ctx, spr.halo, ax, ay, Rd * 0.75, 0.85 * kL);
+  }
+  ctx.beginPath();
+  ctx.arc(ax, ay, Rd * 0.62, 0, TAU);
+  ctx.moveTo(ax + Rd * 0.5, ay);
+  ctx.arc(ax, ay, Rd * 0.5, 0, TAU);
+  for (let i = 0; i < 36; i++) {
+    const an = (i / 36) * TAU, r1 = Rd * 0.62, r2 = Rd * (i % 3 === 0 ? 0.76 : 0.69);
+    ctx.moveTo(ax + Math.cos(an) * r1, ay + Math.sin(an) * r1);
+    ctx.lineTo(ax + Math.cos(an) * r2, ay + Math.sin(an) * r2);
+  }
+  ctx.strokeStyle = `rgba(${COL[2]},${0.55 * kL})`;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Las puntas: la izquierda fija en el centro del círculo y la derecha, que debería trazarlo
+  const kP = suave((d - 0.42) / 0.2);
+  if (kP > 0.01) {
+    // El círculo del principio, ahora a la vista como lo que el compás habría trazado
+    ctx.beginPath();
+    for (let i = 0; i <= 72; i++) {
+      anillo((i / 72) * TAU, 1, 0, 0, 0, 0, 0, L);
+      proyectar(e, cam, L[0], L[1], L[2]);
+      if (!P[2]) continue;
+      if (i === 0) ctx.moveTo(P[0], P[1]); else ctx.lineTo(P[0], P[1]);
+    }
+    ctx.strokeStyle = `rgba(${COL[2]},${0.34 * kP})`;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    for (const tp of [TIP_I, TIP_D]) {
+      proyectar(e, cam, tp[0], tp[1], tp[2]);
+      if (P[2]) luzPunta(ctx, P[0], P[1], e.rr * clamp(P[2] * 2.2, 0.5, 1.1), kP * 0.9);
+    }
+  }
+  if (spr) {
+    const h = spr.halo;
+    // La luz recorre el círculo del principio y se queda corta; después, un latido muy lento
+    const uc = ven(d, 0.5, 0.78);
+    if (uc > 0) pulso(ctx, h, e, cam, ORB_BASE, uc * TAU * 1.4, 1.3, campana(uc) * 0.95, 2);
+    else if (kEst > 0.01) pulso(ctx, h, e, cam, ORB_BASE, t * 0.3, 0.8, 0.42 * kEst * (0.6 + 0.4 * Math.sin(t * 0.5)), 2);
+    // La brecha entre la punta y el círculo
+    const fb = suave((d - 0.5) / 0.14);
+    if (fb > 0.02) destello(ctx, h, e, cam, 0.935, 0.01, 0, fb * (0.5 + 0.5 * Math.pow(Math.max(0, Math.sin(t * 1.7 + d * 36)), 3)));
+    // Pequeñas luces en los anillos colosales: se descubren al mirar
+    const kT = suave((d - 0.55) / 0.25);
+    if (kT > 0.02) {
+      const sp = 2.5;
+      const CA: OrbitaP = { r: 4.2, rx: 1.35, ry: 0.2, cz: 3.2, rz: sp * 0.06 };
+      const CB: OrbitaP = { r: 6, rx: 1.45, ry: -0.25, cz: 5, rz: -sp * 0.04 };
+      const NT = m.denso ? 10 : 6;
+      for (let i = 0; i < NT; i++) {
+        const o = i % 2 ? CB : CA;
+        anillo(0.5 + i * 1.37, o.r, o.rx, o.ry, 0, 0, o.cz, L, o.rz);
+        proyectar(e, cam, L[0], L[1], L[2]);
+        if (!P[2]) continue;
+        const nb = niebla(P[3], cam, e.R);
+        const f = Math.pow(Math.max(0, Math.sin(t * 0.7 + i * 2.1 + d * 5)), 12);
+        halo(ctx, h, P[0], P[1], (6 + 5 * f) * clamp(P[2] * 2, 0.8, 1.8), kT * (0.3 + 0.7 * f) * nb);
+      }
+    }
   }
 }

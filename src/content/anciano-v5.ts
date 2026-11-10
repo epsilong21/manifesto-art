@@ -1,12 +1,12 @@
 /**
- * El anciano de los días · V5 (prototipo del Acto I): textos y línea de tiempo.
- * Recorrido previsto: Prólogo (la pintura) → Acto I → Acto II → Acto III → Epílogo. Aquí solo existen el prólogo y el Acto I.
+ * El anciano de los días · V5: textos y línea de tiempo.
+ * Recorrido: Prólogo (la pintura) → Acto I → Acto II → Acto III → Epílogo.
  */
 
-/** Pantallas de scroll por tramo (escritorio / móvil): [prólogo, Acto I, Acto II, Acto III]. */
+/** Pantallas de scroll por tramo (escritorio / móvil): [prólogo, Acto I, Acto II, Acto III, epílogo]. */
 export const DURACION_V5 = {
-  escritorio: [3.0, 5.2, 5.6, 6.2] as const,
-  movil: [2.6, 4.6, 4.9, 5.4] as const,
+  escritorio: [3.0, 5.2, 5.6, 6.2, 3.8] as const,
+  movil: [2.6, 4.6, 4.9, 5.4, 3.4] as const,
 };
 
 export const TRAMOS_V5 = [
@@ -14,10 +14,11 @@ export const TRAMOS_V5 = [
   { n: 2, kicker: "Acto I", titulo: "El nacimiento de la medida" },
   { n: 3, kicker: "Acto II", titulo: "La arquitectura del orden" },
   { n: 4, kicker: "Acto III", titulo: "El universo imposible" },
+  { n: 5, kicker: "Epílogo", titulo: "Lo que no puede medirse" },
 ] as const;
 
 export type FragmentoV5 = {
-  tramo: 1 | 2 | 3 | 4;
+  tramo: 1 | 2 | 3 | 4 | 5;
   /** Progreso local (0–1) del tramo a partir del cual se muestra. */
   desde: number;
   tipo: "doc" | "int";
@@ -44,9 +45,13 @@ export const FRAGMENTOS_V5: FragmentoV5[] = [
   { tramo: 4, desde: 0.25, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La geometría desobedece", texto: "Los anillos se atraviesan sin romperse y los planos se pliegan hacia donde no hay espacio. Cada figura es posible por separado; juntas, no." },
   { tramo: 4, desde: 0.55, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El espacio imposible", texto: "Una puerta de luz contiene más espacio del que la rodea. Desplaza el plano: un gesto mínimo cambia por completo lo que hay dentro." },
   { tramo: 4, desde: 0.82, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El límite de la medida", texto: "Desde un único punto de vista todo encaja. Desde cualquier otro, no. La medida llega hasta aquí." },
+  { tramo: 5, desde: 0, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "La última perspectiva", texto: "La cámara se retira. Lo que parecía el mundo entero es un solo trazo y, por encima, en la oscuridad, aparece un punto de luz." },
+  { tramo: 5, desde: 0.36, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "El límite de la creación", texto: "Dos brazos descienden hasta el círculo del principio: es el gesto del compás, a la escala de un universo. Pero la punta no llega a tocarlo." },
+  { tramo: 5, desde: 0.66, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Lo que permanece", texto: "Nada se apaga. Todo lo medido sigue ahí, completo y extraordinario; y aun así queda un hueco que ninguna medida alcanza." },
+  { tramo: 5, desde: 0.9, tipo: "int", etiqueta: "Interpretación de MANIFESTO", momento: "Fin", texto: "Blake pintó a quien mide el mundo. MANIFESTO imaginó un universo que crece hasta no caber en su propia medida." },
 ];
 
-export const AMPLIADO_V5: Record<1 | 2 | 3 | 4, { documentado: string[]; interpretacion: string[] }> = {
+export const AMPLIADO_V5: Record<1 | 2 | 3 | 4 | 5, { documentado: string[]; interpretacion: string[] }> = {
   1: {
     documentado: [
       "La imagen abre Europe: a Prophecy (Lambeth, 1794) y muestra a Urizen midiendo el mundo material con un enorme compás, según la Universidad de Glasgow.",
@@ -78,6 +83,16 @@ export const AMPLIADO_V5: Record<1 | 2 | 3 | 4, { documentado: string[]; interpr
     ],
     interpretacion: [
       "El triángulo que solo se cierra desde un punto de vista (inspirado en las figuras imposibles, como el triángulo de Penrose), el nudo, los planos plegados y el portal son geometrías creadas por MANIFESTO. No están en la lámina de Blake ni son una lectura documentada de ella.",
+    ],
+  },
+  5: {
+    documentado: [
+      "Europe: a Prophecy (1794) es un libro ilustrado de William Blake: reúne poemas y grabados que él mismo coloreaba a mano. Su frontispicio es la imagen con la que empieza esta experiencia.",
+      "La lámina muestra a Urizen en el instante de medir, con el compás extendido hacia la oscuridad. No muestra lo que ocurre después: ese final queda abierto.",
+    ],
+    interpretacion: [
+      "El epílogo es una creación de MANIFESTO. La cámara se aleja y la arquitectura resulta ser la huella de un compás gigantesco: un punto de luz arriba, dos brazos que descienden y el círculo del principio. Es la imagen de la pintura llevada al tamaño de un universo.",
+      "La punta no llega a tocar el círculo, y desde casi cualquier otro punto de vista las piezas no encajan. Es nuestra manera de pensar la crítica de Blake al orden racional, no una intención suya demostrada. La obra no da una respuesta: se queda en el misterio.",
     ],
   },
 };

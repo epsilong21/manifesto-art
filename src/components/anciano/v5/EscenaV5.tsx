@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ANCIANO_IMG as I } from "@/content/anciano";
 import { rutaPublica } from "@/lib/rutaPublica";
@@ -19,7 +20,7 @@ type Medidas = {
 type Mando = { cur: number; tgt: number };
 
 /**
- * V5 · prólogo (la pintura) y Actos I, II y III. Un escenario fijo cuyo progreso lo marca el scroll (o un control con movimiento reducido).
+ * V5 · prólogo (la pintura), Actos I, II y III y epílogo. Un escenario fijo cuyo progreso lo marca el scroll (o un control con movimiento reducido).
  * Las medidas salen del contenedor, no de la ventana: funciona igual dentro de un iframe o de una plantilla ajena.
  */
 export function EscenaV5() {
@@ -36,7 +37,10 @@ export function EscenaV5() {
   const peekP = useRef<number | null>(null);
   const manualRef = useRef(false);
   /** Fin del prólogo y del Acto I en el progreso total */
-  const limite = useRef({ e1: 0.2, e2: 0.4, e3: 0.7 });
+  const limite = useRef({ e1: 0.15, e2: 0.35, e3: 0.6, e4: 0.85 });
+  /** Reloj ambiental del reposo final (segundos) y petición de mostrar la pintura entera al llegar al inicio */
+  const reloj = useRef(0);
+  const peekAlLlegar = useRef(false);
   const suav = useRef({ raf: 0, t: 0, activo: false });
   const giro = useRef<Mando>({ cur: 0, tgt: 0 });
   const cabeceo = useRef<Mando>({ cur: 0, tgt: 0 });
@@ -49,7 +53,8 @@ export function EscenaV5() {
   const arrastre = useRef<{ id: number; x: number; y: number } | null>(null);
   const ultimoBorde = useRef("");
 
-  const [tramo, setTramo] = useState<1 | 2 | 3 | 4>(1);
+  const [tramo, setTramo] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [reposo, setReposo] = useState(false);
   const [frag, setFrag] = useState(0);
   const [mando, setMando] = useState(false);
   const [manual, setManual] = useState(false);
@@ -66,9 +71,9 @@ export function EscenaV5() {
     const f = fig.current;
     const cv = lienzo.current;
     if (!m || !f) return;
-    const { e1, e2, e3 } = limite.current;
-    const tr: 1 | 2 | 3 | 4 = p < e1 ? 1 : p < e2 ? 2 : p < e3 ? 3 : 4;
-    const local = tr === 1 ? p / e1 : tr === 2 ? (p - e1) / (e2 - e1) : tr === 3 ? (p - e2) / (e3 - e2) : (p - e3) / (1 - e3);
+    const { e1, e2, e3, e4 } = limite.current;
+    const tr: 1 | 2 | 3 | 4 | 5 = p < e1 ? 1 : p < e2 ? 2 : p < e3 ? 3 : p < e4 ? 4 : 5;
+    const local = tr === 1 ? p / e1 : tr === 2 ? (p - e1) / (e2 - e1) : tr === 3 ? (p - e2) / (e3 - e2) : tr === 4 ? (p - e3) / (e4 - e3) : (p - e4) / (1 - e4);
     let camX = 0, camY = 0, k = 1, opac = 1;
     const ctx = cv?.getContext("2d") ?? null;
     const cx = m.vx + m.vw / 2, cy = m.vy + m.vh / 2;
@@ -88,15 +93,16 @@ export function EscenaV5() {
       camX = FOCO_COMPAS.x; camY = FOCO_COMPAS.y; k = m.kC;
       // Acto I (a) y Acto II (b): el Acto II parte exactamente del estado final del Acto I
       const a = tr === 2 ? local : 1;
-      const b = tr === 3 ? local : tr === 4 ? 1 : 0;
-      const c = tr === 4 ? local : 0;
+      const b = tr === 3 ? local : tr >= 4 ? 1 : 0;
+      const c = tr === 4 ? local : tr === 5 ? 1 : 0;
+      const d = tr === 5 ? local : 0;
       opac = 1 - suave(a / 0.2);
       if (ctx && mundo.current) {
         pintarActo(mundo.current, {
           ctx, w: m.W, h: m.H, cx, cy: m.W < 640 ? cy - m.vh * 0.16 * suave((a - 0.1) / 0.5) : cy, c0x: m.c0x, c0y: m.c0y, R: m.R, th0: m.th0, f: m.f, rr: m.rr,
           a, b, tilt: tilt.current.cur, giro: giro.current.cur, cabeceo: cabeceo.current.cur, abre: tr >= 3 ? abre.current.cur : 0,
           rx: tr === 3 ? Math.min(1, Math.abs(abre.current.tgt - abre.current.cur) * 4) : tr === 4 ? Math.min(1, Math.abs(plano.current.tgt - plano.current.cur) * 5) : 0,
-          c, plano: plano.current.cur,
+          c, plano: plano.current.cur, d, t: reloj.current,
         });
       }
     }
@@ -111,6 +117,7 @@ export function EscenaV5() {
     const hayMando = (tr === 2 && local > 0.42) || tr >= 3;
     arrastrable.current = (tr === 2 && local > 0.2) || tr >= 3;
     setMando(hayMando);
+    setReposo(tr === 5 && local > 0.8);
     barra.current?.style.setProperty("--an-p", p.toFixed(4));
   }, []);
 
@@ -144,8 +151,8 @@ export function EscenaV5() {
     const denso = !movil;
     if (!mundo.current || mundo.current.denso !== denso) mundo.current = crearMundo(denso);
     const dur = W < 640 ? DURACION_V5.movil : DURACION_V5.escritorio;
-    const total = dur[0] + dur[1] + dur[2] + dur[3];
-    limite.current = { e1: dur[0] / total, e2: (dur[0] + dur[1]) / total, e3: (dur[0] + dur[1] + dur[2]) / total };
+    const total = dur[0] + dur[1] + dur[2] + dur[3] + dur[4];
+    limite.current = { e1: dur[0] / total, e2: (dur[0] + dur[1]) / total, e3: (dur[0] + dur[1] + dur[2]) / total, e4: (dur[0] + dur[1] + dur[2] + dur[3]) / total };
     pista.current?.style.setProperty("--v5-pant", String(total + 1));
     dibujar(progreso.current);
   }, [dibujar]);
@@ -188,6 +195,7 @@ export function EscenaV5() {
     const dist = Math.max(1, r.height - vh);
     const p = clamp(-r.top / dist);
     if (peekP.current !== null && Math.abs(p - peekP.current) > 0.003) { peekP.current = null; setMirando(false); }
+    if (peekAlLlegar.current && p < 0.001) { peekAlLlegar.current = false; peekP.current = p; setMirando(true); }
     objetivo.current = p;
     const sv = suav.current;
     if (!sv.activo) {
@@ -244,6 +252,31 @@ export function EscenaV5() {
     };
   }, [medir, leer, manual]);
 
+  /* Reposo final del epílogo: un movimiento ambiental muy lento (10 fotogramas por segundo; 8 en móvil), solo mientras la escena es visible y hasta 90 s sin interacción */
+  useEffect(() => {
+    const st = escenario.current;
+    if (!reposo || manual || !st) return;
+    let raf = 0, ultimo = 0, visible = true;
+    const intervalo = mundo.current?.denso === false ? 125 : 100;
+    let hasta = performance.now() + 90000;
+    const t0 = performance.now() - reloj.current * 1000;
+    function paso(ahora: number) {
+      raf = 0;
+      if (!visible || document.hidden || ahora > hasta) return;
+      if (ahora - ultimo >= intervalo) { ultimo = ahora; reloj.current = (ahora - t0) / 1000; dibujar(progreso.current); }
+      raf = requestAnimationFrame(paso);
+    }
+    const arrancar = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(paso); };
+    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; arrancar(); });
+    io.observe(st);
+    const despertar = () => { hasta = performance.now() + 90000; arrancar(); };
+    document.addEventListener("visibilitychange", arrancar);
+    st.addEventListener("pointerdown", despertar);
+    st.addEventListener("keydown", despertar);
+    arrancar();
+    return () => { cancelAnimationFrame(raf); io.disconnect(); document.removeEventListener("visibilitychange", arrancar); st.removeEventListener("pointerdown", despertar); st.removeEventListener("keydown", despertar); };
+  }, [reposo, manual, dibujar]);
+
   useEffect(() => {
     if (manual) { progreso.current = pManual; objetivo.current = pManual; dibujar(pManual); }
   }, [manual, pManual, dibujar]);
@@ -288,10 +321,17 @@ export function EscenaV5() {
     const y = t.getBoundingClientRect().top + window.scrollY + p * dist + 1;
     window.scrollTo({ top: y, behavior: "smooth" });
   };
-  const inicio = (n: 1 | 2 | 3 | 4) => {
-    const { e1, e2, e3 } = limite.current;
-    if (manualRef.current) return n === 1 ? 0 : n === 2 ? e1 + (e2 - e1) * 0.85 : n === 3 ? e2 + (e3 - e2) * 0.7 : e3 + (1 - e3) * 0.75;
-    return n === 1 ? 0 : n === 2 ? e1 : n === 3 ? e2 : e3;
+  const inicio = (n: 1 | 2 | 3 | 4 | 5) => {
+    const { e1, e2, e3, e4 } = limite.current;
+    if (manualRef.current) return n === 1 ? 0 : n === 2 ? e1 + (e2 - e1) * 0.85 : n === 3 ? e2 + (e3 - e2) * 0.7 : n === 4 ? e3 + (e4 - e3) * 0.75 : e4 + (1 - e4) * 0.8;
+    return n === 1 ? 0 : n === 2 ? e1 : n === 3 ? e2 : n === 4 ? e3 : e4;
+  };
+  /** Vuelve al inicio y deja la pintura entera a la vista (sin acercamientos) */
+  const verPintura = () => {
+    if (manualRef.current) { peekP.current = 0; setMirando(true); setPManual(0); return; }
+    peekAlLlegar.current = true;
+    window.setTimeout(() => { peekAlLlegar.current = false; }, 6000);
+    ir(0);
   };
   const alternarMirar = () => {
     if (peekP.current !== null) { peekP.current = null; setMirando(false); }
@@ -304,7 +344,7 @@ export function EscenaV5() {
 
   return (
     <div ref={pista} className={`v5-pista${manual ? " v5-pista--manual" : ""}`} style={{ ["--v5-pant" as string]: 9.2 }}>
-      <section ref={escenario} className="v5-escenario" data-tramo={tramo} data-mando={mando} aria-label="El anciano de los días, prototipo del Acto I">
+      <section ref={escenario} className="v5-escenario" data-tramo={tramo} data-mando={mando} aria-label="El anciano de los días, recorrido interactivo">
         <div className="v5-fondo" aria-hidden="true" />
         <div ref={ventana} className="v5-ventana">
           <div ref={fig} className={`an-fig v5-fig${mirando ? " an-fig--mirando" : ""}`}>
@@ -356,16 +396,17 @@ export function EscenaV5() {
             </button>
           )}
           {final && (
-            <div className="an-fin">
-              <button type="button" className="an-btn" onClick={() => ir(0)}>Ver la pintura completa</button>
-              <button type="button" className="an-btn" onClick={() => ir(inicio(tramo === 4 ? 4 : 3))}>{tramo === 4 ? "Repetir el Acto III" : "Repetir el Acto II"}</button>
+            <div className="an-fin an-fin--epilogo">
+              <button type="button" className="an-btn" onClick={verPintura}><span className="v5-corto">La pintura</span><span className="v5-largo">Volver a la pintura</span></button>
+              <button type="button" className="an-btn" onClick={() => ir(0)}><span className="v5-corto">Repetir</span><span className="v5-largo">Repetir la experiencia</span></button>
+              <Link href="/conceptos" className="an-btn an-btn--solido"><span className="v5-corto">Catálogo</span><span className="v5-largo">Ir al catálogo</span></Link>
             </div>
           )}
         </div>
 
         {mando && (
           <div className="v5-mando" role="group" aria-label="Explorar la estructura">
-          {tramo === 4 ? (
+          {tramo === 5 ? null : tramo === 4 ? (
             <label>
               <span>Desplazar el plano</span>
               <input type="range" min={0} max={100} step={1} value={Math.round(planoUI * 100)} onChange={(e) => cambiarPlano(Number(e.target.value) / 100)} aria-valuetext={`plano al ${Math.round(planoUI * 100)} por ciento de su recorrido`} />
@@ -392,9 +433,9 @@ export function EscenaV5() {
             {tramo === 4 && (
               <button type="button" className="an-btn" onClick={() => cambiarPlano(Math.abs(planoUI - 0.5) < 0.25 ? 1 : 0.5)}>{Math.abs(planoUI - 0.5) < 0.25 ? "Desplazar" : "Volver"}</button>
             )}
-            <button type="button" className="an-btn" onClick={restablecer}>Restablecer la vista</button>
+            <button type="button" className="an-btn" onClick={restablecer}>{tramo === 5 ? <><span className="v5-corto">Restablecer</span><span className="v5-largo">Restablecer la vista</span></> : "Restablecer la vista"}</button>
           </div>
-          <p className="v5-pista-texto">{tramo === 4 ? "Un gesto pequeño, un cambio imposible. También puedes arrastrar sobre la escena." : "También puedes arrastrar sobre la escena."}</p>
+          <p className="v5-pista-texto">{tramo === 5 ? "Gira la vista: las piezas se alinean y se separan. También puedes arrastrar sobre la escena." : tramo === 4 ? "Un gesto pequeño, un cambio imposible. También puedes arrastrar sobre la escena." : "También puedes arrastrar sobre la escena."}</p>
         </div>
         )}
 
