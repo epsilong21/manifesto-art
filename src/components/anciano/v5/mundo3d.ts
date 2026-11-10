@@ -288,6 +288,17 @@ type Cam = { tx: number; ty: number; tz: number; cy: number; sy: number; cp: num
 const P = new Float64Array(4);
 /** Foco de luz del Acto II: posición del núcleo en pantalla, su escala y su intensidad (lo leen anillos y planos) */
 const FOCO = { x: 0, y: 0, s: 0, ci: 0, ok: false };
+/**
+ * Composición final del epílogo. Todo se aplica solo con e.d > 0 y a partir del estado exacto del Acto III (d = 0):
+ * la arquitectura se abre (profundidad y planos se separan, como con «Abrir la arquitectura»), la cámara termina más girada
+ * para repartir las capas en diagonal, y lo secundario cede brillo para que mande la jerarquía (disco → arquitectura → portal).
+ */
+const EPI = {
+  abre: 0.62,
+  yaw: 0.5, pitch: 0.2,
+  mira: [0.45, -1.3, 1.6],
+  atenua: 0.05,
+};
 
 function proyectar(e: Acto, c: Cam, lx: number, ly: number, lz: number) {
   const X = e.c0x + e.R * (lx * c.ct - ly * c.st), Y = e.c0y + e.R * (lx * c.st + ly * c.ct), Z = e.R * lz * c.ex;
@@ -455,6 +466,7 @@ const ARISTAS: [number, number][] = [[0, 2], [0, 3], [0, 4], [0, 5], [1, 2], [1,
 const NUCLEO_Z = 1.2;
 
 export function pintarActo(m: Mundo, e: Acto) {
+  if (e.d > 0) e.abre = mezcla(e.abre, EPI.abre, suave(e.d / 0.4));
   const { ctx, w, h, a, b } = e;
   ctx.clearRect(0, 0, w, h);
   const ee = suave((a - 0.1) / 0.7);
@@ -491,7 +503,7 @@ export function pintarActo(m: Mundo, e: Acto) {
       cam.tz = e.R * cc(1.5, 1.7, 2.2, 2.6, 2.0);
     }
   }
-  GAN = 1 + 0.35 * suave(e.d / 0.4);
+  GAN = 1 + 0.32 * suave(e.d / 0.4);
   if (e.d > 0) {
     // Epílogo: desde el punto de vista de referencia → la cámara se retira y sube → encuadra el compás → reposo
     const s1 = suave(e.d / 0.42), s2 = suave((e.d - 0.3) / 0.36), s3 = suave((e.d - 0.62) / 0.38);
@@ -499,15 +511,15 @@ export function pintarActo(m: Mundo, e: Acto) {
     // Distancia final: que el compás entero (unas seis medidas de alto) quepa en la parte libre de la escena
     // (el texto va debajo de la escena en anchos < 896 px salvo en apaisado bajo)
     const apilado = e.w < 896 && !(e.w > e.h && e.h <= 512);
-    const libre = apilado ? 0.44 * e.h : 0.8 * e.h;
+    const libre = apilado ? (e.h <= 704 ? 0.36 : 0.42) * e.h : (e.h <= 512 ? 0.62 : 0.8) * e.h;
     const fin = clamp((0.28 * Math.min(e.w, e.h)) / (libre / 5.6), 1.4, 3.4);
-    yaw = ee(0.42, 0.38, 0.28, 0.3);
-    pitch = ee(0.18, 0.15, 0.12, 0.14);
+    yaw = ee(0.42, 0.4, 0.5, EPI.yaw);
+    pitch = ee(0.18, 0.16, 0.18, EPI.pitch);
     cam.dist = dist1 * ee(1, 0.76 * fin, fin, fin * 0.98);
-    cam.tz = e.R * ee(2.0, 1.8, 1.4, 1.4);
+    cam.tz = e.R * ee(2.0, 1.8, EPI.mira[2], EPI.mira[2]);
     const kt = suave(e.d / 0.55), cth = Math.cos(e.th0), sth = Math.sin(e.th0);
-    cam.tx = e.c0x + kt * e.R * (0.45 * cth + 1.5 * sth);
-    cam.ty = e.c0y + kt * e.R * (0.45 * sth - 1.5 * cth);
+    cam.tx = e.c0x + kt * e.R * (EPI.mira[0] * cth - EPI.mira[1] * sth);
+    cam.ty = e.c0y + kt * e.R * (EPI.mira[0] * sth + EPI.mira[1] * cth);
   }
   yaw += e.giro * 0.6;
   pitch += e.cabeceo * 0.35;
@@ -515,7 +527,7 @@ export function pintarActo(m: Mundo, e: Acto) {
   // Luz del núcleo: intensidad por momento (calma → concentración → inquietud) y foco en pantalla
   const luzB = suave(b / 0.15);
   const nu0 = suave((b - 0.46) / 0.16);
-  const ci = nu0 * (0.7 + 0.3 * suave((b - 0.55) / 0.2)) * (1 + 0.08 * Math.sin(b * 50)) * (1 + 0.5 * e.rx) * (1 - 0.4 * suave(e.d / 0.4));
+  const ci = nu0 * (0.7 + 0.3 * suave((b - 0.55) / 0.2)) * (1 + 0.08 * Math.sin(b * 50)) * (1 + 0.5 * e.rx) * (1 - 0.12 * suave(e.d / 0.4));
   FOCO.ok = false;
   FOCO.ci = ci;
   if (b > 0) { proyectar(e, cam, 0, 0, NUCLEO_Z); FOCO.x = P[0]; FOCO.y = P[1]; FOCO.s = P[2]; FOCO.ok = P[2] > 0; }
@@ -550,7 +562,7 @@ export function pintarActo(m: Mundo, e: Acto) {
   }
 
   // En el Acto II lo ya construido cede protagonismo (la composición se mantiene legible): se atenúa de forma global
-  ctx.globalAlpha = 1 - 0.55 * suave((b - 0.2) / 0.3) + 0.2 * suave((b - 0.72) / 0.2) + 0.08 * suave(e.d / 0.4);
+  ctx.globalAlpha = 1 - 0.55 * suave((b - 0.2) / 0.3) + 0.2 * suave((b - 0.72) / 0.2) - EPI.atenua * suave(e.d / 0.5);
 
   // Haces de luz: de la punta del compás hacia el fondo
   const haz = suave((a - 0.52) / 0.3);
@@ -936,7 +948,8 @@ function pintarActoII(m: Mundo, e: Acto, cam: Cam, n: number, spin: number, tens
       const f = 1 - 0.22 * tens * (0.5 + 0.5 * Math.sin(b * 47) * Math.sin(b * 13));
       if (spr) {
         // En el Acto III la cámara se acerca al núcleo: su luz se limita para que no devore la escena
-        const R0 = mezcla(e.R * gs, Math.min(e.R * gs, 0.3 * Math.min(e.w, e.h)), suave(e.c / 0.15));
+        // (en el epílogo el núcleo se ve de lejos: su luz gana radio para seguir siendo el segundo punto de atención)
+        const R0 = mezcla(e.R * gs, Math.min(e.R * gs, 0.3 * Math.min(e.w, e.h)), suave(e.c / 0.15)) * (1 + 0.75 * suave(e.d / 0.5));
         // Energía radial: textura de rayos precalculada, que gira despacio (como los rayos de la pintura)
         const rot = b * 0.9 + tens * 0.45 * Math.sin(b * 30);
         const al = Math.min(1, 0.27 * ci * f);
@@ -1263,8 +1276,10 @@ function portal(ctx: CanvasRenderingContext2D, m: Mundo, e: Acto, cam: Cam, spin
   const ir = 1 - Math.pow(1 - fr, 3);
   const pl = e.plano;
   // En pantallas estrechas el portal sube para que los mandos no lo cubran
-  const cx = 0.6, cy = e.w < 640 ? 0.05 : 0.7, cz = 2.5 + 1.2 * (pl - 0.5);
-  const rad = 1.0 * ir * (1 + 0.012 * Math.sin(e.c * 60));
+  // Epílogo: el portal se desplaza hacia su rincón y se hace algo menor, para no competir con la arquitectura
+  const xe = suave(e.d / 0.6);
+  const cx = 0.6 + 1.1 * xe, cy = (e.w < 640 ? 0.05 + 0.15 * xe : 0.7 + 0.6 * xe), cz = 2.5 + 1.2 * (pl - 0.5) - 0.7 * xe;
+  const rad = (1.0 - 0.15 * xe) * ir * (1 + 0.012 * Math.sin(e.c * 60));
   if (rad < 0.03) return;
   const N = 40;
   const pts: number[] = [];
@@ -1424,9 +1439,12 @@ function pintarActoIII(m: Mundo, e: Acto, cam: Cam, spin: number, tens: number, 
     { r: 0.1, rx: -0.6, ry: 0.9, ox: -0.45, oy: -0.25, cz: NUCLEO_Z - 0.3, t0: 0.38, t1: 0.5, w: 1.1, a: 0.9, c: 0, cn: true },
   ];
   for (const an of ESC) dibujarAnillo(ctx, e, cam, an, an.r > 5 ? 140 : 36);
+  // En el epílogo lo secundario cede brillo; el portal no
+  ctx.globalAlpha = 1 - 0.2 * suave(e.d / 0.5);
   plegados(ctx, e, cam);
   nudo(ctx, m, e, cam, spin);
   triangulo(ctx, spr, e, cam, dist1, suave((c - 0.42) / 0.3));
+  ctx.globalAlpha = 1;
   portal(ctx, m, e, cam, spin, tens, tilt);
 }
 
