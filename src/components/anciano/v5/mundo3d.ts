@@ -154,7 +154,11 @@ export type Mundo = {
   /** Texturas de luz precalculadas (null si no hay DOM) */
   sprites: Sprites | null;
   denso: boolean;
+  /** Capa estática del reposo del epílogo (todo lo que no depende del reloj ambiental), con la clave de los parámetros que la produjeron */
+  cache: CapaEstatica | null;
 };
+
+type CapaEstatica = { cv: HTMLCanvasElement; cx: CanvasRenderingContext2D; clave: Float64Array; ok: boolean };
 
 export function crearMundo(denso: boolean): Mundo {
   const r = rng(1794);
@@ -197,7 +201,7 @@ export function crearMundo(denso: boolean): Mundo {
     const hacer = () => { if (denso) crearNubeAsync(256, (c) => { sprites.nube = c; }); };
     if ("requestIdleCallback" in window) window.requestIdleCallback(hacer, { timeout: 2500 }); else setTimeout(hacer, 800);
   }
-  return { polvo, polvo2, rayos, motas, sprites, denso };
+  return { polvo, polvo2, rayos, motas, sprites, denso, cache: null };
 }
 
 /* ── Prólogo: velo y luz en las puntas del compás ── */
@@ -282,6 +286,8 @@ export type Acto = {
   /** Progreso del epílogo, 0–1 (0 antes de él; durante él, `c` vale 1) y reloj ambiental en segundos (solo avanza en el reposo final) */
   d: number;
   t: number;
+  /** Reposo ambiental: solo cambia `t` respecto al fotograma anterior, así que puede reutilizarse la capa estática */
+  amb?: boolean;
 };
 
 type Cam = { tx: number; ty: number; tz: number; cy: number; sy: number; cp: number; sp: number; dist: number; ct: number; st: number; ex: number; fz: number };
@@ -467,8 +473,7 @@ const NUCLEO_Z = 1.2;
 
 export function pintarActo(m: Mundo, e: Acto) {
   if (e.d > 0) e.abre = mezcla(e.abre, EPI.abre, suave(e.d / 0.4));
-  const { ctx, w, h, a, b } = e;
-  ctx.clearRect(0, 0, w, h);
+  const { w, h, a, b } = e;
   const ee = suave((a - 0.1) / 0.7);
   const sF = clamp((0.56 * Math.min(w, h)) / (e.R * 2.0), 0.1, 0.8);
   const dist1 = e.f / sF;
@@ -536,6 +541,23 @@ export function pintarActo(m: Mundo, e: Acto) {
   const n = m.denso ? 110 : 72;
   const spin = b * 1.5 + e.c * 1.0;
   const tens = suave((b - 0.78) / 0.2);
+  const K = PRE;
+  K.cam = cam; K.ci = ci; K.n = n; K.spin = spin; K.tens = tens; K.luzB = luzB; K.dist1 = dist1;
+  if (e.amb && e.d > 0 && pintarAmbiente(m, e, K)) return;
+  e.ctx.clearRect(0, 0, w, h);
+  pintarBase(m, e, K, 0);
+  pintarPolvo(m, e, K);
+  pintarCubierta(m, e, K);
+}
+
+/** Valores del preámbulo de pintarActo que comparten las capas (se reutiliza el mismo objeto: sin asignaciones por fotograma). */
+type Pre = { cam: Cam; ci: number; n: number; spin: number; tens: number; luzB: number; dist1: number };
+const PRE = { cam: null as unknown as Cam, ci: 0, n: 0, spin: 0, tens: 0, luzB: 0, dist1: 0 } satisfies Pre;
+
+/** Geometría, luces y planos de los tres actos y el epílogo. `parte` 1 omite lo que depende del reloj ambiental, 2 solo lo que depende de él. */
+function pintarBase(m: Mundo, e: Acto, K: Pre, parte: 0 | 1) {
+  const { ctx, w, h, a, b } = e;
+  const { cam, ci, n, spin, tens, luzB, dist1 } = K;
 
   ctx.globalCompositeOperation = "lighter";
   ctx.lineCap = "round";
@@ -726,9 +748,13 @@ export function pintarActo(m: Mundo, e: Acto) {
   ctx.globalAlpha = 1;
   if (b > 0) pintarActoII(m, e, cam, n, spin, tens, ci);
   if (e.c > 0) pintarActoIII(m, e, cam, spin, tens, tilt, dist1);
-  if (e.d > 0) pintarEpilogo(m, e, cam);
+  if (e.d > 0) pintarEpilogo(m, e, cam, parte);
+}
 
-  // Polvo en suspensión: da escala y profundidad con el paralaje de la cámara
+/** Polvo en suspensión: da escala y profundidad con el paralaje de la cámara (aditivo, no depende del reloj ambiental). */
+function pintarPolvo(m: Mundo, e: Acto, K: Pre) {
+  const { ctx, w, h, a, b } = e;
+  const cam = K.cam;
   const pv = m.polvo;
   for (let i = 0; i < pv.length; i += 5) {
     const al = suave((a - pv[i + 3]) / 0.1);
@@ -755,9 +781,71 @@ export function pintarActo(m: Mundo, e: Acto) {
       ctx.fillRect(x - s / 2, y - s / 2, s, s);
     }
   }
+}
+
+/** Capas finales no aditivas: sombras del Acto III y viñeta. Van siempre encima de todo lo demás. */
+function pintarCubierta(m: Mundo, e: Acto, K: Pre) {
+  const { ctx, b } = e;
   ctx.globalCompositeOperation = "source-over";
-  if (e.c > 0) sombras(ctx, e, cam);
-  if (b > 0) vineta(ctx, e, luzB, tens * (1 - 0.6 * suave(e.d / 0.5)));
+  if (e.c > 0) sombras(ctx, e, K.cam);
+  if (b > 0) vineta(ctx, e, K.luzB, K.tens * (1 - 0.6 * suave(e.d / 0.5)));
+}
+
+/* ── Reposo del epílogo ──
+ * Del fotograma anterior solo cambia el reloj ambiental `t`, que únicamente usan el epílogo y la vida de fondo. Todo lo demás (los tres
+ * actos, la composición del compás, el polvo) se pinta una vez en una capa aparte; cada fotograma de reposo copia esa capa y añade solo lo
+ * que respira o gira. Como toda esa luz es aditiva, el resultado coincide con pintarlo todo de nuevo. Si cambia cualquier parámetro
+ * (giro, cabeceo, tamaño…) la clave deja de coincidir y la capa se vuelve a crear. */
+const CLAVE = new Float64Array(24);
+function pintarAmbiente(m: Mundo, e: Acto, K: Pre): boolean {
+  if (typeof document === "undefined") return false;
+  const ctx = e.ctx, dest = ctx.canvas;
+  let c = m.cache;
+  if (!c) {
+    const cv = document.createElement("canvas");
+    const cx = cv.getContext("2d");
+    if (!cx) return false;
+    c = m.cache = { cv, cx, clave: new Float64Array(CLAVE.length), ok: false };
+  }
+  const k = CLAVE;
+  k[0] = e.w; k[1] = e.h; k[2] = e.cx; k[3] = e.cy; k[4] = e.c0x; k[5] = e.c0y; k[6] = e.R; k[7] = e.th0; k[8] = e.f; k[9] = e.rr;
+  k[10] = e.a; k[11] = e.b; k[12] = e.c; k[13] = e.d; k[14] = e.tilt; k[15] = e.giro; k[16] = e.cabeceo; k[17] = e.abre; k[18] = e.rx; k[19] = e.plano;
+  k[20] = m.denso ? 1 : 0; k[21] = m.sprites?.nube ? 1 : 0; k[22] = dest.width; k[23] = dest.height;
+  let igual = c.ok;
+  for (let i = 0; igual && i < k.length; i++) if (k[i] !== c.clave[i]) igual = false;
+  if (!igual) {
+    c.ok = false;
+    if (c.cv.width !== dest.width || c.cv.height !== dest.height) { c.cv.width = dest.width; c.cv.height = dest.height; } else c.cx.clearRect(0, 0, c.cv.width, c.cv.height);
+    c.cx.setTransform(ctx.getTransform());
+    const ee = { ...e, ctx: c.cx };
+    pintarBase(m, ee, K, 1);
+    pintarPolvo(m, ee, K);
+    c.clave.set(k);
+    c.ok = true;
+  }
+  ctx.clearRect(0, 0, e.w, e.h);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 1;
+  ctx.drawImage(c.cv, 0, 0);
+  ctx.restore();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.globalAlpha = 1;
+  pintarEpilogo(m, e, K.cam, 2);
+  pintarCubierta(m, e, K);
+  return true;
+}
+
+/** Libera la capa estática (memoria del lienzo auxiliar) al salir del reposo. */
+export function soltarCapa(m: Mundo | null) {
+  const c = m?.cache;
+  if (!c) return;
+  c.cv.width = c.cv.height = 0;
+  c.ok = false;
+  m!.cache = null;
 }
 
 /** Dibuja un sprite de luz precalculado (barato: una sola llamada de imagen, sin crear gradientes por fotograma). */
@@ -1481,8 +1569,10 @@ const ORB_BASE: OrbitaP = { r: 1, rx: 0, ry: 0, cz: 0, rz: 0 };
  * brazos graduados hasta el círculo del principio. La punta derecha no llega a tocarlo. Reutiliza sprites y funciones del motor:
  * no crea geometría nueva por fotograma salvo dos brazos y sus marcas.
  */
-function pintarEpilogo(m: Mundo, e: Acto, cam: Cam) {
+function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 = 0) {
   const { ctx, d, t } = e;
+  // parte 0: todo, en el orden original · 1: lo que no depende del reloj ambiental · 2: solo lo que respira, gira o late
+  const est = parte !== 2, din = parte !== 1;
   const spr = m.sprites;
   const kL = suave((d - 0.08) / 0.2);
   if (kL <= 0.003) return;
@@ -1494,8 +1584,8 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam) {
 
   // Cono de luz: del disco hacia la arquitectura
   const cono = suave((d - 0.3) / 0.3);
-  proyectar(e, cam, 0.5, 0.2, 1.2);
-  if (cono > 0.01 && P[2]) {
+  if (est) proyectar(e, cam, 0.5, 0.2, 1.2);
+  if (est && cono > 0.01 && P[2]) {
     const bx = P[0], by = P[1], bs = P[2];
     const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
     const w0 = Rd * 0.45, w1 = e.R * bs * 1.8;
@@ -1519,33 +1609,36 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam) {
     if (!P[2]) return;
     const px = P[0], py = P[1], ps = P[2];
     const ex = mezcla(ax, px, grow), ey = mezcla(ay, py, grow);
-    let g = ctx.createLinearGradient(ax, ay, ex, ey);
-    g.addColorStop(0, `rgba(${COL[0]},0.05)`);
-    g.addColorStop(1, `rgba(${COL[2]},0.26)`);
-    ctx.strokeStyle = g;
-    ctx.lineWidth = 7 * clamp(ps * 2, 0.8, 1.6);
-    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.stroke();
-    g = ctx.createLinearGradient(ax, ay, ex, ey);
-    g.addColorStop(0, `rgba(${COL[2]},0.3)`);
-    g.addColorStop(1, `rgba(${COL[2]},0.92)`);
-    ctx.strokeStyle = g;
-    ctx.lineWidth = 1.5 * clamp(ps * 2, 0.8, 1.6);
-    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.stroke();
-    // Graduación del brazo: la medida convertida en instrumento
-    const dx = px - ax, dy = py - ay, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
-    const NT = 26;
-    ctx.beginPath();
-    for (let k = 2; k < NT; k++) {
-      const u = k / NT;
-      if (u > grow) break;
-      const l = (k % 5 === 0 ? 0.075 : 0.036) * Rd * 2;
-      const x = mezcla(ax, px, u), y = mezcla(ay, py, u);
-      ctx.moveTo(x - nx * l, y - ny * l);
-      ctx.lineTo(x + nx * l, y + ny * l);
+    if (est) {
+      let g = ctx.createLinearGradient(ax, ay, ex, ey);
+      g.addColorStop(0, `rgba(${COL[0]},0.05)`);
+      g.addColorStop(1, `rgba(${COL[2]},0.26)`);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 7 * clamp(ps * 2, 0.8, 1.6);
+      ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.stroke();
+      g = ctx.createLinearGradient(ax, ay, ex, ey);
+      g.addColorStop(0, `rgba(${COL[2]},0.3)`);
+      g.addColorStop(1, `rgba(${COL[2]},0.92)`);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 1.5 * clamp(ps * 2, 0.8, 1.6);
+      ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.stroke();
+      // Graduación del brazo: la medida convertida en instrumento
+      const dx = px - ax, dy = py - ay, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+      const NT = 26;
+      ctx.beginPath();
+      for (let k = 2; k < NT; k++) {
+        const u = k / NT;
+        if (u > grow) break;
+        const l = (k % 5 === 0 ? 0.075 : 0.036) * Rd * 2;
+        const x = mezcla(ax, px, u), y = mezcla(ay, py, u);
+        ctx.moveTo(x - nx * l, y - ny * l);
+        ctx.lineTo(x + nx * l, y + ny * l);
     }
     ctx.strokeStyle = `rgba(${COL[0]},${0.55 * kL})`;
     ctx.lineWidth = 1;
     ctx.stroke();
+    }
+    if (!din) return;
     // La luz desciende por el brazo: una vez al aparecer el compás y, ya en reposo, de forma lenta y espaciada
     const u1 = ven(d, 0.38 + i * 0.05, 0.56 + i * 0.05);
     let u = u1, fu = campana(u1);
@@ -1563,35 +1656,39 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam) {
 
   if (spr) {
     // Disco de luz y rayos: la fuerza creadora de la pintura, ahora lejana
-    ctx.save();
-    ctx.translate(ax, ay);
-    ctx.rotate(d * 0.9 + t * 0.03);
-    ctx.globalAlpha = 0.36 * kL;
-    ctx.drawImage(spr.rayos, -Rd * 3.6, -Rd * 3.6, Rd * 7.2, Rd * 7.2);
-    ctx.rotate(-d * 1.6 - t * 0.05 + 1);
-    ctx.globalAlpha = 0.16 * kL;
-    ctx.drawImage(spr.rayos2 ?? spr.rayos, -Rd * 2.8, -Rd * 2.8, Rd * 5.6, Rd * 5.6);
-    ctx.restore();
-    halo(ctx, spr.halo, ax, ay, Rd * 3.2, 0.28 * kL * resp);
-    halo(ctx, spr.halo, ax, ay, Rd * 1.6, 0.5 * kL * resp);
-    halo(ctx, spr.halo, ax, ay, Rd * 0.75, 0.85 * kL);
+    if (din) {
+      ctx.save();
+      ctx.translate(ax, ay);
+      ctx.rotate(d * 0.9 + t * 0.03);
+      ctx.globalAlpha = 0.36 * kL;
+      ctx.drawImage(spr.rayos, -Rd * 3.6, -Rd * 3.6, Rd * 7.2, Rd * 7.2);
+      ctx.rotate(-d * 1.6 - t * 0.05 + 1);
+      ctx.globalAlpha = 0.16 * kL;
+      ctx.drawImage(spr.rayos2 ?? spr.rayos, -Rd * 2.8, -Rd * 2.8, Rd * 5.6, Rd * 5.6);
+      ctx.restore();
+      halo(ctx, spr.halo, ax, ay, Rd * 3.2, 0.28 * kL * resp);
+      halo(ctx, spr.halo, ax, ay, Rd * 1.6, 0.5 * kL * resp);
+    }
+    if (est) halo(ctx, spr.halo, ax, ay, Rd * 0.75, 0.85 * kL);
   }
-  ctx.beginPath();
-  ctx.arc(ax, ay, Rd * 0.62, 0, TAU);
-  ctx.moveTo(ax + Rd * 0.5, ay);
-  ctx.arc(ax, ay, Rd * 0.5, 0, TAU);
-  for (let i = 0; i < 36; i++) {
-    const an = (i / 36) * TAU, r1 = Rd * 0.62, r2 = Rd * (i % 3 === 0 ? 0.76 : 0.69);
-    ctx.moveTo(ax + Math.cos(an) * r1, ay + Math.sin(an) * r1);
-    ctx.lineTo(ax + Math.cos(an) * r2, ay + Math.sin(an) * r2);
+  if (est) {
+    ctx.beginPath();
+    ctx.arc(ax, ay, Rd * 0.62, 0, TAU);
+    ctx.moveTo(ax + Rd * 0.5, ay);
+    ctx.arc(ax, ay, Rd * 0.5, 0, TAU);
+    for (let i = 0; i < 36; i++) {
+      const an = (i / 36) * TAU, r1 = Rd * 0.62, r2 = Rd * (i % 3 === 0 ? 0.76 : 0.69);
+      ctx.moveTo(ax + Math.cos(an) * r1, ay + Math.sin(an) * r1);
+      ctx.lineTo(ax + Math.cos(an) * r2, ay + Math.sin(an) * r2);
   }
   ctx.strokeStyle = `rgba(${COL[2]},${0.55 * kL})`;
   ctx.lineWidth = 1;
   ctx.stroke();
+  }
 
   // Las puntas: la izquierda fija en el centro del círculo y la derecha, que debería trazarlo
   const kP = suave((d - 0.42) / 0.2);
-  if (kP > 0.01) {
+  if (est && kP > 0.01) {
     // El círculo del principio, ahora a la vista como lo que el compás habría trazado
     ctx.beginPath();
     for (let i = 0; i <= 72; i++) {
@@ -1608,7 +1705,7 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam) {
       if (P[2]) luzPunta(ctx, P[0], P[1], e.rr * clamp(P[2] * 2.2, 0.5, 1.1), kP * 0.9);
     }
   }
-  if (spr) {
+  if (spr && din) {
     const h = spr.halo;
     // La luz recorre el círculo del principio y se queda corta; después, un latido muy lento
     const uc = ven(d, 0.5, 0.78);

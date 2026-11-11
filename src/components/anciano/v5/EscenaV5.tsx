@@ -7,7 +7,7 @@ import { rutaPublica } from "@/lib/rutaPublica";
 import { AMPLIADO_V5, DURACION_V5, ESPECIFICO_DESDE, FRAGMENTOS_V5, PRESENTACION_V5, TRAMOS_V5 } from "@/content/anciano-v5";
 import { controlesEn, crearGuion, etapas, pEn, tEn, trLocal, type Controles, type Guion } from "./presentacion";
 import { CENTRO, FOCO_COMPAS, FOCO_URIZEN, clamp, mezcla, suave } from "../limiteGeom";
-import { PUNTA_DER, crearMundo, pintarActo, pintarPrologo, type Mundo } from "./mundo3d";
+import { PUNTA_DER, crearMundo, pintarActo, pintarPrologo, soltarCapa, type Mundo } from "./mundo3d";
 
 
 type Medidas = {
@@ -19,6 +19,9 @@ type Medidas = {
 
 /** Valores que el visitante modifica; cada uno tiene un objetivo (lo que pide) y un valor pintado (que lo sigue sin saltos). */
 type Mando = { cur: number; tgt: number };
+
+/** Separación mínima entre dos fotogramas pintados por el scroll, un arrastre o la presentación (ms): en pantallas de 120 Hz o más se pinta cada dos refrescos (≈60 fps). El resto de la página sigue a la frecuencia de la pantalla. */
+const MIN_DIB = 9;
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
@@ -55,6 +58,11 @@ export function EscenaV5() {
   const anim = useRef(0);
   const arrastre = useRef<{ id: number; x: number; y: number } | null>(null);
   const ultimoBorde = useRef("");
+  /** Instante del último fotograma pintado por el scroll, un arrastre o la presentación (el reposo ambiental no repinta si acaba de haber uno) */
+  const ultimoDib = useRef(0);
+  const ultimoCine = useRef("");
+  const presDeuda = useRef(0);
+  const presTimer = useRef(0);
 
   const [tramo, setTramo] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [reposo, setReposo] = useState(false);
@@ -103,13 +111,14 @@ export function EscenaV5() {
   const presScrollT = useRef(0);
   const playBtn = useRef<HTMLButtonElement>(null);
 
-  const dibujar = useCallback((p: number) => {
+  const dibujar = useCallback((p: number, amb = false) => {
     const m = med.current;
     const f = fig.current;
     const cv = lienzo.current;
     if (!m || !f) return;
     const { e1, e2, e3, e4 } = limite.current;
     const tr: 1 | 2 | 3 | 4 | 5 = p < e1 ? 1 : p < e2 ? 2 : p < e3 ? 3 : p < e4 ? 4 : 5;
+    if (!amb) ultimoDib.current = performance.now();
     const local = tr === 1 ? p / e1 : tr === 2 ? (p - e1) / (e2 - e1) : tr === 3 ? (p - e2) / (e3 - e2) : tr === 4 ? (p - e3) / (e4 - e3) : (p - e4) / (1 - e4);
     // Política de los ajustes del visitante: se conservan, pero solo rigen donde sus mandos están disponibles
     // (giro, cabeceo e inclinación desde ~55 % del Acto I; abrir la arquitectura desde ~50 % del Acto II). Fuera de ahí su
@@ -149,10 +158,12 @@ export function EscenaV5() {
           ctx, w: m.W, h: m.H, cx, cy: m.W < 640 ? cy - m.vh * 0.16 * suave((a - 0.1) / 0.5) : cy, c0x: m.c0x, c0y: m.c0y, R: m.R, th0: m.th0, f: m.f, rr: m.rr,
           a, b, tilt: tilt.current.cur * vig, giro: giro.current.cur * vig, cabeceo: cabeceo.current.cur * vig, abre: abre.current.cur * vigAbre,
           rx: tr === 3 ? Math.min(1, Math.abs(abre.current.tgt - abre.current.cur) * 4) : tr === 4 ? Math.min(1, Math.abs(plano.current.tgt - plano.current.cur) * 5) : 0,
-          c, plano: plano.current.cur, d, t: reloj.current,
+          c, plano: plano.current.cur, d, t: reloj.current, amb: amb && tr === 5,
         });
       }
     }
+    // Reposo ambiental: solo cambia el lienzo; el resto de la escena (cámara, textos, mandos) ya está como corresponde
+    if (amb && tr === 5) return;
     f.style.transform = `translate3d(${(-camX * k * m.ancho).toFixed(1)}px, ${(-camY * k * m.ancho).toFixed(1)}px, 0) scale(${k.toFixed(4)})`;
     f.style.opacity = opac.toFixed(3);
     const borde = `${(clamp((k - 1) / 0.8) * 4).toFixed(2)}%`;
@@ -168,7 +179,8 @@ export function EscenaV5() {
     setReposo(tr === 5 && local > 0.8);
     barra.current?.style.setProperty("--an-p", p.toFixed(4));
     // Título cinematográfico: aparece al comenzar cada tramo y se retira antes de su mitad (no se queda sobre la geometría)
-    escenario.current?.style.setProperty("--cine-o", (suave(local / 0.1) * (1 - suave((local - 0.45) / 0.2))).toFixed(3));
+    const cineO = (suave(local / 0.1) * (1 - suave((local - 0.45) / 0.2))).toFixed(3);
+    if (cineO !== ultimoCine.current) { ultimoCine.current = cineO; escenario.current?.style.setProperty("--cine-o", cineO); }
   }, []);
 
   /* La cabecera del sitio se superpone al comienzo de la escena: el reproductor se coloca justo debajo de su parte visible */
@@ -199,14 +211,15 @@ export function EscenaV5() {
     f.style.width = `${ancho}px`;
     f.style.height = `${ancho * I.ratio}px`;
     if (cv) {
-      cv.width = Math.round(W * dpr);
-      cv.height = Math.round(H * dpr);
+      // Reasignar el tamaño reserva de nuevo la memoria del lienzo y lo vacía: solo cuando realmente cambia
+      const cw = Math.round(W * dpr), ch = Math.round(H * dpr);
+      if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; }
       const ctx = cv.getContext("2d");
       if (!ctx) { setSinLienzo(true); return; }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     const denso = !movil;
-    if (!mundo.current || mundo.current.denso !== denso) mundo.current = crearMundo(denso);
+    if (!mundo.current || mundo.current.denso !== denso) { soltarCapa(mundo.current); mundo.current = crearMundo(denso); }
     const dur = W < 640 ? DURACION_V5.movil : DURACION_V5.escritorio;
     const total = dur[0] + dur[1] + dur[2] + dur[3] + dur[4];
     limite.current = { e1: dur[0] / total, e2: (dur[0] + dur[1]) / total, e3: (dur[0] + dur[1] + dur[2]) / total, e4: (dur[0] + dur[1] + dur[2] + dur[3]) / total };
@@ -216,7 +229,9 @@ export function EscenaV5() {
   }, [dibujar, actualizarCab]);
 
   /** Mantiene vivo el bucle solo mientras algún valor no haya alcanzado su objetivo. */
-  const animar = useCallback(function tick() {
+  const animar = useCallback(function tick(ahora?: number) {
+    // En pantallas de alta frecuencia no se repinta en cada refresco
+    if (ahora !== undefined && ahora - ultimoDib.current < MIN_DIB && ahora >= ultimoDib.current - 20) { anim.current = requestAnimationFrame(tick); return; }
     let activo = false;
     for (const mnd of [giro.current, cabeceo.current, tilt.current, abre.current, plano.current]) {
       const d = mnd.tgt - mnd.cur;
@@ -231,6 +246,7 @@ export function EscenaV5() {
   /** Interpolación del progreso pintado hacia el que marca el scroll, solo con rueda de ratón. */
   const avanzar = useCallback(function tick(ahora: number) {
     const sv = suav.current;
+    if (ahora - ultimoDib.current < MIN_DIB && ahora >= ultimoDib.current - 20) { sv.raf = requestAnimationFrame(tick); return; }
     const dt = Math.min(64, Math.max(0, ahora - sv.t));
     sv.t = ahora;
     const d = objetivo.current - progreso.current;
@@ -245,9 +261,10 @@ export function EscenaV5() {
     sv.raf = requestAnimationFrame(tick);
   }, [dibujar]);
 
-  const leer = useCallback(() => {
+  /** Lee el scroll y pinta si el progreso cambió. Devuelve true si hay un cambio pendiente que no se pudo pintar todavía (por el tope de fotogramas). */
+  const leer = useCallback((permitir = true): boolean => {
     const t = pista.current;
-    if (!t || manualRef.current || presRef.current === "reproduciendo") return;
+    if (!t || manualRef.current || presRef.current === "reproduciendo") return false;
     const r = t.getBoundingClientRect();
     const vh = escenario.current?.clientHeight ?? window.innerHeight;
     const dist = Math.max(1, r.height - vh);
@@ -257,12 +274,14 @@ export function EscenaV5() {
     objetivo.current = p;
     const sv = suav.current;
     if (!sv.activo) {
-      if (p === progreso.current) return;
+      if (p === progreso.current) return false;
+      if (!permitir) return true;
       progreso.current = p;
       dibujar(p);
-      return;
+      return false;
     }
     if (!sv.raf && p !== progreso.current) { sv.t = performance.now(); sv.raf = requestAnimationFrame(avanzar); }
+    return false;
   }, [dibujar, avanzar]);
 
   useEffect(() => {
@@ -291,7 +310,8 @@ export function EscenaV5() {
     if (!st || !t) return;
     let raf = 0;
     let visible = true;
-    const pedir = () => { if (!raf && visible) raf = requestAnimationFrame(() => { raf = 0; leer(); }); };
+    // Si hay un cambio de scroll pendiente pero acaba de pintarse otro fotograma, se espera al siguiente refresco (tope de ≈60 fps); sin cambio pendiente no se reencola nada
+    const pedir = () => { if (!raf && visible) raf = requestAnimationFrame((ts) => { raf = 0; if (leer(!(ts - ultimoDib.current < MIN_DIB && ts >= ultimoDib.current - 20))) pedir(); }); };
     const ro = new ResizeObserver(() => { medir(); pedir(); });
     ro.observe(st);
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) pedir(); }, { rootMargin: "20% 0px" });
@@ -312,29 +332,37 @@ export function EscenaV5() {
     };
   }, [medir, leer, manual, actualizarCab]);
 
-  /* Reposo final del epílogo: un movimiento ambiental muy lento (10 fotogramas por segundo; 8 en móvil), solo mientras la escena es visible y hasta 90 s sin interacción */
+  /* Reposo final del epílogo: un movimiento ambiental muy lento (10 fotogramas por segundo; 8 en móvil), solo mientras la escena es visible y hasta 90 s sin interacción.
+     Cada fotograma se planifica con un temporizador y un único requestAnimationFrame (antes un rAF en bucle despertaba al navegador en cada refresco de la pantalla,
+     60–120 veces por segundo, para dibujar 8–10). El reloj ambiental solo avanza mientras el reposo corre: tras una pausa (pestaña oculta, escena fuera de pantalla)
+     continúa donde estaba, sin saltos. */
   useEffect(() => {
     const st = escenario.current;
     if (!reposo || manual || !st) return;
-    let raf = 0, ultimo = 0, visible = true;
     const intervalo = mundo.current?.denso === false ? 125 : 100;
+    let timer = 0, raf = 0, visible = true, marca = 0;
     let hasta = performance.now() + 90000;
-    const t0 = performance.now() - reloj.current * 1000;
-    function paso(ahora: number) {
+    const parar = () => { clearTimeout(timer); timer = 0; cancelAnimationFrame(raf); raf = 0; marca = 0; };
+    const programar = (espera: number) => { timer = window.setTimeout(() => { timer = 0; raf = requestAnimationFrame(pintar); }, Math.max(0, espera)); };
+    function pintar(ahora: number) {
       raf = 0;
-      if (!visible || document.hidden || ahora > hasta) return;
-      if (ahora - ultimo >= intervalo) { ultimo = ahora; reloj.current = (ahora - t0) / 1000; if (presRef.current !== "reproduciendo") dibujar(progreso.current); }
-      raf = requestAnimationFrame(paso);
+      if (!visible || document.hidden || ahora > hasta) { marca = 0; return; }
+      if (marca) reloj.current += Math.min(0.5, Math.max(0, (ahora - marca) / 1000));
+      marca = ahora;
+      // Si el scroll, un arrastre o la presentación acaban de pintar la escena, este fotograma sobra (el reloj ambiental sí avanza)
+      if (presRef.current !== "reproduciendo" && ahora - ultimoDib.current >= intervalo * 0.8) dibujar(progreso.current, true);
+      programar(intervalo - (performance.now() - ahora) - 4);
     }
-    const arrancar = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(paso); };
-    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; arrancar(); });
+    const arrancar = () => { if (timer || raf || !visible || document.hidden) return; marca = performance.now(); raf = requestAnimationFrame(pintar); };
+    const alVisibilidad = () => { if (document.hidden) parar(); else arrancar(); };
+    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) arrancar(); else parar(); });
     io.observe(st);
     const despertar = () => { hasta = performance.now() + 90000; arrancar(); };
-    document.addEventListener("visibilitychange", arrancar);
+    document.addEventListener("visibilitychange", alVisibilidad);
     st.addEventListener("pointerdown", despertar);
     st.addEventListener("keydown", despertar);
     arrancar();
-    return () => { cancelAnimationFrame(raf); io.disconnect(); document.removeEventListener("visibilitychange", arrancar); st.removeEventListener("pointerdown", despertar); st.removeEventListener("keydown", despertar); };
+    return () => { parar(); io.disconnect(); document.removeEventListener("visibilitychange", alVisibilidad); st.removeEventListener("pointerdown", despertar); st.removeEventListener("keydown", despertar); soltarCapa(mundo.current); };
   }, [reposo, manual, dibujar]);
 
   useEffect(() => {
@@ -407,6 +435,7 @@ export function EscenaV5() {
     presGeo.current = { y0: t.getBoundingClientRect().top + window.scrollY, dist: Math.max(1, t.offsetHeight - vh) };
   }, []);
   const cambiarPres = useCallback((e: EstadoPres) => { presRef.current = e; setPres(e); }, []);
+  const cancelarPres = useCallback(() => { cancelAnimationFrame(presRaf.current); presRaf.current = 0; clearTimeout(presTimer.current); presTimer.current = 0; }, []);
   /** Fija los mandos a los valores de la coreografía (los sliders visibles muestran siempre el valor real). Devuelve si algo cambió. */
   const aplicarControles = useCallback((c: Controles, ui = true) => {
     let cambio = false;
@@ -443,9 +472,15 @@ export function EscenaV5() {
     if (presRef.current !== "reproduciendo") return;
     const g = guion.current;
     if (!g) return;
-    const dt = Math.min(0.1, Math.max(0, (ahora - presUlt.current) / 1000));
+    // El reloj narrativo sigue al tiempo real: una caída de rendimiento no alarga la película. Para no dar un salto al recuperarse, el avance por
+    // fotograma se limita a 0,25 s de película y el resto se recupera en los siguientes (lo que pase de 1 s se descarta: no es una caída, es una parada).
+    const dt = Math.max(0, (ahora - presUlt.current) / 1000);
     presUlt.current = ahora;
-    presT.current = Math.min(g.total, presT.current + dt * velRef.current);
+    const vl = velRef.current;
+    presDeuda.current = Math.min(1, presDeuda.current + dt * vl);
+    const avance = Math.min(presDeuda.current, 0.25 * vl);
+    presDeuda.current -= avance;
+    presT.current = Math.min(g.total, presT.current + avance);
     const t = presT.current, fin = t >= g.total;
     const p = fin ? 1 : pEn(g, t);
     const { tr, local } = trLocal(p, limite.current);
@@ -457,32 +492,36 @@ export function EscenaV5() {
     const cambioC = aplicarControles({ giro: mezcla(d.giro, c.giro, k), tilt: mezcla(d.tilt, c.tilt, k), abre: mezcla(d.abre, c.abre, k), plano: mezcla(d.plano, c.plano, k) }, verUI);
     progreso.current = p; objetivo.current = p;
     // Ritmo de dibujo: pleno en escritorio; 30 fps en móvil o equipos modestos
-    const minDt = mundo.current?.denso === false ? 33 : 0;
+    const minDt = mundo.current?.denso === false ? 33 : MIN_DIB;
+    let dibujado = false;
     if (fin || ((cambioC || p !== presP.current) && ahora - presDib.current >= minDt) || ahora - presDib.current > 100) {
-      presDib.current = ahora; presP.current = p;
+      presDib.current = ahora; presP.current = p; dibujado = true;
       dibujar(p);
     }
     // El scroll de la página acompaña al progreso (barra de desplazamiento, cabecera) a ~8 Hz: basta, y evita forzar el layout en cada fotograma
     if (!manualRef.current && (fin || ahora - presScrollT.current >= 120)) { presScrollT.current = ahora; sincScroll(p); }
-    presBarra.current?.style.setProperty("--pp", (t / g.total).toFixed(4));
+    if (verUI) presBarra.current?.style.setProperty("--pp", (t / g.total).toFixed(4));
     const seg = Math.floor(t);
     if (seg !== presSeg.current) { presSeg.current = seg; if (presTr.current) presTr.current.textContent = fmt(t); if (presRest.current) presRest.current.textContent = `−${fmt(g.total - t)}`; }
     if (fin) { enfocar.current = "fin"; cambiarPres("finalizado"); setAviso("Presentación finalizada. La composición queda suspendida. Puedes volver a verla o explorar la obra."); return; }
-    presRaf.current = requestAnimationFrame(tick);
+    // A ~30 fps (móvil) se espera al siguiente fotograma útil en lugar de despertar al navegador en cada refresco de la pantalla (60–120 Hz)
+    const espera = dibujado && minDt > 0 ? minDt - 5 - (performance.now() - ahora) : 0;
+    if (espera > 4) presTimer.current = window.setTimeout(() => { presTimer.current = 0; presRaf.current = requestAnimationFrame(tick); }, espera);
+    else presRaf.current = requestAnimationFrame(tick);
   }, [dibujar, aplicarControles, cambiarPres, sincScroll]);
 
   const pausar = useCallback((gesto?: string) => {
     if (presRef.current !== "reproduciendo") return;
-    cancelAnimationFrame(presRaf.current); presRaf.current = 0;
+    cancelarPres();
     // El progreso exacto vuelve al scroll y los sliders al valor real, para continuar en modo manual sin saltos
     if (!manualRef.current && gesto === "exacto") { const y = Math.round(presGeo.current.y0 + objetivo.current * presGeo.current.dist); window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior }); presY.current = window.scrollY; }
     volcarUI();
     cambiarPres("pausado");
     setAviso("Presentación en pausa. Puedes seguir en modo manual o reanudarla desde este punto.");
-  }, [cambiarPres, volcarUI]);
+  }, [cambiarPres, volcarUI, cancelarPres]);
 
   const comenzar = useCallback(() => {
-    cancelAnimationFrame(presRaf.current); presRaf.current = 0;
+    cancelarPres();
     // Ninguna animación del modo exploración (suavizado del scroll, mandos pendientes) puede competir con el reloj cinematográfico
     cancelAnimationFrame(suav.current.raf); suav.current.raf = 0;
     cancelAnimationFrame(anim.current); anim.current = 0;
@@ -504,12 +543,12 @@ export function EscenaV5() {
     dibujar(0);
     presT.current = 0; presSeg.current = -1;
     presFase.current = { t: performance.now() - 1000, desde: { giro: 0, tilt: 0, abre: 0, plano: 0.5 } };
-    presUlt.current = performance.now(); presDib.current = 0;
+    presUlt.current = performance.now(); presDib.current = 0; presDeuda.current = 0;
     cambiarPres("reproduciendo");
     setAviso("Presentación iniciada.");
     enfocar.current = "play";
     presRaf.current = requestAnimationFrame(paso);
-  }, [dibujar, paso, reiniciarMandos, cambiarPres, geoScroll]);
+  }, [dibujar, paso, reiniciarMandos, cambiarPres, geoScroll, cancelarPres]);
 
   const reanudar = useCallback(() => {
     if (presRef.current === "finalizado") { comenzar(); return; }
@@ -520,7 +559,7 @@ export function EscenaV5() {
     presFase.current = { t: performance.now(), desde: { giro: giro.current.cur, tilt: tilt.current.cur, abre: abre.current.cur, plano: plano.current.cur } };
     presY.current = window.scrollY; presP.current = -1;
     uiPres.current = { giro: 9, tilt: 9, abre: 9, plano: 9 };
-    presUlt.current = performance.now();
+    presUlt.current = performance.now(); presDeuda.current = 0;
     cambiarPres("reproduciendo");
     setAviso("Presentación reanudada.");
     presRaf.current = requestAnimationFrame(paso);
@@ -528,7 +567,7 @@ export function EscenaV5() {
 
   /** Cinematográfico → exploración: se detiene el reloj, el punto narrativo actual pasa a ser el scroll (una sola fuente de verdad) y los mandos muestran su valor real */
   const salir = useCallback(() => {
-    cancelAnimationFrame(presRaf.current); presRaf.current = 0;
+    cancelarPres();
     if (!manualRef.current && presRef.current !== "inactivo") {
       const y = Math.round(presGeo.current.y0 + objetivo.current * presGeo.current.dist);
       window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior }); presY.current = window.scrollY;
@@ -537,7 +576,7 @@ export function EscenaV5() {
     cambiarPres("inactivo"); setPasos(false); setExplorando(true);
     setAviso("Modo exploración. Desplaza la página para avanzar a tu ritmo.");
     enfocar.current = "nav";
-  }, [cambiarPres, volcarUI]);
+  }, [cambiarPres, volcarUI, cancelarPres]);
   const elegirExplorar = () => {
     setExplorando(true);
     setAviso("Modo exploración. Desplaza la página para avanzar a tu ritmo.");
@@ -592,7 +631,7 @@ export function EscenaV5() {
     window.addEventListener("keydown", alTecla);
     return () => window.removeEventListener("keydown", alTecla);
   }, [pres, pasos, salir]);
-  useEffect(() => () => cancelAnimationFrame(presRaf.current), []);
+  useEffect(() => () => cancelarPres(), [cancelarPres]);
   useEffect(() => {
     if (enfocar.current === "play") { enfocar.current = null; playBtn.current?.focus(); }
     else if (enfocar.current === "fin") { enfocar.current = null; document.querySelector<HTMLElement>(".v5-cine-fin button")?.focus(); }
