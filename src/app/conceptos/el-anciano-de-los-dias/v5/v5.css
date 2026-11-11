@@ -221,3 +221,97 @@
 
 /* Orientación en móvil: el menú muestra el nombre del acto en curso (el resto queda en su número) */
 .v5-pie .an-nav button[aria-current="step"] .an-nav__t { display: inline; }
+
+
+/* ── Dos modalidades: elección editorial en el prólogo y modo cinematográfico ── */
+.v5-eleccion {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.6rem 0 0.2rem;
+  background: linear-gradient(to top, var(--c-bg) 78%, transparent);
+}
+.v5-eleccion__t { margin: 0; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-accent); }
+.v5-eleccion__op { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.v5-op {
+  display: grid;
+  align-content: start;
+  gap: 0.15rem;
+  min-height: 44px;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--c-accent);
+  border-radius: 0.9rem;
+  background: transparent;
+  color: var(--c-luz);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.v5-op:focus-visible { outline: 2px solid var(--c-luz); outline-offset: 3px; }
+@media (hover: hover) { .v5-op:hover { background: rgb(199 141 67 / 0.16); } }
+.v5-op__n { font-weight: 600; font-size: 0.95rem; }
+.v5-op__m { font-size: 0.75rem; color: var(--c-muted); }
+.v5-op__x { display: none; }
+.v5-op__d { display: none; font-size: 0.8125rem; line-height: 1.4; color: var(--c-ink); }
+@media (min-width: 56rem) {
+  .v5-op__x { display: inline; }
+}
+@media (min-width: 56rem) and (min-height: 44rem) {
+  .v5-op__d { display: block; }
+}
+
+/* En móvil vertical, con la elección o la pista de scroll en el pie, el panel de texto reserva su altura */
+@media (max-width: 55.99rem) and (min-height: 32.01rem) {
+  .v5-escenario:has(.an-guia) { --v5-pie: 4.9rem; }
+}
+/* Móvil vertical bajo (p. ej. 320×640): el prólogo se compacta para que texto y elección quepan juntos */
+@media (max-width: 55.99rem) and (max-height: 44rem) and (min-height: 32.01rem) {
+  .v5-escenario[data-tramo="1"] .an-autor, .v5-eleccion__t { display: none; }
+  .v5-escenario[data-tramo="1"] .v5-texto { gap: 0.3rem; }
+  .v5-escenario[data-tramo="1"] .an-principal { font-size: 0.9rem; line-height: 1.38; }
+  .v5-eleccion { background: var(--c-bg); padding-top: 0.35rem; }
+}
+
+/* Modo cinematográfico: se retiran los paneles editoriales, los mandos manuales y el menú de tramos (display: none:
+   ni se ven, ni se enfocan, ni bloquean clics, ni los anuncian los lectores de pantalla). El velo cede para que la instalación respire. */
+.v5-escenario[data-modo="cine"] .v5-texto,
+.v5-escenario[data-modo="cine"] .v5-mando,
+.v5-escenario[data-modo="cine"] .an-nav,
+.v5-escenario[data-modo="cine"] .an-guia,
+.v5-escenario[data-modo="cine"] .an-manual,
+.v5-escenario[data-modo="cine"] .an-barra { display: none; }
+.v5-escenario[data-modo="cine"] .v5-velo { opacity: 0.55; }
+.v5-escenario[data-modo="cine"] .v5-lienzo--mover { cursor: default; }
+
+.v5-cine-barra { display: flex; align-items: center; gap: 0.25rem; flex: 1 1 100%; width: 100%; min-width: 0; }
+.v5-cine-prog { position: relative; flex: 1 1 auto; min-width: 2rem; height: 3px; border-radius: 3px; background: rgb(199 141 67 / 0.25); overflow: hidden; }
+.v5-cine-prog::after { content: ""; position: absolute; inset: 0; background: var(--c-accent); transform-origin: 0 50%; transform: scaleX(var(--pp, 0)); }
+.v5-cine-salir { border: 1px solid var(--c-accent); margin-left: 0.25rem; }
+@media (max-width: 24rem) {
+  .v5-cine-barra { flex-wrap: wrap; row-gap: 0; }
+  .v5-cine-prog { order: -1; flex: 1 1 100%; margin: 0.3rem 0 0.1rem; }
+  .v5-cine-barra .v5-player__t { flex: 1 1 auto; text-align: center; }
+}
+
+/* Títulos y cierre cinematográficos: ocupan la zona del texto (no la del punto de atención) */
+.v5-cine-zona {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: 54%;
+  bottom: calc(var(--v5-pie) + 1.5rem);
+  display: grid;
+  align-content: center;
+  padding: 0 var(--mf-gutter);
+  pointer-events: none;
+}
+.v5-cine-zona > * { pointer-events: auto; }
+.v5-cine-t { display: grid; gap: 0.35rem; opacity: var(--cine-o, 1); pointer-events: none; }
+.v5-cine-fin { display: grid; gap: 0.6rem; max-width: 34rem; animation: an-fade 0.8s ease; }
+@media (min-width: 56rem), (orientation: landscape) and (max-height: 32rem) {
+  .v5-cine-zona { right: auto; top: var(--an-cab); bottom: var(--v5-pie); width: min(34rem, 44%); padding-left: max(var(--mf-gutter), env(safe-area-inset-left)); }
+}
+@media (prefers-reduced-motion: reduce) { .v5-cine-fin { animation: none; } }

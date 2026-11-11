@@ -81,6 +81,10 @@ export function EscenaV5() {
   const [pasos, setPasos] = useState(false);
   const [etapa, setEtapa] = useState(0);
   const [aviso, setAviso] = useState("");
+  /** El visitante ya está dentro de una modalidad (explorando): no se le vuelve a pedir que elija */
+  const [explorando, setExplorando] = useState(false);
+  const presTr = useRef<HTMLSpanElement>(null);
+  const presRest = useRef<HTMLSpanElement>(null);
   const guion = useRef<Guion | null>(null);
   const presT = useRef(0);
   const presUlt = useRef(0);
@@ -92,9 +96,8 @@ export function EscenaV5() {
   const presFase = useRef<{ t: number; desde: Controles }>({ t: 0, desde: { giro: 0, tilt: 0, abre: 0, plano: 0.5 } });
   const uiPres = useRef<Controles>({ giro: 0, tilt: 0, abre: 0, plano: 0.5 });
   const presBarra = useRef<HTMLSpanElement>(null);
-  const presTiempo = useRef<HTMLSpanElement>(null);
   const presSeg = useRef(-1);
-  const enfocar = useRef<"play" | "nav" | null>(null);
+  const enfocar = useRef<"play" | "nav" | "fin" | null>(null);
   const cabAlto = useRef(0);
   const presUiT = useRef(0);
   const presScrollT = useRef(0);
@@ -164,6 +167,8 @@ export function EscenaV5() {
     setMando(hayMando);
     setReposo(tr === 5 && local > 0.8);
     barra.current?.style.setProperty("--an-p", p.toFixed(4));
+    // Título cinematográfico: aparece al comenzar cada tramo y se retira antes de su mitad (no se queda sobre la geometría)
+    escenario.current?.style.setProperty("--cine-o", (suave(local / 0.1) * (1 - suave((local - 0.45) / 0.2))).toFixed(3));
   }, []);
 
   /* La cabecera del sitio se superpone al comienzo de la escena: el reproductor se coloca justo debajo de su parte visible */
@@ -461,8 +466,8 @@ export function EscenaV5() {
     if (!manualRef.current && (fin || ahora - presScrollT.current >= 120)) { presScrollT.current = ahora; sincScroll(p); }
     presBarra.current?.style.setProperty("--pp", (t / g.total).toFixed(4));
     const seg = Math.floor(t);
-    if (seg !== presSeg.current && presTiempo.current) { presSeg.current = seg; presTiempo.current.textContent = `${fmt(t)} / ${fmt(g.total)}`; }
-    if (fin) { cambiarPres("finalizado"); setAviso("Presentación finalizada. La composición queda suspendida."); return; }
+    if (seg !== presSeg.current) { presSeg.current = seg; if (presTr.current) presTr.current.textContent = fmt(t); if (presRest.current) presRest.current.textContent = `−${fmt(g.total - t)}`; }
+    if (fin) { enfocar.current = "fin"; cambiarPres("finalizado"); setAviso("Presentación finalizada. La composición queda suspendida. Puedes volver a verla o explorar la obra."); return; }
     presRaf.current = requestAnimationFrame(tick);
   }, [dibujar, aplicarControles, cambiarPres, sincScroll]);
 
@@ -478,6 +483,9 @@ export function EscenaV5() {
 
   const comenzar = useCallback(() => {
     cancelAnimationFrame(presRaf.current); presRaf.current = 0;
+    // Ninguna animación del modo exploración (suavizado del scroll, mandos pendientes) puede competir con el reloj cinematográfico
+    cancelAnimationFrame(suav.current.raf); suav.current.raf = 0;
+    cancelAnimationFrame(anim.current); anim.current = 0;
     peekP.current = null; peekAlLlegar.current = false; setMirando(false);
     reiniciarMandos();
     const g = guion.current ?? crearGuion();
@@ -518,12 +526,23 @@ export function EscenaV5() {
     presRaf.current = requestAnimationFrame(paso);
   }, [comenzar, paso, cambiarPres, geoScroll]);
 
+  /** Cinematográfico → exploración: se detiene el reloj, el punto narrativo actual pasa a ser el scroll (una sola fuente de verdad) y los mandos muestran su valor real */
   const salir = useCallback(() => {
     cancelAnimationFrame(presRaf.current); presRaf.current = 0;
-    cambiarPres("inactivo"); setPasos(false);
-    setAviso("Presentación cerrada. Recorrido manual.");
+    if (!manualRef.current && presRef.current !== "inactivo") {
+      const y = Math.round(presGeo.current.y0 + objetivo.current * presGeo.current.dist);
+      window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior }); presY.current = window.scrollY;
+    }
+    volcarUI();
+    cambiarPres("inactivo"); setPasos(false); setExplorando(true);
+    setAviso("Modo exploración. Desplaza la página para avanzar a tu ritmo.");
     enfocar.current = "nav";
-  }, [cambiarPres]);
+  }, [cambiarPres, volcarUI]);
+  const elegirExplorar = () => {
+    setExplorando(true);
+    setAviso("Modo exploración. Desplaza la página para avanzar a tu ritmo.");
+    enfocar.current = "nav";
+  };
 
   const ciclarVel = () => {
     const v = PRESENTACION_V5.velocidades;
@@ -547,9 +566,9 @@ export function EscenaV5() {
     const st = escenario.current;
     const alScroll = () => { if (Math.abs(window.scrollY - presY.current) > 8) pausar(); };
     const alTecla = (e: KeyboardEvent) => {
-      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key) && !(e.target as Element | null)?.closest?.(".v5-player")) pausar();
+      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key) && !(e.target as Element | null)?.closest?.(".v5-player, .v5-cine-barra")) pausar();
     };
-    const alBajar = (e: PointerEvent) => { if (!(e.target as Element | null)?.closest?.(".v5-player")) pausar("exacto"); };
+    const alBajar = (e: PointerEvent) => { if (!(e.target as Element | null)?.closest?.(".v5-player, .v5-cine-barra")) pausar("exacto"); };
     const alOcultar = () => { if (document.hidden) pausar("exacto"); };
     const alGesto = () => pausar();
     window.addEventListener("wheel", alGesto, { passive: true });
@@ -576,6 +595,7 @@ export function EscenaV5() {
   useEffect(() => () => cancelAnimationFrame(presRaf.current), []);
   useEffect(() => {
     if (enfocar.current === "play") { enfocar.current = null; playBtn.current?.focus(); }
+    else if (enfocar.current === "fin") { enfocar.current = null; document.querySelector<HTMLElement>(".v5-cine-fin button")?.focus(); }
     else if (enfocar.current === "nav" && pres === "inactivo" && !pasos) { enfocar.current = null; document.querySelector<HTMLElement>(".v5-pie .an-nav [aria-current]")?.focus(); }
   });
 
@@ -587,10 +607,11 @@ export function EscenaV5() {
   const f = FRAGMENTOS_V5[frag];
   const ocultoEsp = espec ? undefined : "v5-oculto";
   const final = frag === FRAGMENTOS_V5.length - 1;
+  const cine = pres !== "inactivo";
 
   return (
     <div ref={pista} className={`v5-pista${manual ? " v5-pista--manual" : ""}`} style={{ ["--v5-pant" as string]: 9.2 }}>
-      <section ref={escenario} className="v5-escenario" data-tramo={tramo} data-mando={mando} aria-label="El anciano de los días, recorrido interactivo">
+      <section ref={escenario} className="v5-escenario" data-modo={cine ? "cine" : "exploracion"} data-tramo={tramo} data-mando={mando} aria-label="El anciano de los días, recorrido interactivo">
         <div className="v5-fondo" aria-hidden="true" />
         <div ref={ventana} className="v5-ventana">
           <div ref={fig} className={`an-fig v5-fig${mirando ? " an-fig--mirando" : ""}`}>
@@ -637,7 +658,24 @@ export function EscenaV5() {
               {AMPLIADO_V5[tramo].interpretacion.map((t) => <p key={t}>{t}</p>)}
             </div>
           </details>
-          {tramo === 1 && (frag > 0 || mirando) && pres !== "reproduciendo" && (
+          {tramo === 1 && frag === 0 && !explorando && !pasos && !cine && (
+            <div className="v5-eleccion" role="group" aria-labelledby="v5-elec-t">
+              <p id="v5-elec-t" className="v5-eleccion__t">Contempla la obra a tu manera</p>
+              <div className="v5-eleccion__op">
+                <button type="button" className="v5-op" onClick={comenzar}>
+                  <span className="v5-op__n">Cinematográfico</span>
+                  <span className="v5-op__m">{manual ? "Por etapas" : "60 segundos"}<span className="v5-op__x"> · Una experiencia guiada</span></span>
+                  <span className="v5-op__d">La creación, el orden y lo imposible se despliegan ante ti.</span>
+                </button>
+                <button type="button" className="v5-op" onClick={elegirExplorar}>
+                  <span className="v5-op__n">Explorar</span>
+                  <span className="v5-op__m">A tu ritmo<span className="v5-op__x"> · Descubre e interactúa</span></span>
+                  <span className="v5-op__d">Recorre los actos, altera las estructuras y comprende su significado.</span>
+                </button>
+              </div>
+            </div>
+          )}
+          {tramo === 1 && (frag > 0 || mirando) && (
             <button type="button" className="an-btn" aria-pressed={mirando} onClick={alternarMirar}>
               {mirando ? "Volver al recorrido" : "Ver la pintura completa"}
             </button>
@@ -703,38 +741,57 @@ export function EscenaV5() {
             </label>
           )}
           {!manual && tramo === 1 && frag === 0 && pres === "inactivo" && <p className="an-guia" aria-hidden="true">Desplaza para acercarte</p>}
+          {cine && (
+            <div className="v5-cine-barra" role="group" aria-label="Presentación cinematográfica">
+              <button type="button" ref={playBtn} className="v5-player__b v5-player__ico" aria-label={pres === "reproduciendo" ? "Pausar presentación" : pres === "finalizado" ? "Repetir presentación" : "Reanudar presentación"} onClick={() => (pres === "reproduciendo" ? pausar("exacto") : reanudar())}>
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="currentColor">
+                  {pres === "reproduciendo" ? <path d="M4 3h3v10H4zM9 3h3v10H9z" /> : pres === "finalizado" ? <path d="M8 2a6 6 0 1 0 6 6h-2a4 4 0 1 1-1.2-2.8L9 7h5V2l-1.8 1.8A6 6 0 0 0 8 2z" /> : <path d="M4 2.5v11l9-5.5z" />}
+                </svg>
+              </button>
+              <span ref={presTr} className="v5-player__t" aria-hidden="true">0:00</span>
+              <span ref={presBarra} className="v5-cine-prog" aria-hidden="true" />
+              <span ref={presRest} className="v5-player__t" aria-hidden="true">−1:00</span>
+              <button type="button" className="v5-player__b" aria-label={`Velocidad ${String(vel).replace(".", ",")} por. Cambiar velocidad`} onClick={ciclarVel}>{String(vel).replace(".", ",")}×</button>
+              <button type="button" className="v5-player__b v5-cine-salir" aria-label="Salir de la presentación y explorar la obra" onClick={salir}>Explorar</button>
+            </div>
+          )}
         </div>
-        {tramo === 1 && frag === 0 && pres === "inactivo" && !pasos && !mirando && (
+        {!cine && !pasos && !(tramo === 1 && frag === 0 && !explorando) && (
           <div className="v5-player v5-player--ver">
             <button type="button" className="v5-player__b v5-ver" onClick={comenzar}>
               <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="currentColor"><path d="M4 2.5v11l9-5.5z" /></svg>
-              Ver presentación
+              {manual ? "Por etapas" : "Cinematográfico · 60 s"}
             </button>
           </div>
         )}
-        {(pres !== "inactivo" || pasos) && (
-          <div className="v5-player" role="group" aria-label="Presentación">
-            {pasos ? (
-              <>
-                <button type="button" ref={playBtn} className="v5-player__b" onClick={() => irEtapa(etapa - 1)} disabled={etapa <= 0}>Anterior</button>
-                <span className="v5-player__t" aria-hidden="true">{etapa + 1} / {FRAGMENTOS_V5.length}</span>
-                <button type="button" className="v5-player__b" onClick={() => irEtapa(etapa + 1)} disabled={etapa >= FRAGMENTOS_V5.length - 1}>Siguiente</button>
-              </>
-            ) : (
-              <>
-                <button type="button" ref={playBtn} className="v5-player__b v5-player__ico" aria-label={pres === "reproduciendo" ? "Pausar presentación" : pres === "finalizado" ? "Repetir presentación" : "Reanudar presentación"} onClick={() => (pres === "reproduciendo" ? pausar("exacto") : reanudar())}>
-                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="currentColor">
-                    {pres === "reproduciendo" ? <path d="M4 3h3v10H4zM9 3h3v10H9z" /> : pres === "finalizado" ? <path d="M8 2a6 6 0 1 0 6 6h-2a4 4 0 1 1-1.2-2.8L9 7h5V2l-1.8 1.8A6 6 0 0 0 8 2z" /> : <path d="M4 2.5v11l9-5.5z" />}
-                  </svg>
-                </button>
-                <button type="button" className="v5-player__b" aria-label={`Velocidad ${String(vel).replace(".", ",")} por. Cambiar velocidad`} onClick={ciclarVel}>{String(vel).replace(".", ",")}×</button>
-                <span ref={presTiempo} className="v5-player__t" aria-hidden="true">0:00 / {guion.current ? fmt(guion.current.total) : "1:00"}</span>
-              </>
-            )}
+        {cine && pres !== "finalizado" && (
+          <div className="v5-cine-zona" aria-hidden="true">
+            <div className="v5-cine-t">
+              <p className="an-kicker">{TRAMOS_V5[tramo - 1].kicker}</p>
+              <h2 className="an-titulo an-titulo--escena">{tramo === 1 ? "El anciano de los días" : TRAMOS_V5[tramo - 1].titulo}</h2>
+            </div>
+          </div>
+        )}
+        {pres === "finalizado" && (
+          <div className="v5-cine-zona">
+            <div className="v5-cine-fin" role="group" aria-label="Fin de la presentación">
+              <p className="an-kicker">Fin · Lo que no puede medirse</p>
+              <p className="an-principal">Cada forma que acabas de ver tiene una explicación. Explora la obra a tu ritmo para comprenderla.</p>
+              <div className="an-fin">
+                <button type="button" className="an-btn" onClick={comenzar}>Volver a ver</button>
+                <button type="button" className="an-btn an-btn--solido" onClick={salir}>Explorar la obra</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {pasos && (
+          <div className="v5-player" role="group" aria-label="Recorrido por etapas">
+            <button type="button" ref={playBtn} className="v5-player__b" onClick={() => irEtapa(etapa - 1)} disabled={etapa <= 0}>Anterior</button>
+            <span className="v5-player__t" aria-hidden="true">{etapa + 1} / {FRAGMENTOS_V5.length}</span>
+            <button type="button" className="v5-player__b" onClick={() => irEtapa(etapa + 1)} disabled={etapa >= FRAGMENTOS_V5.length - 1}>Siguiente</button>
             <button type="button" className="v5-player__b v5-player__ico" aria-label="Salir de la presentación" onClick={salir}>
               <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 3l10 10M13 3L3 13" /></svg>
             </button>
-            {!pasos && <span ref={presBarra} className="v5-player__barra" aria-hidden="true" />}
           </div>
         )}
         <p className="sr-only" role="status">{aviso}</p>
