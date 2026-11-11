@@ -158,7 +158,8 @@ export type Mundo = {
   cache: CapaEstatica | null;
 };
 
-type CapaEstatica = { cv: HTMLCanvasElement; cx: CanvasRenderingContext2D; clave: Float64Array; ok: boolean };
+/** `cv`: capa estática. `cv2`: estática + capa lenta (se rehace a baja frecuencia). `cv3`: la cubierta (sombras y viñeta) ya compuesta. Cada fotograma copia `cv2`, añade las luces que viajan y aplica `cv3`. */
+type CapaEstatica = { cv: HTMLCanvasElement; cx: CanvasRenderingContext2D; clave: Float64Array; ok: boolean; cv2: HTMLCanvasElement; cx2: CanvasRenderingContext2D; ok2: boolean; cv3: HTMLCanvasElement; cx3: CanvasRenderingContext2D };
 
 export function crearMundo(denso: boolean): Mundo {
   const r = rng(1794);
@@ -288,6 +289,8 @@ export type Acto = {
   t: number;
   /** Reposo ambiental: solo cambia `t` respecto al fotograma anterior, así que puede reutilizarse la capa estática */
   amb?: boolean;
+  /** Reposo ambiental: en este fotograma también se refresca la capa lenta (velos, rayos, halos que respiran) */
+  lenta?: boolean;
 };
 
 type Cam = { tx: number; ty: number; tz: number; cy: number; sy: number; cp: number; sp: number; dist: number; ct: number; st: number; ex: number; fz: number };
@@ -792,20 +795,31 @@ function pintarCubierta(m: Mundo, e: Acto, K: Pre) {
 }
 
 /* ── Reposo del epílogo ──
- * Del fotograma anterior solo cambia el reloj ambiental `t`, que únicamente usan el epílogo y la vida de fondo. Todo lo demás (los tres
- * actos, la composición del compás, el polvo) se pinta una vez en una capa aparte; cada fotograma de reposo copia esa capa y añade solo lo
- * que respira o gira. Como toda esa luz es aditiva, el resultado coincide con pintarlo todo de nuevo. Si cambia cualquier parámetro
- * (giro, cabeceo, tamaño…) la clave deja de coincidir y la capa se vuelve a crear. */
+ * Del fotograma anterior solo cambia el reloj ambiental `t`, que únicamente usan el epílogo y la vida de fondo. Se separan tres capas:
+ *  · estática (los tres actos, la composición del compás, el polvo): se pinta una vez;
+ *  · lenta (velos, rayos que giran, halos que respiran, motas): se rehace a baja frecuencia (≈8–10 Hz), su cambio entre fotogramas es imperceptible;
+ *  · viva (las luces que viajan por una línea: la del brazo, las de los anillos, el pulso del círculo, los destellos): se pinta en CADA fotograma
+ *    con el reloj real, porque su movimiento sí se nota si va a saltos.
+ * Cada fotograma copia estática + lenta y añade solo la capa viva. Como toda esa luz es aditiva, el resultado coincide con pintarlo todo de nuevo.
+ * Si cambia cualquier parámetro (giro, cabeceo, tamaño…) la clave deja de coincidir y las capas se recrean. */
 const CLAVE = new Float64Array(24);
+function copiar(dest: CanvasRenderingContext2D, origen: HTMLCanvasElement) {
+  dest.save();
+  dest.setTransform(1, 0, 0, 1, 0, 0);
+  dest.globalCompositeOperation = "source-over";
+  dest.globalAlpha = 1;
+  dest.drawImage(origen, 0, 0);
+  dest.restore();
+}
 function pintarAmbiente(m: Mundo, e: Acto, K: Pre): boolean {
   if (typeof document === "undefined") return false;
   const ctx = e.ctx, dest = ctx.canvas;
   let c = m.cache;
   if (!c) {
-    const cv = document.createElement("canvas");
-    const cx = cv.getContext("2d");
-    if (!cx) return false;
-    c = m.cache = { cv, cx, clave: new Float64Array(CLAVE.length), ok: false };
+    const cv = document.createElement("canvas"), cv2 = document.createElement("canvas"), cv3 = document.createElement("canvas");
+    const cx = cv.getContext("2d"), cx2 = cv2.getContext("2d"), cx3 = cv3.getContext("2d");
+    if (!cx || !cx2 || !cx3) return false;
+    c = m.cache = { cv, cx, clave: new Float64Array(CLAVE.length), ok: false, cv2, cx2, ok2: false, cv3, cx3 };
   }
   const k = CLAVE;
   k[0] = e.w; k[1] = e.h; k[2] = e.cx; k[3] = e.cy; k[4] = e.c0x; k[5] = e.c0y; k[6] = e.R; k[7] = e.th0; k[8] = e.f; k[9] = e.rr;
@@ -814,28 +828,38 @@ function pintarAmbiente(m: Mundo, e: Acto, K: Pre): boolean {
   let igual = c.ok;
   for (let i = 0; igual && i < k.length; i++) if (k[i] !== c.clave[i]) igual = false;
   if (!igual) {
-    c.ok = false;
-    if (c.cv.width !== dest.width || c.cv.height !== dest.height) { c.cv.width = dest.width; c.cv.height = dest.height; } else c.cx.clearRect(0, 0, c.cv.width, c.cv.height);
-    c.cx.setTransform(ctx.getTransform());
+    c.ok = false; c.ok2 = false;
+    for (const [cv, cx] of [[c.cv, c.cx], [c.cv2, c.cx2], [c.cv3, c.cx3]] as [HTMLCanvasElement, CanvasRenderingContext2D][]) {
+      if (cv.width !== dest.width || cv.height !== dest.height) { cv.width = dest.width; cv.height = dest.height; } else cx.clearRect(0, 0, cv.width, cv.height);
+      cx.setTransform(ctx.getTransform());
+    }
     const ee = { ...e, ctx: c.cx };
     pintarBase(m, ee, K, 1);
     pintarPolvo(m, ee, K);
+    pintarCubierta(m, { ...e, ctx: c.cx3 }, K);
     c.clave.set(k);
     c.ok = true;
   }
+  if (!c.ok2 || e.lenta) {
+    // capa estática + capa lenta
+    c.cx2.clearRect(0, 0, e.w, e.h);
+    copiar(c.cx2, c.cv);
+    c.cx2.globalCompositeOperation = "lighter";
+    c.cx2.lineCap = "round";
+    c.cx2.lineJoin = "round";
+    c.cx2.globalAlpha = 1;
+    pintarEpilogo(m, { ...e, ctx: c.cx2 }, K.cam, 3);
+    c.ok2 = true;
+  }
+  VIAJERA = false;
   ctx.clearRect(0, 0, e.w, e.h);
-  ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = 1;
-  ctx.drawImage(c.cv, 0, 0);
-  ctx.restore();
+  copiar(ctx, c.cv2);
   ctx.globalCompositeOperation = "lighter";
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   ctx.globalAlpha = 1;
-  pintarEpilogo(m, e, K.cam, 2);
-  pintarCubierta(m, e, K);
+  pintarEpilogo(m, e, K.cam, 4);
+  copiar(ctx, c.cv3);
   return true;
 }
 
@@ -844,7 +868,9 @@ export function soltarCapa(m: Mundo | null) {
   const c = m?.cache;
   if (!c) return;
   c.cv.width = c.cv.height = 0;
-  c.ok = false;
+  c.cv2.width = c.cv2.height = 0;
+  c.cv3.width = c.cv3.height = 0;
+  c.ok = false; c.ok2 = false;
   m!.cache = null;
 }
 
@@ -862,8 +888,13 @@ const ven = (b: number, b0: number, b1: number) => { const u = (b - b0) / (b1 - 
 const campana = (u: number) => (u < 0 ? 0 : Math.sin(Math.PI * u));
 
 /** Pulso de luz que recorre una órbita: cola degradada (tres trazos de longitud decreciente) y cabeza con halo. */
+/** Hay una luz recorriendo una línea en el fotograma pintado (el reposo ambiental solo necesita alta cadencia mientras la haya). */
+let VIAJERA = false;
+export const hayLuzViajera = () => VIAJERA;
+
 function pulso(ctx: CanvasRenderingContext2D, spr: HTMLCanvasElement, e: Acto, cam: Cam, o: OrbitaP, cabeza: number, largo: number, fuerza: number, c: 0 | 1 | 2) {
   if (fuerza < 0.03) return;
+  VIAJERA = true;
   for (let k = 0; k < 3; k++) {
     const span = largo * (1 - k * 0.3);
     ctx.beginPath();
@@ -1569,10 +1600,11 @@ const ORB_BASE: OrbitaP = { r: 1, rx: 0, ry: 0, cz: 0, rz: 0 };
  * brazos graduados hasta el círculo del principio. La punta derecha no llega a tocarlo. Reutiliza sprites y funciones del motor:
  * no crea geometría nueva por fotograma salvo dos brazos y sus marcas.
  */
-function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 = 0) {
+function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 | 3 | 4 = 0) {
   const { ctx, d, t } = e;
-  // parte 0: todo, en el orden original · 1: lo que no depende del reloj ambiental · 2: solo lo que respira, gira o late
-  const est = parte !== 2, din = parte !== 1;
+  // parte 0: todo, en el orden original · 1: lo que no depende del reloj ambiental · 2: todo lo que depende de él
+  // 3: solo lo lento (velos, rayos, halos que respiran, motas) · 4: solo las luces que viajan por una línea (necesitan fluidez)
+  const est = parte <= 1, lento = parte === 0 || parte === 2 || parte === 3, rapido = parte === 0 || parte === 2 || parte === 4;
   const spr = m.sprites;
   const kL = suave((d - 0.08) / 0.2);
   if (kL <= 0.003) return;
@@ -1638,7 +1670,7 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 = 0) {
     ctx.lineWidth = 1;
     ctx.stroke();
     }
-    if (!din) return;
+    if (!rapido) return;
     // La luz desciende por el brazo: una vez al aparecer el compás y, ya en reposo, de forma lenta y espaciada
     const u1 = ven(d, 0.38 + i * 0.05, 0.56 + i * 0.05);
     let u = u1, fu = campana(u1);
@@ -1649,6 +1681,7 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 = 0) {
       ctx.lineWidth = 2.6;
       ctx.beginPath(); ctx.moveTo(ux, uy); ctx.lineTo(hx, hy); ctx.stroke();
       if (spr) halo(ctx, spr.halo, hx, hy, 15 * clamp(ps * 2, 0.8, 1.8), fu);
+      VIAJERA = true;
     }
   };
   brazo(TIP_I, suave((d - 0.16) / 0.3), 0);
@@ -1656,7 +1689,7 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 = 0) {
 
   if (spr) {
     // Disco de luz y rayos: la fuerza creadora de la pintura, ahora lejana
-    if (din) {
+    if (lento) {
       ctx.save();
       ctx.translate(ax, ay);
       ctx.rotate(d * 0.9 + t * 0.03);
@@ -1705,8 +1738,9 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 = 0) {
       if (P[2]) luzPunta(ctx, P[0], P[1], e.rr * clamp(P[2] * 2.2, 0.5, 1.1), kP * 0.9);
     }
   }
-  if (spr && din) {
+  if (spr && (lento || rapido)) {
     const h = spr.halo;
+    if (rapido) {
     // La luz recorre el círculo del principio y se queda corta; después, un latido muy lento
     const uc = ven(d, 0.5, 0.78);
     if (uc > 0) pulso(ctx, h, e, cam, ORB_BASE, uc * TAU * 1.4, 1.3, campana(uc) * 0.95, 2);
@@ -1714,9 +1748,10 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 = 0) {
     // La brecha entre la punta y el círculo
     const fb = suave((d - 0.5) / 0.14);
     if (fb > 0.02) destello(ctx, h, e, cam, 0.935, 0.01, 0, fb * (0.5 + 0.5 * Math.pow(Math.max(0, Math.sin(t * 1.7 + d * 36)), 3)));
-    // Pequeñas luces en los anillos colosales: se descubren al mirar
+    }
+    // Pequeñas luces en los anillos colosales: se descubren al mirar (parpadean en su sitio, no viajan)
     const kT = suave((d - 0.55) / 0.25);
-    if (kT > 0.02) {
+    if (lento && kT > 0.02) {
       const sp = 2.5;
       const CA: OrbitaP = { r: 4.2, rx: 1.35, ry: 0.2, cz: 3.2, rz: sp * 0.06 };
       const CB: OrbitaP = { r: 6, rx: 1.45, ry: -0.25, cz: 5, rz: -sp * 0.04 };
@@ -1732,7 +1767,7 @@ function pintarEpilogo(m: Mundo, e: Acto, cam: Cam, parte: 0 | 1 | 2 = 0) {
       }
     }
     const kV = suave((d - 0.62) / 0.3);
-    if (kV > 0.02) vidaDeFondo(m, e, cam, kV);
+    if (kV > 0.02) vidaDeFondo(m, e, cam, kV, lento, rapido);
   }
 }
 
@@ -1754,19 +1789,19 @@ const ORB_GIG: OrbitaP = { r: 11, rx: 1.45, ry: 0.1, cz: -4, rz: 0 };
  * Dos velos que respiran en las zonas oscuras, motas lejanas que laten a ritmos distintos, una luz que recorre por turnos los
  * anillos colosales, un destello ocasional en las graduaciones de los brazos y brillos del anillo mayor que solo se descubren al girar.
  */
-function vidaDeFondo(m: Mundo, e: Acto, cam: Cam, k: number) {
+function vidaDeFondo(m: Mundo, e: Acto, cam: Cam, k: number, lento: boolean, rapido: boolean) {
   const { ctx, t } = e;
   const spr = m.sprites;
   if (!spr) return;
   const h = spr.halo;
   const resp = 0.5 + 0.5 * Math.sin(t * 0.35);
   // Respiración: velos cálidos (uno ámbar, otro carmesí) a los lados de la composición
-  for (const [lx, ly, lz, rad, a, ph] of [[-4.5, -0.5, 1, 4.2, 0.19, 0], [6.5, -2.5, -1.5, 4.6, 0.15, 2.1]] as number[][]) {
+  if (lento) for (const [lx, ly, lz, rad, a, ph] of [[-4.5, -0.5, 1, 4.2, 0.19, 0], [6.5, -2.5, -1.5, 4.6, 0.15, 2.1]] as number[][]) {
     proyectar(e, cam, lx, ly, lz);
     if (P[2]) halo(ctx, h, P[0], P[1], e.R * P[2] * rad, a * k * (0.65 + 0.35 * Math.sin(t * 0.3 + ph)));
   }
-  proyectar(e, cam, 5, 3.5, 3);
-  if (P[2] && spr.rayos2) {
+  if (lento) proyectar(e, cam, 5, 3.5, 3);
+  if (lento && P[2] && spr.rayos2) {
     const R0 = e.R * P[2] * 3.2;
     ctx.save();
     ctx.translate(P[0], P[1]);
@@ -1776,7 +1811,7 @@ function vidaDeFondo(m: Mundo, e: Acto, cam: Cam, k: number) {
     ctx.restore();
   }
   // Motas lejanas: laten a ritmos distintos (nunca todas a la vez)
-  const NM = m.denso ? 28 : 14;
+  const NM = lento ? (m.denso ? 28 : 14) : 0;
   for (let i = 0; i < NM; i++) {
     const j = i * 5;
     proyectar(e, cam, MOTAS_FONDO[j], MOTAS_FONDO[j + 1], MOTAS_FONDO[j + 2]);
@@ -1785,19 +1820,19 @@ function vidaDeFondo(m: Mundo, e: Acto, cam: Cam, k: number) {
     halo(ctx, h, P[0], P[1], (5 + 5.5 * MOTAS_FONDO[j + 4]) * clamp(P[2] * 2, 0.9, 1.8), k * (0.3 + 0.6 * lat) * Math.max(0.55, niebla(P[3], cam, e.R)));
   }
   // Una luz recorre por turnos cada anillo colosal (ciclos de ~34 s desfasados, activos un tercio del tiempo)
-  [ORB_CA, ORB_CB, ORB_GIG].forEach((o, i) => {
+  if (rapido) [ORB_CA, ORB_CB, ORB_GIG].forEach((o, i) => {
     const u = ven(((t / 34 + i * 0.33) % 1), 0, 0.36);
     if (u > 0) pulso(ctx, h, e, cam, o, u * TAU * 0.7 + i * 2.2, 0.9, campana(u) * 0.95 * k, i === 1 ? 0 : 2);
   });
   // Destello ocasional en una graduación de un brazo (uno cada ~7 s, alternando)
   const ciclo = t / 7, n = Math.floor(ciclo), f = campana(ciclo - n);
-  if (f > 0.05) {
+  if (rapido && f > 0.05) {
     const u = 0.25 + 0.6 * ((n * 0.382) % 1), tip = n % 2 ? TIP_D : TIP_I;
     destello(ctx, h, e, cam, mezcla(APICE[0], tip[0], u), mezcla(APICE[1], tip[1], u), mezcla(APICE[2], tip[2], u), f * k);
   }
   // Brillos del anillo mayor: se descubren al girar la vista
   const g = suave(Math.abs(e.giro) * 2.2);
-  if (g > 0.03) {
+  if (lento && g > 0.03) {
     for (let i = 0; i < 6; i++) {
       anillo(i * 1.05 + 0.4, ORB_GIG.r, ORB_GIG.rx, ORB_GIG.ry, 0, 0, ORB_GIG.cz, L, 0);
       proyectar(e, cam, L[0], L[1], L[2]);

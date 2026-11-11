@@ -7,7 +7,7 @@ import { rutaPublica } from "@/lib/rutaPublica";
 import { AMPLIADO_V5, DURACION_V5, ESPECIFICO_DESDE, FRAGMENTOS_V5, PRESENTACION_V5, TRAMOS_V5 } from "@/content/anciano-v5";
 import { controlesEn, crearGuion, etapas, pEn, tEn, trLocal, type Controles, type Guion } from "./presentacion";
 import { CENTRO, FOCO_COMPAS, FOCO_URIZEN, clamp, mezcla, suave } from "../limiteGeom";
-import { PUNTA_DER, crearMundo, pintarActo, pintarPrologo, soltarCapa, type Mundo } from "./mundo3d";
+import { PUNTA_DER, crearMundo, hayLuzViajera, pintarActo, pintarPrologo, soltarCapa, type Mundo } from "./mundo3d";
 
 
 type Medidas = {
@@ -61,6 +61,8 @@ export function EscenaV5() {
   /** Instante del último fotograma pintado por el scroll, un arrastre o la presentación (el reposo ambiental no repinta si acaba de haber uno) */
   const ultimoDib = useRef(0);
   const ultimoCine = useRef("");
+  /** Instante del último avance del reloj ambiental (0 = parado): el reloj corre con el tiempo real mientras se pinta el tramo final del epílogo, con cualquier bucle */
+  const relojMarca = useRef(0);
   const presDeuda = useRef(0);
   const presTimer = useRef(0);
 
@@ -111,14 +113,15 @@ export function EscenaV5() {
   const presScrollT = useRef(0);
   const playBtn = useRef<HTMLButtonElement>(null);
 
-  const dibujar = useCallback((p: number, amb = false) => {
+  const dibujar = useCallback((p: number, amb = false, lenta = false) => {
     const m = med.current;
     const f = fig.current;
     const cv = lienzo.current;
     if (!m || !f) return;
     const { e1, e2, e3, e4 } = limite.current;
     const tr: 1 | 2 | 3 | 4 | 5 = p < e1 ? 1 : p < e2 ? 2 : p < e3 ? 3 : p < e4 ? 4 : 5;
-    if (!amb) ultimoDib.current = performance.now();
+    const ahoraDib = performance.now();
+    if (!amb) ultimoDib.current = ahoraDib;
     const local = tr === 1 ? p / e1 : tr === 2 ? (p - e1) / (e2 - e1) : tr === 3 ? (p - e2) / (e3 - e2) : tr === 4 ? (p - e3) / (e4 - e3) : (p - e4) / (1 - e4);
     // Política de los ajustes del visitante: se conservan, pero solo rigen donde sus mandos están disponibles
     // (giro, cabeceo e inclinación desde ~55 % del Acto I; abrir la arquitectura desde ~50 % del Acto II). Fuera de ahí su
@@ -130,6 +133,12 @@ export function EscenaV5() {
       plano.current.cur = 0.5; plano.current.tgt = 0.5;
       setGiroUI(0); setTiltUI(0); setAbreUI(0); setPlanoUI(0.5);
     }
+    // Reloj ambiental (luces que viajan, velos que respiran): avanza con el tiempo real cada vez que se pinta el tramo final del epílogo (desde que asoman las luces), sea cual sea el bucle
+    // (reposo, scroll, arrastre o presentación). Un salto tras una pausa se acota a 0,5 s; los bucles lo ponen a 0 al pararse.
+    if (tr === 5 && local > 0.6) {
+      if (relojMarca.current) reloj.current += Math.min(0.5, Math.max(0, (ahoraDib - relojMarca.current) / 1000));
+      relojMarca.current = ahoraDib;
+    } else relojMarca.current = 0;
     let camX = 0, camY = 0, k = 1, opac = 1;
     const ctx = cv?.getContext("2d") ?? null;
     const cx = m.vx + m.vw / 2, cy = m.vy + m.vh / 2;
@@ -158,7 +167,7 @@ export function EscenaV5() {
           ctx, w: m.W, h: m.H, cx, cy: m.W < 640 ? cy - m.vh * 0.16 * suave((a - 0.1) / 0.5) : cy, c0x: m.c0x, c0y: m.c0y, R: m.R, th0: m.th0, f: m.f, rr: m.rr,
           a, b, tilt: tilt.current.cur * vig, giro: giro.current.cur * vig, cabeceo: cabeceo.current.cur * vig, abre: abre.current.cur * vigAbre,
           rx: tr === 3 ? Math.min(1, Math.abs(abre.current.tgt - abre.current.cur) * 4) : tr === 4 ? Math.min(1, Math.abs(plano.current.tgt - plano.current.cur) * 5) : 0,
-          c, plano: plano.current.cur, d, t: reloj.current, amb: amb && tr === 5,
+          c, plano: plano.current.cur, d, t: reloj.current, amb: amb && tr === 5, lenta,
         });
       }
     }
@@ -332,28 +341,42 @@ export function EscenaV5() {
     };
   }, [medir, leer, manual, actualizarCab]);
 
-  /* Reposo final del epílogo: un movimiento ambiental muy lento (10 fotogramas por segundo; 8 en móvil), solo mientras la escena es visible y hasta 90 s sin interacción.
-     Cada fotograma se planifica con un temporizador y un único requestAnimationFrame (antes un rAF en bucle despertaba al navegador en cada refresco de la pantalla,
-     60–120 veces por segundo, para dibujar 8–10). El reloj ambiental solo avanza mientras el reposo corre: tras una pausa (pestaña oculta, escena fuera de pantalla)
-     continúa donde estaba, sin saltos. */
+  /* Reposo final del epílogo, hasta 90 s sin interacción y solo mientras la escena es visible. Dos ritmos:
+     · lento (≈8 Hz en móvil, 10 Hz en escritorio): velos, rayos y halos que respiran, cuyo cambio entre fotogramas es imperceptible;
+     · vivo (≈60 fps): mientras una luz recorre una línea (la del brazo, las de los anillos, el pulso del círculo) se repinta cada fotograma con el reloj real,
+       porque a 8–10 fps esos puntos saltan. Sin ninguna luz viajera se vuelve al ritmo lento. Si el dispositivo no sostiene ~36 fps, baja a 30 fps.
+     Cada fotograma se planifica con un temporizador y un único requestAnimationFrame (no un rAF en bucle). El reloj ambiental vive en dibujar() y se
+     detiene al parar el bucle, de modo que tras ocultar la pestaña continúa donde estaba, sin saltos. */
   useEffect(() => {
     const st = escenario.current;
     if (!reposo || manual || !st) return;
-    const intervalo = mundo.current?.denso === false ? 125 : 100;
-    let timer = 0, raf = 0, visible = true, marca = 0;
+    const lentoCada = mundo.current?.denso === false ? 125 : 100;
+    let marcoMs = 12, timer = 0, raf = 0, visible = true, ultLento = 0, ultPintado = 0, media = 0, muestras = 0, modoViva = false, bajoDesde = 0;
     let hasta = performance.now() + 90000;
-    const parar = () => { clearTimeout(timer); timer = 0; cancelAnimationFrame(raf); raf = 0; marca = 0; };
+    const parar = () => { clearTimeout(timer); timer = 0; cancelAnimationFrame(raf); raf = 0; relojMarca.current = 0; ultPintado = 0; modoViva = false; };
     const programar = (espera: number) => { timer = window.setTimeout(() => { timer = 0; raf = requestAnimationFrame(pintar); }, Math.max(0, espera)); };
     function pintar(ahora: number) {
       raf = 0;
-      if (!visible || document.hidden || ahora > hasta) { marca = 0; return; }
-      if (marca) reloj.current += Math.min(0.5, Math.max(0, (ahora - marca) / 1000));
-      marca = ahora;
-      // Si el scroll, un arrastre o la presentación acaban de pintar la escena, este fotograma sobra (el reloj ambiental sí avanza)
-      if (presRef.current !== "reproduciendo" && ahora - ultimoDib.current >= intervalo * 0.8) dibujar(progreso.current, true);
-      programar(intervalo - (performance.now() - ahora) - 4);
+      if (!visible || document.hidden || ahora > hasta) { relojMarca.current = 0; ultPintado = 0; modoViva = false; return; }
+      // Ritmo vivo: se sigue el refresco de la pantalla y se pinta cada ≥12 ms (60 fps a 60/120 Hz, 72 a 144 Hz); los refrescos intermedios no hacen nada
+      // Tras 20 s a 30 fps se vuelve a probar el ritmo pleno (un pico puntual no debe dejar el reposo a medio ritmo para siempre)
+      if (marcoMs > 12 && ahora - bajoDesde > 20000) { marcoMs = 12; muestras = 0; }
+      if (modoViva && ahora - ultPintado < marcoMs) { raf = requestAnimationFrame(pintar); return; }
+      const lenta = ahora - ultLento >= lentoCada;
+      if (lenta) ultLento = ahora;
+      // Si el scroll, un arrastre o la presentación han pintado en los últimos 100 ms, este fotograma sobra (esos bucles ya llevan las luces con el reloj real,
+      // y un fotograma de reposo intercalado invalidaría la caché en cada cambio de cámara)
+      const dibuja = presRef.current !== "reproduciendo" && ahora - ultimoDib.current >= 100;
+      if (dibuja) dibujar(progreso.current, true, lenta);
+      const viva = dibuja && hayLuzViajera();
+      // Vigilancia del ritmo real: si el intervalo medio entre fotogramas vivos supera ~28 ms, se pasa a 30 fps
+      if (viva && ultPintado) { const dlt = ahora - ultPintado; if (dlt < 500) { media = muestras ? media * 0.9 + dlt * 0.1 : dlt; if (++muestras > 45 && media > 28 && marcoMs < 29) { marcoMs = 29; bajoDesde = ahora; } } }
+      ultPintado = dibuja ? ahora : 0;
+      modoViva = viva;
+      if (viva) raf = requestAnimationFrame(pintar);
+      else programar(lentoCada - (performance.now() - ahora) - 4);
     }
-    const arrancar = () => { if (timer || raf || !visible || document.hidden) return; marca = performance.now(); raf = requestAnimationFrame(pintar); };
+    const arrancar = () => { if (timer || raf || !visible || document.hidden) return; raf = requestAnimationFrame(pintar); };
     const alVisibilidad = () => { if (document.hidden) parar(); else arrancar(); };
     const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) arrancar(); else parar(); });
     io.observe(st);
@@ -491,8 +514,9 @@ export function EscenaV5() {
     if (verUI) presUiT.current = ahora;
     const cambioC = aplicarControles({ giro: mezcla(d.giro, c.giro, k), tilt: mezcla(d.tilt, c.tilt, k), abre: mezcla(d.abre, c.abre, k), plano: mezcla(d.plano, c.plano, k) }, verUI);
     progreso.current = p; objetivo.current = p;
-    // Ritmo de dibujo: pleno en escritorio; 30 fps en móvil o equipos modestos
-    const minDt = mundo.current?.denso === false ? 33 : MIN_DIB;
+    // Ritmo de dibujo: pleno en escritorio; 30 fps en móvil o equipos modestos, salvo en el tramo final del epílogo, donde las luces viajeras
+    // necesitan fluidez y la escena enlaza con el reposo vivo (≈60 fps)
+    const minDt = mundo.current?.denso === false && !(tr === 5 && local > 0.6) ? 33 : MIN_DIB;
     let dibujado = false;
     if (fin || ((cambioC || p !== presP.current) && ahora - presDib.current >= minDt) || ahora - presDib.current > 100) {
       presDib.current = ahora; presP.current = p; dibujado = true;
@@ -512,7 +536,7 @@ export function EscenaV5() {
 
   const pausar = useCallback((gesto?: string) => {
     if (presRef.current !== "reproduciendo") return;
-    cancelarPres();
+    cancelarPres(); relojMarca.current = 0;
     // El progreso exacto vuelve al scroll y los sliders al valor real, para continuar en modo manual sin saltos
     if (!manualRef.current && gesto === "exacto") { const y = Math.round(presGeo.current.y0 + objetivo.current * presGeo.current.dist); window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior }); presY.current = window.scrollY; }
     volcarUI();
