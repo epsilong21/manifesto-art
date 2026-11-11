@@ -15,6 +15,8 @@ type Medidas = {
   vx: number; vy: number; vw: number; vh: number;
   ancho: number; kU: number; kC: number; dpr: number;
   R: number; th0: number; c0x: number; c0y: number; f: number; rr: number;
+  /** Encuadre: desplazamiento vertical del centro (fracción del alto de la ventana, solo móvil), zoom y fracción libre del epílogo (cine móvil) */
+  desp: number; zoom: number; libre: number;
 };
 
 /** Valores que el visitante modifica; cada uno tiene un objetivo (lo que pide) y un valor pintado (que lo sigue sin saltos). */
@@ -22,6 +24,13 @@ type Mando = { cur: number; tgt: number };
 
 /** Separación mínima entre dos fotogramas pintados por el scroll, un arrastre o la presentación (ms): en pantallas de 120 Hz o más se pinta cada dos refrescos (≈60 fps). El resto de la página sigue a la frecuencia de la pantalla. */
 const MIN_DIB = 9;
+/** Encuadre del cine en móvil vertical: zoom de cámara y fracción libre del epílogo (se ajustan mirando cada tramo) */
+const ZOOM_CINE = 1;
+/** Zoom de la exploración en móvil vertical (anchos < 640 px): la estructura gana presencia sin cortar el punto de interés */
+const ZOOM_EXPL = 1.15;
+const LIBRE_CINE = 0.7;
+/** En tabletas verticales (≥ 480 px) el epílogo se encuadra más holgado para no cortar el portal ni los brazos del compás */
+const LIBRE_CINE_ANCHO = 0.56;
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
@@ -60,6 +69,7 @@ export function EscenaV5() {
   const ultimoBorde = useRef("");
   /** Instante del último fotograma pintado por el scroll, un arrastre o la presentación (el reposo ambiental no repinta si acaba de haber uno) */
   const ultimoDib = useRef(0);
+  const reenc = useRef(0);
   const ultimoCine = useRef("");
   /** Instante del último avance del reloj ambiental (0 = parado): el reloj corre con el tiempo real mientras se pinta el tramo final del epílogo, con cualquier bucle */
   const relojMarca = useRef(0);
@@ -164,10 +174,10 @@ export function EscenaV5() {
       opac = 1 - suave(a / 0.2);
       if (ctx && mundo.current) {
         pintarActo(mundo.current, {
-          ctx, w: m.W, h: m.H, cx, cy: m.W < 640 ? cy - m.vh * 0.16 * suave((a - 0.1) / 0.5) : cy, c0x: m.c0x, c0y: m.c0y, R: m.R, th0: m.th0, f: m.f, rr: m.rr,
+          ctx, w: m.W, h: m.H, cx, cy: m.W < 640 ? cy - m.vh * m.desp * suave((a - 0.1) / 0.5) : cy, c0x: m.c0x, c0y: m.c0y, R: m.R, th0: m.th0, f: m.f, rr: m.rr,
           a, b, tilt: tilt.current.cur * vig, giro: giro.current.cur * vig, cabeceo: cabeceo.current.cur * vig, abre: abre.current.cur * vigAbre,
           rx: tr === 3 ? Math.min(1, Math.abs(abre.current.tgt - abre.current.cur) * 4) : tr === 4 ? Math.min(1, Math.abs(plano.current.tgt - plano.current.cur) * 5) : 0,
-          c, plano: plano.current.cur, d, t: reloj.current, amb: amb && tr === 5, lenta,
+          c, plano: plano.current.cur, d, t: reloj.current, amb: amb && tr === 5, lenta, zoom: m.zoom, libre: m.libre,
         });
       }
     }
@@ -216,9 +226,26 @@ export function EscenaV5() {
     const R = Math.hypot(xR - xL, yR - yL);
     const movil = W < 640 || (navigator.hardwareConcurrency ?? 4) <= 2;
     const dpr = Math.min(window.devicePixelRatio || 1, movil ? 1.5 : 2);
-    med.current = { W, H, vx, vy, vw, vh, ancho, kU, kC, dpr, R, th0: Math.atan2(yR - yL, xR - xL), c0x: xL, c0y: yL, f: 1.5 * R, rr: Math.max(16, esc * 0.05) };
-    f.style.width = `${ancho}px`;
-    f.style.height = `${ancho * I.ratio}px`;
+    // Encuadre propio del cine en pantalla vertical (sin texto ni mandos): la escena ocupa todo el espacio útil, centrada, y el compás del epílogo crece hasta llenarlo
+    const cineV = st.dataset.modo === "cine" && W < 896 && H > 512;
+    const nuevo: Medidas = { W, H, vx, vy, vw, vh, ancho, kU, kC, dpr, R, th0: Math.atan2(yR - yL, xR - xL), c0x: xL, c0y: yL, f: 1.5 * R, rr: Math.max(16, esc * 0.05), desp: cineV ? 0 : 0.16, zoom: cineV ? ZOOM_CINE : W < 640 ? ZOOM_EXPL : 1, libre: cineV ? (W < 480 ? LIBRE_CINE : LIBRE_CINE_ANCHO) : 0 };
+    const previa = med.current;
+    // Si solo cambió el encuadre (p. ej. al pasar de cine a exploración) la cámara se reencuadra con suavidad en lugar de saltar
+    const reencuadre = !!previa && !manualRef.current && previa.W === W && previa.H === H && previa.dpr === dpr && (previa.vh !== vh || previa.vy !== vy || previa.desp !== nuevo.desp || previa.zoom !== nuevo.zoom || previa.libre !== nuevo.libre);
+    cancelAnimationFrame(reenc.current); reenc.current = 0;
+    const poner = (mm: Medidas) => { med.current = mm; f.style.width = `${mm.ancho}px`; f.style.height = `${mm.ancho * I.ratio}px`; };
+    if (reencuadre && previa) {
+      const t0 = performance.now();
+      const paso = (ahora: number) => {
+        const k = suave((ahora - t0) / 450);
+        const mm = { ...nuevo } as Medidas;
+        for (const c of Object.keys(nuevo) as (keyof Medidas)[]) mm[c] = mezcla(previa[c], nuevo[c], k);
+        poner(mm); dibujar(progreso.current);
+        if (k < 1) reenc.current = requestAnimationFrame(paso); else { reenc.current = 0; poner(nuevo); dibujar(progreso.current); }
+      };
+      poner(previa);
+      reenc.current = requestAnimationFrame(paso);
+    } else poner(nuevo);
     if (cv) {
       // Reasignar el tamaño reserva de nuevo la memoria del lienzo y lo vacía: solo cuando realmente cambia
       const cw = Math.round(W * dpr), ch = Math.round(H * dpr);
@@ -323,6 +350,7 @@ export function EscenaV5() {
     const pedir = () => { if (!raf && visible) raf = requestAnimationFrame((ts) => { raf = 0; if (leer(!(ts - ultimoDib.current < MIN_DIB && ts >= ultimoDib.current - 20))) pedir(); }); };
     const ro = new ResizeObserver(() => { medir(); pedir(); });
     ro.observe(st);
+    if (ventana.current) ro.observe(ventana.current);
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) pedir(); }, { rootMargin: "20% 0px" });
     io.observe(t);
     window.addEventListener("scroll", pedir, { passive: true });
@@ -334,6 +362,7 @@ export function EscenaV5() {
       cancelAnimationFrame(anim.current);
       anim.current = 0;
       ro.disconnect();
+      cancelAnimationFrame(reenc.current); reenc.current = 0;
       io.disconnect();
       window.removeEventListener("scroll", pedir);
       window.removeEventListener("scroll", actualizarCab);
@@ -703,7 +732,10 @@ export function EscenaV5() {
         />
         <div className="v5-velo" aria-hidden="true" />
 
+        {/* En móvil vertical la hoja agrupa mandos y texto, anclada al pie; en escritorio y apaisado es transparente (display: contents) */}
+        <div className="v5-hoja">
         <div className="v5-texto">
+          <div className="v5-texto__cuerpo">
           <p className="an-kicker">{TRAMOS_V5[tramo - 1].kicker} · {f.momento}</p>
           {tramo === 1 ? <h1 className="an-titulo">El anciano de los días</h1> : <h2 className="an-titulo an-titulo--escena">{TRAMOS_V5[tramo - 1].titulo}</h2>}
           {tramo === 1 && frag === 0 && <p className="an-autor">William Blake · 1794 · The Ancient of Days</p>}
@@ -721,6 +753,19 @@ export function EscenaV5() {
               {AMPLIADO_V5[tramo].interpretacion.map((t) => <p key={t}>{t}</p>)}
             </div>
           </details>
+          {tramo === 1 && (frag > 0 || mirando) && (
+            <button type="button" className="an-btn" aria-pressed={mirando} onClick={alternarMirar}>
+              {mirando ? "Volver al recorrido" : "Ver la pintura completa"}
+            </button>
+          )}
+          {final && (
+            <div className="an-fin an-fin--epilogo">
+              <button type="button" className="an-btn" onClick={verPintura}><span className="v5-corto">La pintura</span><span className="v5-largo">Volver a la pintura</span></button>
+              <button type="button" className="an-btn" onClick={() => ir(0)}><span className="v5-corto">Repetir</span><span className="v5-largo">Repetir la experiencia</span></button>
+              <Link href="/conceptos" className="an-btn an-btn--solido"><span className="v5-corto">Catálogo</span><span className="v5-largo">Ir al catálogo</span></Link>
+            </div>
+          )}
+          </div>
           {tramo === 1 && frag === 0 && !explorando && !pasos && !cine && (
             <div className="v5-eleccion" role="group" aria-labelledby="v5-elec-t">
               <p id="v5-elec-t" className="v5-eleccion__t">Contempla la obra a tu manera</p>
@@ -738,22 +783,11 @@ export function EscenaV5() {
               </div>
             </div>
           )}
-          {tramo === 1 && (frag > 0 || mirando) && (
-            <button type="button" className="an-btn" aria-pressed={mirando} onClick={alternarMirar}>
-              {mirando ? "Volver al recorrido" : "Ver la pintura completa"}
-            </button>
-          )}
-          {final && (
-            <div className="an-fin an-fin--epilogo">
-              <button type="button" className="an-btn" onClick={verPintura}><span className="v5-corto">La pintura</span><span className="v5-largo">Volver a la pintura</span></button>
-              <button type="button" className="an-btn" onClick={() => ir(0)}><span className="v5-corto">Repetir</span><span className="v5-largo">Repetir la experiencia</span></button>
-              <Link href="/conceptos" className="an-btn an-btn--solido"><span className="v5-corto">Catálogo</span><span className="v5-largo">Ir al catálogo</span></Link>
-            </div>
-          )}
         </div>
 
-        {mando && (
-          <div className="v5-mando" role="group" aria-label="Explorar la estructura">
+        {/* Desde el Acto I el hueco de los mandos queda reservado (invisible hasta que están disponibles): al aparecer no mueven el texto ni se desplazan */}
+        {(mando || tramo >= 2) && (
+          <div className={`v5-mando${mando ? "" : " v5-oculto"}`} role="group" aria-label="Explorar la estructura">
           {tramo === 5 ? null : tramo === 4 ? (
             <label data-esp className={ocultoEsp} aria-hidden={!espec || undefined}>
               <span>Desplazar el plano</span>
@@ -786,6 +820,7 @@ export function EscenaV5() {
           <p className="v5-pista-texto">{tramo === 5 ? "Gira la vista: las piezas se alinean y se separan. También puedes arrastrar sobre la escena." : "También puedes arrastrar sobre la escena."}</p>
         </div>
         )}
+        </div>
 
         <div className="an-pie v5-pie">
           <span ref={barra} className="an-barra" aria-hidden="true" />

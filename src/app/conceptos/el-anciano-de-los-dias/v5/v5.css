@@ -90,11 +90,8 @@
 .v5-mando input[type="range"]:focus-visible { outline: 2px solid var(--c-luz); outline-offset: 3px; }
 .v5-pista-texto { display: none; margin: 0; font-size: 0.75rem; color: var(--c-muted); }
 
-/* Móvil vertical: al abrir el panel de explicaciones el texto gana altura */
+/* Móvil vertical: tipografía del título (la hoja inferior que agrupa mandos y texto se define al final del archivo) */
 @media (max-width: 55.99rem) and (min-height: 32.01rem) {
-  .v5-escenario[data-tramo="3"] .v5-mando, .v5-escenario[data-tramo="4"] .v5-mando { top: calc(50% - 6.9rem); }
-  .v5-escenario:has(.an-mas[open]) .v5-ventana { height: 24%; }
-  .v5-escenario:has(.an-mas[open]) .v5-texto { top: 24%; }
   .v5-titulo-compacto, .v5-texto .an-titulo { font-size: clamp(1.9rem, 1.1rem + 4.6vw, 2.6rem); }
   .v5-texto .an-fin { gap: 0.4rem; }
   .v5-texto .an-fin .an-btn { padding: 0 0.8rem; font-size: 0.8125rem; }
@@ -134,7 +131,6 @@
 @media (max-width: 22.5rem) {
   .v5-mando { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .v5-mando__botones { grid-column: 1 / -1; flex-direction: row; }
-  .v5-escenario[data-tramo="3"] .v5-mando, .v5-escenario[data-tramo="4"] .v5-mando, .v5-escenario[data-tramo="2"] .v5-mando { top: calc(50% - 6.9rem); }
 }
 @media (min-width: 1800px) {
   .v5-escenario { --an-cab: 5rem; }
@@ -164,8 +160,6 @@
 /* Móvil vertical bajo (p. ej. 320×640): título del epílogo más compacto para que el texto y las acciones quepan juntos */
 @media (max-width: 55.99rem) and (max-height: 44rem) and (min-height: 32.01rem) {
   .v5-escenario[data-tramo="5"] .v5-texto .an-titulo { font-size: 1.55rem; }
-  .v5-escenario[data-tramo="5"] .v5-texto { gap: 0.3rem; top: 45%; }
-  .v5-escenario[data-tramo="5"] .v5-mando { top: calc(45% - 4.6rem); }
 }
 .v5-largo { display: none; }
 @media (min-width: 56rem) {
@@ -262,16 +256,10 @@
   .v5-op__d { display: block; }
 }
 
-/* En móvil vertical, con la elección o la pista de scroll en el pie, el panel de texto reserva su altura */
+/* Móvil vertical: con la pista de scroll en el pie (ya sin la elección a la vista) el pie reserva dos filas */
 @media (max-width: 55.99rem) and (min-height: 32.01rem) {
-  .v5-escenario:has(.an-guia) { --v5-pie: 4.9rem; }
-}
-/* Móvil vertical bajo (p. ej. 320×640): el prólogo se compacta para que texto y elección quepan juntos */
-@media (max-width: 55.99rem) and (max-height: 44rem) and (min-height: 32.01rem) {
-  .v5-escenario[data-tramo="1"] .an-autor, .v5-eleccion__t { display: none; }
-  .v5-escenario[data-tramo="1"] .v5-texto { gap: 0.3rem; }
-  .v5-escenario[data-tramo="1"] .an-principal { font-size: 0.9rem; line-height: 1.38; }
-  .v5-eleccion { background: var(--c-bg); padding-top: 0.35rem; }
+  .v5-escenario:has(.an-guia):not(:has(.v5-eleccion)) { --v5-pie: 4.9rem; }
+  .v5-escenario:has(.v5-eleccion) .an-guia { display: none; }
 }
 
 /* Modo cinematográfico: se retiran los paneles editoriales, los mandos manuales y el menú de tramos (display: none:
@@ -315,3 +303,72 @@
   .v5-cine-zona { right: auto; top: var(--an-cab); bottom: var(--v5-pie); width: min(34rem, 44%); padding-left: max(var(--mf-gutter), env(safe-area-inset-left)); }
 }
 @media (prefers-reduced-motion: reduce) { .v5-cine-fin { animation: none; } }
+
+/* ── V6.3 · Móvil vertical: hoja inferior (mandos + texto) anclada al pie ──
+   La escena conserva su ventana; la hoja mide lo que mide su contenido (hasta un máximo) y se apoya sobre el pie. Así no queda un hueco bajo un texto
+   corto, la elección del prólogo nunca tapa el párrafo (el cuerpo desplazable termina donde empieza la elección) y los mandos van separados del texto. */
+.v5-hoja, .v5-texto__cuerpo { display: contents; }
+@media (max-width: 55.99rem) and (min-height: 32.01rem) {
+  /* Zona segura inferior de iOS (indicador de inicio) que el pie ya absorbe en su relleno pero --v5-pie no cuenta */
+  .v5-escenario { --v5-zona-baja: max(0px, calc(env(safe-area-inset-bottom, 0px) - 0.4rem)); }
+  .v5-hoja {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--v5-pie) + var(--v5-zona-baja, 0px));
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    max-height: min(56%, calc(100% - var(--v5-pie) - var(--an-cab) - 9rem));
+    background: linear-gradient(to top, var(--c-bg) 0, rgb(9 10 13 / 0.94) 82%, rgb(9 10 13 / 0) 100%);
+  }
+  .v5-escenario:has(.an-mas[open]) .v5-hoja { max-height: min(78%, calc(100% - var(--v5-pie) - var(--an-cab) - 3rem)); }
+  /* Los mandos van al fondo de la hoja (zona del pulgar) y no se mueven aunque el texto cambie de longitud; solo el texto crece hacia arriba */
+  .v5-hoja > .v5-mando { position: relative; top: auto; right: auto; bottom: auto; width: auto; order: 1; flex: none; padding-top: 0.5rem; background: transparent; border-top: 1px solid var(--c-line); }
+  .v5-hoja > .v5-texto {
+    position: relative;
+    inset: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    padding: 0.5rem var(--mf-gutter) 0.45rem;
+    animation: none;
+  }
+  .v5-hoja .v5-texto__cuerpo {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-accent) transparent;
+    /* margen de cortesía: el recorte del desplazamiento no debe comerse el anillo de foco (2 px + 3 px de separación) */
+    padding: 0.4rem 0.4rem 0.4rem;
+    margin: -0.4rem -0.4rem 0;
+  }
+  .v5-hoja .v5-eleccion { position: static; flex: none; padding: 0.55rem 0 0.2rem; background: none; }
+  /* Prólogo: la pintura conserva al menos ~9,5 rem visibles por encima de la hoja (la cabecera del sitio ocupa 7,4 rem); si el texto no cabe, solo su cuerpo se desplaza y la elección queda siempre a la vista */
+  .v5-escenario[data-tramo="1"] .v5-hoja { max-height: calc(100% - var(--v5-pie) - 7.4rem - 9.5rem); }
+}
+@media (max-width: 55.99rem) and (max-height: 44rem) and (min-height: 32.01rem) {
+  .v5-eleccion__t { display: none; }
+  .v5-hoja .v5-eleccion { padding-top: 0.4rem; }
+}
+
+/* ── V6.3 · Cinematográfico en móvil vertical ──
+   Sin texto ni mandos, la escena ocupa todo el espacio útil: desde el borde superior (o la zona segura) hasta la barra de reproducción. La cámara se
+   encuadra sobre esa ventana (centro y zoom propios, ver ZOOM_CINE / LIBRE_CINE en EscenaV5); los títulos pasan a la parte baja, sobre la escena. */
+@media (max-width: 55.99rem) and (min-height: 32.01rem) {
+  .v5-escenario[data-modo="cine"] .v5-ventana { top: max(0.5rem, env(safe-area-inset-top)); height: auto; bottom: calc(var(--v5-pie) + var(--v5-zona-baja, 0px)); }
+  .v5-escenario[data-modo="cine"] .v5-cine-zona { top: auto; align-content: end; bottom: calc(var(--v5-pie) + var(--v5-zona-baja, 0px) + 1rem); }
+  .v5-escenario[data-modo="cine"] .v5-cine-fin { padding: 0.9rem 1rem; border-radius: 1rem; background: rgb(9 10 13 / 0.82); }
+  .v5-escenario[data-modo="cine"] .v5-cine-zona:has(.v5-cine-fin) { top: 40%; bottom: calc(var(--v5-pie) + var(--v5-zona-baja, 0px) + 1.5rem); align-content: center; }
+}
+@media (max-width: 24rem) and (min-height: 32.01rem) {
+  .v5-escenario[data-modo="cine"] { --v5-pie: 4.9rem; }
+}

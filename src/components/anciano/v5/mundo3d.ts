@@ -289,6 +289,9 @@ export type Acto = {
   t: number;
   /** Reposo ambiental: solo cambia `t` respecto al fotograma anterior, así que puede reutilizarse la capa estática */
   amb?: boolean;
+  /** Encuadre móvil del cine (sin texto ni mandos): zoom sobre la distancia de cámara y fracción de la escena libre para el compás del epílogo (0 = la de exploración) */
+  zoom?: number;
+  libre?: number;
   /** Reposo ambiental: en este fotograma también se refresca la capa lenta (velos, rayos, halos que respiran) */
   lenta?: boolean;
 };
@@ -478,7 +481,9 @@ export function pintarActo(m: Mundo, e: Acto) {
   if (e.d > 0) e.abre = mezcla(e.abre, EPI.abre, suave(e.d / 0.4));
   const { w, h, a, b } = e;
   const ee = suave((a - 0.1) / 0.7);
-  const sF = clamp((0.56 * Math.min(w, h)) / (e.R * 2.0), 0.1, 0.8);
+  // Zoom móvil: entra poco a poco al empezar el Acto II (el Acto I conserva su encuadre) y se mantiene hasta el Acto III
+  const zEff = 1 + ((e.zoom || 1) - 1) * suave(b / 0.25);
+  const sF = clamp(((0.56 * Math.min(w, h)) / (e.R * 2.0)) * zEff, 0.1, 0.8);
   const dist1 = e.f / sF;
   const cam: Cam = {
     tx: mezcla(0, e.c0x, ee),
@@ -519,11 +524,13 @@ export function pintarActo(m: Mundo, e: Acto) {
     // Distancia final: que el compás entero (unas seis medidas de alto) quepa en la parte libre de la escena
     // (el texto va debajo de la escena en anchos < 896 px salvo en apaisado bajo)
     const apilado = e.w < 896 && !(e.w > e.h && e.h <= 512);
-    const libre = apilado ? (e.h <= 704 ? 0.36 : 0.42) * e.h : (e.h <= 512 ? 0.62 : 0.8) * e.h;
+    const libre = apilado ? (e.libre || (e.h <= 704 ? 0.36 : 0.42)) * e.h : (e.h <= 512 ? 0.62 : 0.8) * e.h;
     const fin = clamp((0.28 * Math.min(e.w, e.h)) / (libre / 5.6), 1.4, 3.4);
     yaw = ee(0.42, 0.4, 0.5, EPI.yaw);
     pitch = ee(0.18, 0.16, 0.18, EPI.pitch);
-    cam.dist = dist1 * ee(1, 0.76 * fin, fin, fin * 0.98);
+    // El zoom móvil solo rige hasta el Acto III: la composición final del epílogo (el compás entero) se calcula sin él
+    const zz = zEff;
+    cam.dist = dist1 * ee(1, 0.76 * fin * zz, fin * zz, fin * 0.98 * zz);
     cam.tz = e.R * ee(2.0, 1.8, EPI.mira[2], EPI.mira[2]);
     const kt = suave(e.d / 0.55), cth = Math.cos(e.th0), sth = Math.sin(e.th0);
     cam.tx = e.c0x + kt * e.R * (EPI.mira[0] * cth - EPI.mira[1] * sth);
