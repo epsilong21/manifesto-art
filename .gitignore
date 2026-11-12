@@ -65,3 +65,6 @@ presentation-review/**/*.png
 
 # Tema de Shopify generado (npm run shopify:empaquetar)
 /shopify-tema/
+
+# Bacon: la reproducción de Crucifixion (1933) está protegida y no entra en Git (ver CuadroBacon.tsx)
+/public/bacon/crucifixion-1933.*

@@ -1,0 +1,220 @@
+/* Crucifixion (Bacon, 1933) · «La materia del sacrificio». Oscuro, mate, sin brillo de interfaz. */
+.theme-bacon {
+  --c-bg: #090605;
+  --c-deep: #1a0d0a;
+  --c-accent: #c8955a; /* ámbar sucio: kickers y foco */
+  --c-sangre: #7d2a24; /* carmesí seco: solo líneas y marcas */
+  --c-ink: #e6dac5; /* hueso */
+  --c-muted: #aa9e8c;
+  --c-line: rgb(230 218 197 / 0.16);
+  --f-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+html:has(.theme-bacon) { background: #090605; }
+.theme-bacon :where(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; }
+
+.bc-kicker { margin: 0; font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent); overflow-wrap: anywhere; }
+
+/* ── Prólogo: la pintura ── */
+.bc-hero { display: grid; gap: 1.5rem; padding: clamp(1.25rem, 4vw, 3rem) var(--mf-gutter) clamp(2rem, 5vw, 3.5rem); }
+.bc-hero__fig { margin: 0; justify-self: center; display: grid; gap: 0.7rem; max-width: 100%; }
+.bc-hero__img {
+  display: block;
+  width: min(100%, calc(62svh * 485 / 620), 26rem);
+  height: auto;
+  aspect-ratio: 485 / 620;
+  box-shadow: 0 0 5rem rgb(0 0 0 / 0.7), 0 0 0 1px var(--c-line);
+}
+.bc-hero figcaption { font-size: 0.8125rem; color: var(--c-muted); text-align: center; max-width: 30rem; margin-inline: auto; }
+.bc-hero__texto { display: grid; gap: 1rem; justify-items: start; max-width: 38rem; }
+.bc-hero h1 { margin: 0; font-size: clamp(2.8rem, 1.2rem + 7vw, 6.5rem); line-height: 0.95; letter-spacing: -0.015em; text-wrap: balance; }
+.bc-lede { margin: 0; font-size: clamp(1.05rem, 1rem + 0.4vw, 1.25rem); color: var(--c-muted); line-height: 1.55; }
+.bc-ficha { margin: 0; display: grid; gap: 0.35rem; font-size: 0.9375rem; width: 100%; }
+.bc-ficha div { display: grid; grid-template-columns: 6rem 1fr; gap: 0.75rem; padding-block: 0.4rem; border-top: 1px solid var(--c-line); }
+.bc-ficha dt { color: var(--c-muted); }
+.bc-ficha dd { margin: 0; }
+.bc-bajar { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--c-accent); text-decoration: none; border-bottom: 1px solid currentColor; }
+@media (min-width: 56rem) {
+  .bc-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 28rem); align-items: center; gap: clamp(2rem, 5vw, 5rem); min-height: calc(100svh - 5rem); }
+  .bc-hero__img { width: min(100%, calc(76svh * 485 / 620), 30rem); justify-self: end; }
+  .bc-hero__fig { justify-self: end; }
+}
+
+/* Marcador de posición: nunca se hace pasar por la pintura */
+.bc-marcador {
+  display: grid; align-content: center; justify-items: center; gap: 0.6rem; text-align: center; padding: 1.5rem;
+  background: radial-gradient(ellipse 70% 60% at 50% 35%, #1d1210, #0b0706 75%);
+  color: var(--c-muted);
+}
+.bc-marcador__t { font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-accent); }
+.bc-marcador__p { font-family: var(--f-display); font-size: 1.15rem; line-height: 1.3; max-width: 14rem; }
+
+/* ── Documentado ── */
+.bc-doc { padding: 0 var(--mf-gutter) clamp(2.5rem, 6vw, 4rem); max-width: 54rem; margin-inline: auto; display: grid; gap: 0.75rem; }
+.bc-doc ul { margin: 0 0 1.25rem; padding-left: 1.1rem; display: grid; gap: 0.7rem; line-height: 1.6; max-width: var(--mf-measure); }
+.bc-doc li::marker { color: var(--c-sangre); }
+.bc-etiqueta { margin: 0; font-family: inherit !important; font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500 !important; color: var(--c-muted); }
+.bc-etiqueta--doc { color: var(--c-ink); }
+.bc-etiqueta--doc::before, .bc-etiqueta--int::before { content: ""; display: inline-block; width: 0.55rem; height: 0.55rem; margin-right: 0.6rem; background: var(--c-ink); }
+.bc-etiqueta--int::before { background: transparent; border: 1px solid var(--c-sangre); }
+
+/* ── Umbral hacia la interpretación ── */
+.bc-umbral {
+  display: grid; gap: 0.35rem; justify-items: center; text-align: center;
+  padding: clamp(3rem, 8vw, 6rem) var(--mf-gutter);
+  background: linear-gradient(#090605, #040302 40%, #040302 60%, #090605);
+  border-block: 1px solid var(--c-line);
+}
+.bc-umbral span { font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-muted); }
+.bc-umbral strong { font-family: var(--f-display); font-weight: 500; font-style: italic; font-size: clamp(1.8rem, 1rem + 4vw, 3.4rem); color: var(--c-accent); text-wrap: balance; }
+
+/* ── Instalación ── */
+.bc-inst { background: #040302; padding: clamp(1.25rem, 3vw, 2.5rem) var(--mf-gutter) clamp(2rem, 4vw, 3rem); display: grid; gap: 1.25rem; grid-template-areas: "cab" "escena" "acto"; }
+.bc-inst__cab { grid-area: cab; display: grid; gap: 0.7rem; align-content: start; }
+.bc-inst__acto { grid-area: acto; display: grid; gap: 0.9rem; align-content: start; }
+.bc-inst__escena { grid-area: escena; display: grid; gap: 0.9rem; min-width: 0; }
+.bc-inst__h { margin: 0; font-size: clamp(1.7rem, 1.1rem + 2.2vw, 2.6rem); line-height: 1.02; text-wrap: balance; }
+
+.bc-actos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+.bc-acto-btn {
+  width: 100%; min-height: 2.75rem; display: flex; align-items: baseline; gap: 0.6rem; padding: 0.5rem 0.7rem; text-align: left;
+  background: transparent; color: var(--c-muted); border: 1px solid var(--c-line); cursor: pointer; font: inherit; font-size: 0.875rem; line-height: 1.2;
+}
+.bc-acto-btn__n { font-family: var(--f-display); font-size: 1.25rem; color: var(--c-accent); }
+.bc-acto-btn__t { display: none; }
+.bc-acto-btn__c { font-size: 0.8125rem; }
+.bc-pista { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 1.1rem; line-height: 1.35; color: var(--c-ink); }
+.bc-pista span { font-family: var(--font-sans); font-style: normal; font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent); margin-right: 0.5rem; }
+.bc-acto-btn[aria-current="step"] { color: var(--c-ink); border-color: var(--c-sangre); background: rgb(125 42 36 / 0.16); }
+@media (hover: hover) { .bc-acto-btn:hover { color: var(--c-ink); border-color: var(--c-muted); } }
+
+.bc-acto__h { margin: 0; font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem); line-height: 1.1; }
+.bc-acto__h span { display: block; font-family: inherit; font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-accent); margin-bottom: 0.25rem; }
+.bc-acto__linea { margin: 0.5rem 0 0.8rem; font-family: var(--f-display); font-style: italic; font-size: 1.2rem; line-height: 1.35; color: var(--c-ink); }
+.bc-acto__ayuda { margin: 0; display: grid; gap: 0.6rem; font-size: 0.9375rem; line-height: 1.5; }
+.bc-acto__ayuda div { display: grid; gap: 0.1rem; padding-left: 0.8rem; border-left: 1px solid var(--c-sangre); }
+.bc-acto__ayuda dt { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted); }
+.bc-acto__ayuda dd { margin: 0; color: var(--c-ink); }
+.bc-inst.is-js .bc-acto:not([data-activo]) { display: none; }
+.bc-acto + .bc-acto { margin-top: 2rem; }
+.bc-inst.is-js .bc-acto + .bc-acto { margin-top: 0; }
+.bc-comprender-link { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--c-accent); }
+
+.bc-lienzo {
+  position: relative; overflow: hidden; background: #050403; border: 1px solid var(--c-line);
+  height: clamp(18rem, 56svh, 34rem); cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+}
+.bc-lienzo:active { cursor: grabbing; }
+.bc-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.bc-sin-gl { position: absolute; inset: 0; background: radial-gradient(ellipse 22% 45% at 50% 48%, #3a2a22, #0c0807 60%, #050403 100%); }
+
+/* Mientras la escena se prepara: composición tipográfica sobre el negro de la sala. Nada simula la escena ni su figura. */
+.bc-inst.is-js .bc-canvas { opacity: 0; transition: opacity 0.6s ease; }
+.bc-inst.is-js .bc-lienzo.is-lista .bc-canvas { opacity: 1; }
+.bc-espera { position: absolute; inset: 0; display: none; place-items: center; padding: 1rem; background: radial-gradient(ellipse 70% 55% at 50% 50%, #0d0907, #050403 75%); cursor: default; }
+.bc-inst.is-js .bc-espera { display: grid; }
+.bc-espera[data-fase="lista"] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.6s ease, visibility 0s 0.6s; }
+.bc-espera__cuerpo { display: grid; justify-items: center; gap: 0.5rem; max-width: 26rem; text-align: center; }
+.bc-espera__k { margin: 0; font-size: 0.6875rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-accent); }
+.bc-espera__t { margin: 0; font-family: var(--f-display); font-style: italic; font-size: clamp(1.35rem, 1rem + 1.6vw, 1.9rem); line-height: 1.2; color: var(--c-ink); text-wrap: balance; }
+.bc-espera__p { margin: 0; font-size: 0.9375rem; color: #d3c3a6; }
+.bc-espera__n { margin: 0.25rem 0 0; font-size: 0.8125rem; line-height: 1.45; color: var(--c-muted); text-wrap: pretty; }
+.bc-espera__hilo { width: 5rem; height: 1px; background: #c8955a; opacity: 0.55; animation: bc-hilo 2.6s ease-in-out infinite; }
+@keyframes bc-hilo { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.7; } }
+.bc-espera__btn { margin-top: 0.4rem; min-height: 2.75rem; padding: 0.5rem 1.1rem; font: inherit; font-size: 0.9375rem; cursor: pointer; background: rgb(125 42 36 / 0.2); color: var(--c-ink); border: 1px solid var(--c-sangre); }
+.bc-espera__btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+@media (hover: hover) { .bc-espera__btn:hover { border-color: var(--c-accent); } }
+/* Sin escena todavía, la luz y la apertura solo guardan el ajuste */
+.bc-inst.is-espera .bc-pad, .bc-inst.is-espera .bc-mando--ap input { opacity: 0.6; }
+.bc-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+@media (max-height: 30rem) { .bc-espera__n { display: none; } }
+
+.bc-mandos { display: grid; grid-template-columns: auto 1fr; gap: 0.9rem 1.25rem; align-items: start; }
+.bc-mando { display: grid; gap: 0.4rem; min-width: 0; }
+.bc-mando__k { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-muted); }
+.bc-mando__ay { font-size: 0.8125rem; color: var(--c-muted); line-height: 1.35; }
+.bc-mando--ap { align-self: stretch; align-content: start; }
+.bc-mando.is-off { opacity: 0.55; }
+.bc-pad {
+  position: relative; width: 7rem; height: 7rem; touch-action: none; cursor: crosshair;
+  background: radial-gradient(circle at 50% 50%, #1b1310, #0a0605 70%); border: 1px solid var(--c-line); border-radius: 50%;
+}
+.bc-pad::before { content: ""; position: absolute; inset: 50% 8% auto 8%; height: 1px; background: var(--c-line); }
+.bc-pad::after { content: ""; position: absolute; inset: 8% auto 8% 50%; width: 1px; background: var(--c-line); }
+.bc-pad__punto {
+  position: absolute; width: 1.1rem; height: 1.1rem; translate: -50% -50%; border-radius: 50%; pointer-events: none;
+  background: #e8c48a; box-shadow: 0 0 1.2rem 0.3rem rgb(232 190 120 / 0.55);
+}
+.bc-pad:focus-visible, .bc-lienzo:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+
+.bc-mando--ap input[type="range"] { width: 100%; height: 2.75rem; margin: 0; accent-color: var(--c-accent); background: transparent; cursor: pointer; }
+.bc-mando--ap input:disabled { cursor: not-allowed; }
+.bc-mando--ap input:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+
+.bc-pasos { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.bc-paso {
+  min-height: 2.75rem; padding: 0.5rem 0.9rem; font: inherit; font-size: 0.9375rem; cursor: pointer;
+  background: transparent; color: var(--c-ink); border: 1px solid var(--c-line);
+}
+.bc-paso--sig { border-color: var(--c-sangre); background: rgb(125 42 36 / 0.2); }
+.bc-paso:disabled { opacity: 0.35; cursor: default; }
+@media (hover: hover) { .bc-paso:not(:disabled):hover { border-color: var(--c-accent); } }
+
+/* Pantallas anchas: texto a la izquierda, escena a la derecha, todo en una altura de pantalla */
+@media (min-width: 56rem) and (min-height: 30rem) {
+  .bc-inst {
+    grid-template-columns: minmax(18rem, 25rem) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "cab escena" "acto escena";
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    min-height: min(100svh, 62rem);
+  }
+  .bc-lienzo { height: auto; min-height: 20rem; }
+  .bc-acto-btn__t { display: inline; }
+  .bc-acto-btn__c { display: none; }
+  .bc-inst__escena { grid-template-rows: 1fr auto auto; }
+  .bc-actos { grid-template-columns: 1fr; }
+  .bc-mandos { grid-template-columns: auto 1fr auto; align-items: center; }
+  .bc-pasos { grid-column: auto; grid-template-columns: auto auto; }
+}
+/* Entre 56 y 80rem la columna de la escena es estrecha: los pasos van en su propia fila */
+@media (min-width: 56rem) and (max-width: 79.99rem) and (min-height: 30rem) {
+  .bc-mandos { grid-template-columns: auto 1fr; }
+  .bc-pasos { grid-column: 1 / -1; }
+}
+/* Móvil en horizontal: el lienzo queda fijo a casi toda la altura; el texto y los mandos pasan por la izquierda */
+@media (min-width: 40rem) and (max-height: 30rem) {
+  .bc-inst {
+    grid-template-columns: minmax(15rem, 22rem) minmax(0, 1fr);
+    grid-template-areas: "cab lienzo" "pista lienzo" "mandos lienzo" "acto lienzo";
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 1.25rem;
+    padding-top: 0.5rem;
+  }
+  .bc-inst__escena { display: contents; }
+  .bc-lienzo { grid-area: lienzo; position: sticky; top: 0.5rem; align-self: start; height: calc(100svh - 1rem); min-height: 0; }
+  .bc-pista { grid-area: pista; font-size: 1rem; }
+  .bc-mandos { grid-area: mandos; grid-template-columns: auto 1fr; gap: 0.5rem 0.9rem; }
+  .bc-pad { width: 5.5rem; height: 5.5rem; }
+  .bc-inst__h { font-size: 1.4rem; }
+  .bc-actos { gap: 0.3rem; }
+}
+
+/* ── Comprender lo que estoy viendo ── */
+.bc-comprender { background: #090605; border-top: 1px solid var(--c-line); padding: 0 var(--mf-gutter); }
+.bc-comprender summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3.5rem; padding-block: 1rem;
+  max-width: 54rem; margin-inline: auto; font-family: var(--f-display); font-size: clamp(1.4rem, 1.1rem + 1.4vw, 2rem);
+}
+.bc-comprender summary::-webkit-details-marker { display: none; }
+.bc-comprender summary::after { content: "+"; font-family: system-ui, sans-serif; font-size: 1.5rem; color: var(--c-accent); }
+.bc-comprender[open] summary::after { content: "−"; }
+.bc-comprender summary:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.bc-comprender__cuerpo { max-width: 54rem; margin-inline: auto; padding-bottom: 3rem; display: grid; gap: 1.4rem; }
+@media (min-width: 48rem) { .bc-comprender__cuerpo { grid-template-columns: 1fr 1fr; gap: 1.6rem 3rem; } }
+.bc-comprender__cuerpo h3 { margin: 0 0 0.3rem; font-size: 0.8125rem !important; font-family: inherit !important; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent); font-weight: 500 !important; }
+.bc-comprender__cuerpo p { margin: 0; line-height: 1.6; color: var(--c-ink); }
+
+/* Sin JS: los tres actos se leen uno tras otro, sin escena */
+@media (prefers-reduced-motion: reduce) {
+  .theme-bacon *, .theme-bacon *::before { transition: none !important; animation: none !important; }
+}
