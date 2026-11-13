@@ -5,6 +5,7 @@ export const FICHA: [string, string][] = [
   ["Título", "Crucifixion"],
   ["Año", "1933"],
   ["Técnica", "Óleo sobre lienzo, 62 × 48,5 cm"],
+  ["Catálogo razonado", "CR 33-01"],
   ["Paradero", "Colección privada (Murderme Collection)"],
 ];
 
@@ -80,6 +81,42 @@ export const ESTADOS_APERTURA = [
   "La materia queda abierta: el cuerpo es ya soporte.",
 ];
 
+/** Instalación I: la aparición (secuencia breve al llegar; se puede saltar y volver a ver). Una frase por momento. */
+export const APARICION = {
+  kicker: "Instalación I",
+  titulo: "La materia del sacrificio",
+  saltar: "Saltar y explorar",
+  volver: "Volver a ver la aparición",
+  momentos: ["Oscuridad.", "Algo cuelga.", "La luz lo encuentra.", "Tiene un adentro.", "La materia se abre.", "Queda la sombra."],
+};
+
+/** Umbral entre las dos instalaciones: el cuerpo se retira y deja su lugar. */
+export const UMBRAL = {
+  lineas: ["El cuerpo se retira.", "Queda el lugar que ocupaba.", "Y su sombra, repartida."],
+};
+
+/** Instalación II. */
+export const NEGATIVO = {
+  kicker: "Instalación II",
+  titulo: "El negativo del cuerpo",
+  linea: "Tres membranas cuelgan ante un muro. Ninguna contiene el cuerpo.",
+  toque: "Arrastra los planos · mira el muro",
+  ayuda: "Arrastra un plano a izquierda o derecha. Con teclado: elige plano (1, 2, 3 o ↑↓) y muévelo con ← →.",
+  aria: "Tres planos suspendidos delante de un muro, iluminados desde abajo. Sus sombras se suman en el muro. Usa las flechas izquierda y derecha para mover el plano elegido; arriba y abajo para cambiar de plano.",
+  planos: ["Delante", "En medio", "Al fondo"],
+  separar: "Separar los planos",
+  encuentro: "Ningún plano lo contiene. Solo su sombra lo reúne.",
+  encuentroSr: "Las tres sombras coinciden: en el muro aparece una figura suspendida.",
+  sinCanvas: "Este navegador no puede dibujar la sala.",
+};
+
+/** Epílogo. */
+export const EPILOGO = {
+  titulo: "La forma que permanece",
+  linea: "No queda el cuerpo. Queda el lugar donde la luz no pudo pasar.",
+  volver: "Volver a la pintura",
+};
+
 export const COMPRENDER = {
   titulo: "Comprender lo que estoy viendo",
   bloques: [
@@ -93,7 +130,7 @@ export const COMPRENDER = {
     },
     {
       k: "Construcción de MANIFESTO",
-      t: "La instalación es nuestra: una masa modelada en volumen y calculada en tiempo real, una lámpara que puedes mover y una materia que se abre. No copia el cuadro ni lo traduce a 3D. No hay cruz: si aparece una, es solo la sombra.",
+      t: "Las dos instalaciones son nuestras. La primera es una masa modelada en volumen y calculada en tiempo real, con una lámpara que puedes mover y una materia que se abre. La segunda son tres membranas cuyas sombras solo forman una figura en una posición concreta. Ninguna copia el cuadro ni lo traduce a 3D. No hay cruz: si aparece una, es solo sombra.",
     },
     {
       k: "El gesto principal",
@@ -104,10 +141,13 @@ export const COMPRENDER = {
 
 export const CREDITOS = {
   imagen:
-    "Crucifixion (1933), Francis Bacon © The Estate of Francis Bacon. All rights reserved. La reproducción no se incluye en el repositorio: mientras no haya licencia, esta ruta usa un marcador de posición.",
-  nota: "Las formas de la instalación son originales de MANIFESTO y no reproducen la pintura. La obra de Bacon está protegida por derechos de autor.",
+    "Crucifixion (1933), Francis Bacon © The Estate of Francis Bacon. All rights reserved. Licencias de reproducción: DACS. La reproducción no se incluye: MANIFESTO no dispone de licencia ni autorización documentada, así que esta página usa un marcador de posición. Este aviso no concede derechos de reproducción ni constituye una excepción de copyright.",
+  nota: "Las obras de terceros pertenecen a sus titulares. Las dos instalaciones, el umbral y el epílogo son interpretaciones independientes y originales de MANIFESTO, inspiradas en la obra y no realizadas ni avaladas por Francis Bacon ni por The Estate of Francis Bacon. Solicitudes de derechos, correcciones y retiradas: manifesto.msto@gmail.com.",
   fuentes: [
-    { label: "The Estate of Francis Bacon: Crucifixion, 1933", href: "https://www.francis-bacon.com/artworks/paintings/1930s" },
+    { label: "The Estate of Francis Bacon: Crucifixion", href: "https://www.francis-bacon.com/artworks/paintings/crucifixion" },
+    { label: "The Estate of Francis Bacon: derechos", href: "https://www.francis-bacon.com/rights" },
+    { label: "DACS: Crucifixion, 1933", href: "https://www.dacs.org.uk/artwork/crucifixion-1933-3569" },
+    { label: "Geist: Crucifixion, 1933 (ficha complementaria)", href: "https://geistmc.com/our-artists/francis-bacon/francis-bacon-originals/early-works/crucifixion-1933/" },
     { label: "Artchive: Crucifixion (1933)", href: "https://www.artchive.com/artwork/crucifixion-francis-bacon-1933/" },
     { label: "Wikipedia: Crucifixion (Francis Bacon, 1933)", href: "https://en.wikipedia.org/wiki/Crucifixion_(Francis_Bacon,_1933)" },
   ],

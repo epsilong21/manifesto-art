@@ -67,12 +67,11 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-umbral span { font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-muted); }
 .bc-umbral strong { font-family: var(--f-display); font-weight: 500; font-style: italic; font-size: clamp(1.8rem, 1rem + 4vw, 3.4rem); color: var(--c-accent); text-wrap: balance; }
 
-/* ── Instalación ── */
-.bc-inst { background: #040302; padding: clamp(1.25rem, 3vw, 2.5rem) var(--mf-gutter) clamp(2rem, 4vw, 3rem); display: grid; gap: 1.25rem; grid-template-areas: "cab" "escena" "acto"; }
-.bc-inst__cab { grid-area: cab; display: grid; gap: 0.7rem; align-content: start; }
-.bc-inst__acto { grid-area: acto; display: grid; gap: 0.9rem; align-content: start; }
-.bc-inst__escena { grid-area: escena; display: grid; gap: 0.9rem; min-width: 0; }
-.bc-inst__h { margin: 0; font-size: clamp(1.7rem, 1.1rem + 2.2vw, 2.6rem); line-height: 1.02; text-wrap: balance; }
+/* ── Instalación I · La materia del sacrificio ── */
+.bc-inst { background: #040302; padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(2rem, 4vw, 3rem); display: grid; gap: 1rem; }
+.bc-inst__cab { padding-inline: var(--mf-gutter); display: grid; gap: 0.45rem; }
+.bc-inst__h, .bc-neg__h { margin: 0; font-size: clamp(2.1rem, 1.2rem + 3.6vw, 3.8rem); line-height: 0.98; letter-spacing: -0.01em; text-wrap: balance; }
+.bc-inst__escena { min-width: 0; }
 
 .bc-actos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
 .bc-acto-btn {
@@ -82,35 +81,61 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-acto-btn__n { font-family: var(--f-display); font-size: 1.25rem; color: var(--c-accent); }
 .bc-acto-btn__t { display: none; }
 .bc-acto-btn__c { font-size: 0.8125rem; }
-.bc-pista { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 1.1rem; line-height: 1.35; color: var(--c-ink); }
-.bc-pista span { font-family: var(--font-sans); font-style: normal; font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent); margin-right: 0.5rem; }
 .bc-acto-btn[aria-current="step"] { color: var(--c-ink); border-color: var(--c-sangre); background: rgb(125 42 36 / 0.16); }
 @media (hover: hover) { .bc-acto-btn:hover { color: var(--c-ink); border-color: var(--c-muted); } }
+.bc-pista { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 1.1rem; line-height: 1.35; color: var(--c-ink); }
+.bc-pista span { font-family: var(--font-sans); font-style: normal; font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent); margin-right: 0.5rem; }
 
-.bc-acto__h { margin: 0; font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem); line-height: 1.1; }
-.bc-acto__h span { display: block; font-family: inherit; font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-accent); margin-bottom: 0.25rem; }
-.bc-acto__linea { margin: 0.5rem 0 0.8rem; font-family: var(--f-display); font-style: italic; font-size: 1.2rem; line-height: 1.35; color: var(--c-ink); }
-.bc-acto__ayuda { margin: 0; display: grid; gap: 0.6rem; font-size: 0.9375rem; line-height: 1.5; }
+.bc-acto__linea { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 1.15rem; line-height: 1.4; color: var(--c-ink); }
+.bc-acto__linea span { display: block; font-family: var(--font-sans); font-style: normal; font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-accent); margin-bottom: 0.2rem; }
+.bc-acto__mas summary { cursor: pointer; min-height: 2.75rem; display: flex; align-items: center; font-size: 0.8125rem; letter-spacing: 0.06em; color: var(--c-muted); }
+.bc-acto__mas summary:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.bc-acto__ayuda { margin: 0.2rem 0 0; display: grid; gap: 0.6rem; font-size: 0.9375rem; line-height: 1.5; }
 .bc-acto__ayuda div { display: grid; gap: 0.1rem; padding-left: 0.8rem; border-left: 1px solid var(--c-sangre); }
 .bc-acto__ayuda dt { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted); }
 .bc-acto__ayuda dd { margin: 0; color: var(--c-ink); }
 .bc-inst.is-js .bc-acto:not([data-activo]) { display: none; }
-.bc-acto + .bc-acto { margin-top: 2rem; }
+.bc-acto + .bc-acto { margin-top: 1.5rem; }
 .bc-inst.is-js .bc-acto + .bc-acto { margin-top: 0; }
 .bc-comprender-link { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--c-accent); }
 
+/* El escenario: a sangre en móvil, la forma manda */
 .bc-lienzo {
-  position: relative; overflow: hidden; background: #050403; border: 1px solid var(--c-line);
-  height: clamp(18rem, 56svh, 34rem); cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  position: relative; overflow: hidden; background: #030202;
+  height: clamp(24rem, 76svh, 46rem); cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none;
 }
 .bc-lienzo:active { cursor: grabbing; }
-.bc-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.bc-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  transform: translateY(var(--enc-y, 0%)) scale(var(--enc-s, 1)); transform-origin: 50% 44%;
+  transition: transform var(--enc-t, 0ms) cubic-bezier(0.45, 0, 0.2, 1), opacity 0.6s ease;
+}
 .bc-sin-gl { position: absolute; inset: 0; background: radial-gradient(ellipse 22% 45% at 50% 48%, #3a2a22, #0c0807 60%, #050403 100%); }
+/* La aparición: franjas de cine que se abren al terminar, y una frase por momento */
+.bc-lienzo::before, .bc-lienzo::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 0; background: #000; z-index: 2; pointer-events: none;
+  transition: height 1.2s cubic-bezier(0.45, 0, 0.2, 1);
+}
+.bc-lienzo::before { top: 0; }
+.bc-lienzo::after { bottom: 0; }
+.bc-inst[data-cine="corriendo"] .bc-lienzo::before, .bc-inst[data-cine="corriendo"] .bc-lienzo::after { height: 8%; }
+.bc-cine__momento {
+  position: absolute; left: 1rem; right: 1rem; bottom: 11%; margin: 0; z-index: 3; text-align: center; pointer-events: none;
+  font-family: var(--f-display); font-style: italic; font-size: clamp(1.35rem, 1rem + 1.8vw, 2.3rem); color: var(--c-ink);
+  text-shadow: 0 0 1.6rem #000, 0 0 0.4rem #000; animation: bc-momento 1.6s ease both;
+}
+@keyframes bc-momento { from { opacity: 0; translate: 0 0.5rem; } to { opacity: 1; translate: 0 0; } }
+.bc-cine__saltar {
+  position: absolute; top: calc(8% + 0.6rem); right: 0.75rem; z-index: 4; min-height: 2.75rem; padding: 0.4rem 0.9rem;
+  font: inherit; font-size: 0.8125rem; letter-spacing: 0.04em; cursor: pointer; background: rgb(4 3 2 / 0.6); color: var(--c-ink); border: 1px solid var(--c-line);
+}
+.bc-cine__saltar:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+@media (hover: hover) { .bc-cine__saltar:hover { border-color: var(--c-accent); } }
 
 /* Mientras la escena se prepara: composición tipográfica sobre el negro de la sala. Nada simula la escena ni su figura. */
-.bc-inst.is-js .bc-canvas { opacity: 0; transition: opacity 0.6s ease; }
+.bc-inst.is-js .bc-canvas { opacity: 0; }
 .bc-inst.is-js .bc-lienzo.is-lista .bc-canvas { opacity: 1; }
-.bc-espera { position: absolute; inset: 0; display: none; place-items: center; padding: 1rem; background: radial-gradient(ellipse 70% 55% at 50% 50%, #0d0907, #050403 75%); cursor: default; }
+.bc-espera { position: absolute; inset: 0; z-index: 5; display: none; place-items: center; padding: 1rem; background: radial-gradient(ellipse 70% 55% at 50% 50%, #0d0907, #050403 75%); cursor: default; }
 .bc-inst.is-js .bc-espera { display: grid; }
 .bc-espera[data-fase="lista"] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.6s ease, visibility 0s 0.6s; }
 .bc-espera__cuerpo { display: grid; justify-items: center; gap: 0.5rem; max-width: 26rem; text-align: center; }
@@ -123,11 +148,14 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-espera__btn { margin-top: 0.4rem; min-height: 2.75rem; padding: 0.5rem 1.1rem; font: inherit; font-size: 0.9375rem; cursor: pointer; background: rgb(125 42 36 / 0.2); color: var(--c-ink); border: 1px solid var(--c-sangre); }
 .bc-espera__btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
 @media (hover: hover) { .bc-espera__btn:hover { border-color: var(--c-accent); } }
-/* Sin escena todavía, la luz y la apertura solo guardan el ajuste */
 .bc-inst.is-espera .bc-pad, .bc-inst.is-espera .bc-mando--ap input { opacity: 0.6; }
 .bc-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 @media (max-height: 30rem) { .bc-espera__n { display: none; } }
 
+/* Mandos: debajo de la escena, discretos; durante la aparición se apagan un poco (siguen disponibles) */
+.bc-inst__panel { padding-inline: var(--mf-gutter); display: grid; gap: 0.9rem; transition: opacity 0.8s ease; }
+.bc-inst[data-cine="corriendo"] .bc-inst__panel { opacity: 0.4; }
+.bc-inst[data-cine="corriendo"] .bc-inst__panel:focus-within { opacity: 1; }
 .bc-mandos { display: grid; grid-template-columns: auto 1fr; gap: 0.9rem 1.25rem; align-items: start; }
 .bc-mando { display: grid; gap: 0.4rem; min-width: 0; }
 .bc-mando__k { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-muted); }
@@ -135,7 +163,7 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-mando--ap { align-self: stretch; align-content: start; }
 .bc-mando.is-off { opacity: 0.55; }
 .bc-pad {
-  position: relative; width: 7rem; height: 7rem; touch-action: none; cursor: crosshair;
+  position: relative; width: 6.5rem; height: 6.5rem; touch-action: none; cursor: crosshair;
   background: radial-gradient(circle at 50% 50%, #1b1310, #0a0605 70%); border: 1px solid var(--c-line); border-radius: 50%;
 }
 .bc-pad::before { content: ""; position: absolute; inset: 50% 8% auto 8%; height: 1px; background: var(--c-line); }
@@ -144,12 +172,10 @@ html:has(.theme-bacon) { background: #090605; }
   position: absolute; width: 1.1rem; height: 1.1rem; translate: -50% -50%; border-radius: 50%; pointer-events: none;
   background: #e8c48a; box-shadow: 0 0 1.2rem 0.3rem rgb(232 190 120 / 0.55);
 }
-.bc-pad:focus-visible, .bc-lienzo:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
-
+.bc-pad:focus-visible, .bc-lienzo:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -2px; }
 .bc-mando--ap input[type="range"] { width: 100%; height: 2.75rem; margin: 0; accent-color: var(--c-accent); background: transparent; cursor: pointer; }
 .bc-mando--ap input:disabled { cursor: not-allowed; }
 .bc-mando--ap input:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
-
 .bc-pasos { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .bc-paso {
   min-height: 2.75rem; padding: 0.5rem 0.9rem; font: inherit; font-size: 0.9375rem; cursor: pointer;
@@ -158,45 +184,172 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-paso--sig { border-color: var(--c-sangre); background: rgb(125 42 36 / 0.2); }
 .bc-paso:disabled { opacity: 0.35; cursor: default; }
 @media (hover: hover) { .bc-paso:not(:disabled):hover { border-color: var(--c-accent); } }
+.bc-volver {
+  grid-column: 1 / -1; justify-self: start; min-height: 2.75rem; padding: 0; font: inherit; font-size: 0.875rem; cursor: pointer;
+  background: transparent; border: 0; color: var(--c-accent); text-decoration: underline; text-underline-offset: 0.3em; text-decoration-thickness: 1px;
+}
+.bc-volver:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
 
-/* Pantallas anchas: texto a la izquierda, escena a la derecha, todo en una altura de pantalla */
-@media (min-width: 56rem) and (min-height: 30rem) {
-  .bc-inst {
-    grid-template-columns: minmax(18rem, 25rem) minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
-    grid-template-areas: "cab escena" "acto escena";
-    column-gap: clamp(1.5rem, 3vw, 3rem);
-    min-height: min(100svh, 62rem);
+@media (min-width: 56rem) {
+  .bc-lienzo { height: min(86svh, 56rem); margin-inline: var(--mf-gutter); border: 1px solid var(--c-line); }
+  .bc-inst__panel {
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 30rem); grid-template-areas: "actos mandos" "pista mandos" "acto mandos";
+    column-gap: clamp(2rem, 4vw, 4rem); align-items: start;
   }
-  .bc-lienzo { height: auto; min-height: 20rem; }
+  .bc-actos { grid-area: actos; }
+  .bc-pista { grid-area: pista; }
+  .bc-mandos { grid-area: mandos; }
+  .bc-inst__acto { grid-area: acto; }
   .bc-acto-btn__t { display: inline; }
   .bc-acto-btn__c { display: none; }
-  .bc-inst__escena { grid-template-rows: 1fr auto auto; }
-  .bc-actos { grid-template-columns: 1fr; }
-  .bc-mandos { grid-template-columns: auto 1fr auto; align-items: center; }
-  .bc-pasos { grid-column: auto; grid-template-columns: auto auto; }
 }
-/* Entre 56 y 80rem la columna de la escena es estrecha: los pasos van en su propia fila */
-@media (min-width: 56rem) and (max-width: 79.99rem) and (min-height: 30rem) {
-  .bc-mandos { grid-template-columns: auto 1fr; }
-  .bc-pasos { grid-column: 1 / -1; }
-}
-/* Móvil en horizontal: el lienzo queda fijo a casi toda la altura; el texto y los mandos pasan por la izquierda */
+/* Móvil en horizontal: la escena casi a pantalla completa */
 @media (min-width: 40rem) and (max-height: 30rem) {
-  .bc-inst {
-    grid-template-columns: minmax(15rem, 22rem) minmax(0, 1fr);
-    grid-template-areas: "cab lienzo" "pista lienzo" "mandos lienzo" "acto lienzo";
-    grid-template-rows: auto auto auto 1fr;
-    column-gap: 1.25rem;
-    padding-top: 0.5rem;
-  }
-  .bc-inst__escena { display: contents; }
-  .bc-lienzo { grid-area: lienzo; position: sticky; top: 0.5rem; align-self: start; height: calc(100svh - 1rem); min-height: 0; }
-  .bc-pista { grid-area: pista; font-size: 1rem; }
-  .bc-mandos { grid-area: mandos; grid-template-columns: auto 1fr; gap: 0.5rem 0.9rem; }
+  .bc-lienzo { height: calc(100svh - 1rem); }
+  .bc-canvas { scale: 0.86; translate: 0 3%; -webkit-mask-image: radial-gradient(ellipse 70% 78% at 50% 50%, #000 62%, transparent 100%); mask-image: radial-gradient(ellipse 70% 78% at 50% 50%, #000 62%, transparent 100%); }
   .bc-pad { width: 5.5rem; height: 5.5rem; }
-  .bc-inst__h { font-size: 1.4rem; }
-  .bc-actos { gap: 0.3rem; }
+}
+
+/* ── Umbral · Lo que desaparece (progreso de desplazamiento en --p) ── */
+.bc-paso-umbral { --p: 0.5; position: relative; height: 240svh; background: #040302; }
+.bc-paso-umbral__fijo { position: sticky; top: 0; height: 100svh; overflow: hidden; background: linear-gradient(#0b0806, #080605 70%, #050403); }
+.bc-paso-umbral__sala { position: absolute; inset: 0; }
+/* La sala no se apaga: la luz de arriba (la de la Instalación I) cede a la del suelo (la de la II) */
+.bc-paso-umbral__arriba {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 55% 50% at 50% 30%, rgb(160 118 84 / 0.2), transparent 72%);
+  opacity: clamp(0, calc(1 - var(--p) * 1.5), 1);
+}
+.bc-paso-umbral__luz {
+  position: absolute; inset: auto 0 0 0; height: 82%;
+  background: radial-gradient(ellipse 55% 70% at 50% 100%, rgb(222 146 76 / 0.4), rgb(130 66 34 / 0.13) 45%, transparent 76%);
+  opacity: clamp(0, calc((var(--p) - 0.3) * 1.8), 1);
+}
+.bc-paso-umbral__suelo {
+  position: absolute; left: 0; right: 0; top: 82%; bottom: 0;
+  background: linear-gradient(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.6)); border-top: 1px solid rgb(214 196 168 / 0.14);
+  opacity: clamp(0, calc((var(--p) - 0.35) * 2), 1);
+}
+/* La forma se hunde y se borra; su huella queda: el mismo contorno, pálido */
+.bc-paso-umbral__forma, .bc-paso-umbral__marca { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: contain; transform-origin: 50% 40%; }
+.bc-paso-umbral__forma {
+  opacity: clamp(0, calc(1 - var(--p) * 2.2), 0.95);
+  transform: translateY(calc(var(--p) * 7%)) scale(calc(1 - var(--p) * 0.08), calc(1 - var(--p) * 0.02));
+  filter: blur(calc(var(--p) * 14px)) brightness(calc(1 - var(--p) * 1.1));
+}
+.bc-paso-umbral__marca {
+  mix-blend-mode: screen;
+  filter: grayscale(1) sepia(0.45) contrast(1.7) brightness(0.95) blur(calc(5px + var(--p) * 8px));
+  opacity: calc(clamp(0, (var(--p) - 0.1) * 3.5, 1) * clamp(0, (0.92 - var(--p)) * 3, 1) * 0.55);
+}
+.bc-paso-umbral__forma[data-vacia], .bc-paso-umbral__marca[data-vacia] { display: none; }
+.bc-paso-umbral__huella {
+  position: absolute; left: 50%; top: 47%; width: min(48vw, 34svh); aspect-ratio: 0.62; translate: -50% -50%;
+  border-radius: 48% 52% 44% 56% / 38% 40% 60% 62%;
+  background: radial-gradient(ellipse at 50% 45%, rgb(214 196 168 / 0.17), rgb(214 196 168 / 0.05) 55%, transparent 72%);
+  filter: blur(10px);
+  opacity: calc(clamp(0, var(--p) * 3.2, 1) * clamp(0, (1 - var(--p)) * 2.4, 1) * 0.6);
+}
+.bc-paso-umbral__huella[data-sin-imagen] { opacity: calc(clamp(0, var(--p) * 3.2, 1) * clamp(0, (1 - var(--p)) * 2.4, 1)); }
+/* El cable: se acorta, y en su lugar bajan tres hasta la luz; al final asoman tres membranas de canto */
+.bc-paso-umbral__cable {
+  position: absolute; left: 50%; top: 0; width: 1px; background: rgb(214 196 168 / 0.45); box-shadow: 0.4rem 0 0.3rem rgb(0 0 0 / 0.45);
+  height: calc(32% * (1 - clamp(0, (var(--p) - 0.45) * 2.2, 1)));
+}
+.bc-paso-umbral__hilos { --k: clamp(0, calc((var(--p) - 0.42) * 2.4), 1); position: absolute; left: 50%; top: 0; height: calc(30% + var(--k) * 38%); opacity: var(--k); }
+.bc-paso-umbral__hilos i { position: absolute; top: 0; width: 1px; height: 100%; background: linear-gradient(rgb(214 196 168 / 0.5), rgb(232 192 140 / 0.38)); }
+.bc-paso-umbral__hilos i:nth-child(1) { translate: calc(var(--k) * -1 * min(14vw, 9rem)) 0; height: 92%; }
+.bc-paso-umbral__hilos i:nth-child(3) { translate: calc(var(--k) * min(12vw, 8rem)) 0; height: 84%; }
+.bc-paso-umbral__hilos i::after {
+  content: ""; position: absolute; left: -3px; top: 100%; width: 7px; height: 4.5rem; border-radius: 2px 2px 45% 45%;
+  background: linear-gradient(rgb(236 206 166 / 0.55), rgb(170 96 54 / 0.2));
+  opacity: clamp(0, calc((var(--p) - 0.64) * 3), 1);
+}
+.bc-paso-umbral__lineas p {
+  --c: calc(0.2 + var(--i) * 0.29);
+  position: absolute; left: var(--mf-gutter); right: var(--mf-gutter); top: 74%; margin: 0; text-align: center;
+  font-family: var(--f-display); font-style: italic; font-size: clamp(1.45rem, 1rem + 2.2vw, 2.6rem); line-height: 1.15; color: var(--c-ink); text-wrap: balance;
+  text-shadow: 0 0 1.2rem #000;
+  opacity: calc(clamp(0, (var(--p) - var(--c) + 0.16) * 6, 1) * clamp(0, (var(--c) + 0.16 - var(--p)) * 6, 1));
+}
+
+/* ── Instalación II · El negativo del cuerpo ── */
+.bc-neg { background: #040302; padding: clamp(1.5rem, 4vw, 3rem) 0 clamp(2rem, 4vw, 3rem); display: grid; gap: 1rem; }
+.bc-neg__cab { padding-inline: var(--mf-gutter); display: grid; gap: 0.45rem; max-width: 46rem; }
+.bc-neg__linea { margin: 0; font-family: var(--f-display); font-style: italic; font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem); line-height: 1.35; color: var(--c-muted); }
+.bc-neg__escena {
+  position: relative; overflow: hidden; outline: none;
+  height: clamp(26rem, 138vw, 84svh); max-height: 52rem;
+  background: radial-gradient(ellipse 60% 55% at 52% 100%, #2a1a10, #0b0706 60%, #050403);
+}
+.bc-neg__escena:focus-visible { box-shadow: inset 0 0 0 2px var(--c-accent); }
+.bc-neg__canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.4s ease; touch-action: pan-y; }
+.bc-neg__escena.is-lista .bc-neg__canvas { opacity: 1; }
+.bc-neg__canvas.is-sobre { cursor: grab; }
+.bc-neg__canvas.is-arrastre { cursor: grabbing; }
+.bc-neg__toque {
+  position: absolute; left: 50%; bottom: 1rem; translate: -50% 0; margin: 0; pointer-events: none; white-space: nowrap;
+  font-size: 0.6875rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(230 218 197 / 0.72); transition: opacity 0.9s ease;
+}
+.bc-neg__toque[data-oculto] { opacity: 0; }
+.bc-neg__encuentro {
+  position: absolute; left: 1rem; right: 1rem; bottom: 1.1rem; margin: 0; text-align: center; pointer-events: none;
+  font-family: var(--f-display); font-style: italic; font-size: clamp(1.15rem, 1rem + 1vw, 1.7rem); line-height: 1.25; color: var(--c-ink); text-wrap: balance;
+  text-shadow: 0 0 1.4rem #000, 0 0 0.4rem #000; opacity: 0; translate: 0 0.5rem; transition: opacity 1.4s ease 0.35s, translate 1.4s ease 0.35s;
+}
+.bc-neg[data-alineado] .bc-neg__encuentro { opacity: 1; translate: 0 0; }
+.bc-neg__sin { position: absolute; inset: auto 1rem 1rem; margin: 0; text-align: center; color: var(--c-muted); }
+.bc-neg__mandos { padding-inline: var(--mf-gutter); display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; }
+.bc-neg__planos { display: flex; gap: 0.35rem; }
+.bc-neg__plano, .bc-neg__separar {
+  min-height: 2.75rem; padding: 0.4rem 0.8rem; font: inherit; font-size: 0.8125rem; cursor: pointer;
+  background: transparent; color: var(--c-muted); border: 1px solid var(--c-line);
+}
+.bc-neg__plano[aria-pressed="true"] { color: var(--c-ink); border-color: var(--c-sangre); background: rgb(125 42 36 / 0.16); }
+.bc-neg__plano:focus-visible, .bc-neg__separar:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+@media (hover: hover) { .bc-neg__plano:hover, .bc-neg__separar:hover { color: var(--c-ink); border-color: var(--c-muted); } }
+.bc-neg__ay { margin: 0; flex-basis: 100%; font-size: 0.8125rem; line-height: 1.4; color: var(--c-muted); }
+@media (min-width: 56rem) {
+  .bc-neg__escena { height: min(86svh, 56rem); max-height: none; margin-inline: var(--mf-gutter); border: 1px solid var(--c-line); }
+}
+@media (min-width: 40rem) and (max-height: 30rem) { .bc-neg__escena { height: calc(100svh - 1rem); } }
+
+/* ── Epílogo · La forma que permanece ── */
+.bc-epi { --p: 0.8; position: relative; height: 200svh; background: #040302; }
+.bc-epi__fijo {
+  position: sticky; top: 0; height: 100svh; overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 100%, rgb(214 140 72 / 0.3), rgb(110 60 32 / 0.12) 45%, transparent 75%),
+    linear-gradient(#0a0706, #0e0a08 75%, #070504);
+}
+.bc-epi__suelo { position: absolute; left: 0; right: 0; top: 82%; bottom: 0; background: linear-gradient(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.62)); border-top: 1px solid rgb(214 196 168 / 0.1); }
+/* Las membranas ya no están: quedan sus cables */
+.bc-epi__cables i { position: absolute; top: 0; width: 1px; background: linear-gradient(rgb(214 196 168 / 0.42), rgb(214 196 168 / 0.16)); }
+.bc-epi__cables i:nth-child(1) { left: calc(50% - min(9vw, 6rem)); height: 58%; }
+.bc-epi__cables i:nth-child(2) { left: 50%; height: 52%; }
+.bc-epi__cables i:nth-child(3) { left: calc(50% + min(8vw, 5.5rem)); height: 61%; }
+.bc-epi__muro { position: absolute; left: 50%; top: 40%; width: min(92vw, 70svh); height: auto; translate: -50% -50%; overflow: visible; }
+/* La sombra vuelve nítida, se deshace; queda su negativo, como quemado en el yeso */
+.bc-epi__sombra { fill: #050202; opacity: calc(clamp(0, var(--p) * 4, 1) * clamp(0, (0.52 - var(--p)) * 4, 1) * 0.9); }
+.bc-epi__sombra-difusa { fill: #050202; opacity: calc(clamp(0, (var(--p) - 0.28) * 4, 1) * clamp(0, (0.8 - var(--p)) * 4, 1) * 0.7); }
+.bc-epi__halo { fill: #e8c08a; opacity: calc(clamp(0, (var(--p) - 0.45) * 2.5, 1) * 0.24); }
+.bc-epi__negativo { fill: #ece0c8; opacity: calc(clamp(0, (var(--p) - 0.5) * 2.5, 1) * 0.2); }
+.bc-epi__texto {
+  position: absolute; left: 0; right: 0; bottom: max(1.5rem, 5svh); display: grid; justify-items: center; gap: 0.6rem;
+  padding-inline: var(--mf-gutter); text-align: center; opacity: clamp(0, calc((var(--p) - 0.55) * 3), 1);
+}
+.bc-epi__texto:focus-within { opacity: 1; }
+.bc-epi__h { margin: 0; font-style: italic; font-size: clamp(1.9rem, 1.2rem + 3vw, 3.4rem); line-height: 1; text-wrap: balance; }
+.bc-epi__texto p { margin: 0; max-width: 30rem; font-family: var(--f-display); font-size: clamp(1.05rem, 1rem + 0.5vw, 1.3rem); line-height: 1.4; color: var(--c-muted); text-wrap: balance; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bc-paso-umbral { height: auto; }
+  .bc-paso-umbral__fijo { position: relative; height: 80svh; }
+  .bc-paso-umbral__lineas { position: absolute; inset: auto 0 12% 0; display: grid; gap: 0.4rem; }
+  .bc-paso-umbral__lineas p { position: static; opacity: 1; }
+  .bc-epi { height: auto; }
+  .bc-epi__fijo { position: relative; height: 100svh; }
+  .bc-epi__texto { opacity: 1; }
 }
 
 /* ── Comprender lo que estoy viendo ── */
@@ -218,3 +371,8 @@ html:has(.theme-bacon) { background: #090605; }
 @media (prefers-reduced-motion: reduce) {
   .theme-bacon *, .theme-bacon *::before { transition: none !important; animation: none !important; }
 }
+
+/* Aviso de derechos y contacto, antes del pie */
+.bc-derechos { background: #090605; border-top: 1px solid var(--c-line); padding: 1.25rem var(--mf-gutter); }
+.bc-derechos p { margin: 0 auto; max-width: 54rem; font-size: 0.875rem; line-height: 1.6; color: var(--c-muted); overflow-wrap: anywhere; }
+.bc-derechos a { color: var(--c-accent); text-underline-offset: 0.2em; display: inline-block; min-height: 1.5rem; }

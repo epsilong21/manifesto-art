@@ -87,6 +87,16 @@ Protegida por derechos de autor hasta el 1 de enero de 2059. © The Estate of Je
 - **Sin licencia:** **no hay autorización de The Estate of Jean-Michel Basquiat ni de Artestar**, ni del MoMA para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y así se indica en la página. Se retirará si lo pide el titular de los derechos, o se sustituirá por un archivo con licencia si se obtiene.
 - **Capas de MANIFESTO:** la mesa de luz, la fotocopiadora, la ampliación y el Archivo vivo se superponen o se aplican al mostrarla, y no alteran el archivo.
 
+### Crucifixion · Francis Bacon, 1933 · Colección privada (catálogo razonado CR 33-01)
+
+Óleo sobre lienzo, 62 × 48,5 cm. Protegida por derechos de autor. © The Estate of Francis Bacon. Todos los derechos reservados. Licencias de reproducción: DACS, Londres.
+
+- **Reproducción:** **ningún archivo de la pintura está en el repositorio ni en la exportación.** La página muestra un marcador de posición rotulado como tal. MANIFESTO no dispone de licencia ni autorización documentada de The Estate of Francis Bacon, de DACS ni del propietario de la obra, y nada de lo aquí escrito concede derechos de reproducción.
+- **Referencia local (no publicada):** para revisión se probó la rendición de 260 × 363 px que la [ficha de Geist](https://geistmc.com/our-artists/francis-bacon/francis-bacon-originals/early-works/crucifixion-1933/) publica en su sitio (título, año, óleo sobre lienzo y 62 × 48,5 cm coinciden con la obra; la ficha no da número de catálogo razonado ni procedencia). Su leyenda dice «© The Estate of Francis Bacon. Image reproduced for educational purposes only»: es la reserva de derechos de la Estate y la finalidad de esa galería, **no una licencia para MANIFESTO**; Geist no ha concedido ningún permiso. El archivo vive en `public/bacon/crucifixion-1933.jpg` (ignorado por Git), solo se activa con `NEXT_PUBLIC_BACON_CUADRO=1` y el exportador y el verificador impiden que salga en la exportación pública. Es de baja resolución y no se amplía.
+- **Fuente de la ficha documental:** [The Estate of Francis Bacon](https://www.francis-bacon.com/artworks/paintings/crucifixion), [condiciones de derechos de la Estate](https://www.francis-bacon.com/rights), [DACS](https://www.dacs.org.uk/artwork/crucifixion-1933-3569), [Artchive](https://www.artchive.com/artwork/crucifixion-francis-bacon-1933/) [Geist (ficha complementaria)](https://geistmc.com/our-artists/francis-bacon/francis-bacon-originals/early-works/crucifixion-1933/) y [Wikipedia](https://en.wikipedia.org/wiki/Crucifixion_(Francis_Bacon,_1933)). La relación con Los tres bailarines (Picasso) se presenta en la página como lectura, no como hecho.
+- **Para publicar la imagen:** hace falta una licencia de reproducción de DACS / The Estate of Francis Bacon, o su permiso escrito, y un archivo de resolución suficiente con procedencia documentada. Hasta entonces la imagen no se publica.
+- **Solicitudes de derechos, correcciones y retiradas:** manifesto.msto@gmail.com.
+
 ### Cristo de San Juan de la Cruz · Salvador Dalí, 1951 · Kelvingrove Art Gallery and Museum, Glasgow
 
 Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fundació Gala-Salvador Dalí a través de VEGAP.
@@ -109,6 +119,8 @@ En *Untitled* (Basquiat), la lámina anatómica (rótulos y cotas), las cuatro c
 En *Glenn* (Basquiat), el esquema de la obra, la entrada de escáner, la mesa de luz (los cinco hallazgos, las capas «Figura», «Fondo» y «Gesto», la fotocopiadora y la ampliación), la instalación «Archivo vivo» de las tres lecturas («Retrato», «Máscara», «Archivo»: documentos, letras, pestañas, sellos ficticios, índices y marcas), el expediente y la composición tipográfica del catálogo son creaciones de MANIFESTO. Las piezas de «Archivo vivo» no contienen datos propios: los textos de sus fichas son los de la página, con su fuente. Las descripciones de lo que se ve proceden de textos de terceros y se marcan como Observación; las lecturas marcadas como Interpretación son propuestas de MANIFESTO.
 
 En las páginas 06–09 (*La ascensión al Empíreo*, *El descendimiento de la cruz*, *La loca Meg* y *Los siete pecados capitales*), los recorridos, las zonas, los anillos, las pistas, los filtros de luz y las mediciones son creaciones de MANIFESTO, dibujadas o calculadas sobre la reproducción sin alterar el archivo.
+
+En *Crucifixion* (Bacon), las dos instalaciones («La materia del sacrificio», calculada en tiempo real con WebGL2, y «El negativo del cuerpo», dibujada en Canvas 2D), el umbral, el epílogo y las tres lecturas son creaciones originales de MANIFESTO, generadas con código. Se inspiran en la obra, pero no la reproducen ni la imitan, y no han sido realizadas ni avaladas por Francis Bacon ni por The Estate of Francis Bacon.
 
 En *Cristo de San Juan de la Cruz* (Dalí), el modelo de las dos miradas, la franja de luz entre la sombra y la bahía, la regla de luminosidad y las guías de triángulo, círculo y ejes son creaciones de MANIFESTO, generadas con código y dibujadas aparte, sin alterar el archivo.
 

@@ -48,7 +48,7 @@ for (const r of ["", "conceptos/"]) {
 }
 
 // 2. Nada ajeno al sitio: ni originales (/obras), ni Dante, ni carpetas internas
-const PROHIBIDO = /(barca-de-dante|prototipos|presentation-review|assets-source|qa-reports|\.map$|^obras\/)/;
+const PROHIBIDO = /(^bacon\/|barca-de-dante|prototipos|presentation-review|assets-source|qa-reports|\.map$|^obras\/)/;
 for (const a of archivos) if (PROHIBIDO.test(a)) errores.push(`Archivo no permitido: ${a}`);
 
 // 2b. La pintura de Dalí: variantes presentes si se pidió; la referencia, nunca al publicar

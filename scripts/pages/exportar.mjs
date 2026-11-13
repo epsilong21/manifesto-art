@@ -126,6 +126,8 @@ for (const archivo of OBRAS) {
   }
 }
 rmSync(join(out, "obras"), { recursive: true, force: true });
+// La reproducción de Crucifixion (Bacon) es solo de vista previa local y no tiene licencia: nunca sale en la exportación
+rmSync(join(out, "bacon"), { recursive: true, force: true });
 
 // Next 16.4 antepone basePath a las imágenes Open Graph por archivo aunque
 // metadataBase ya incluya esa ruta (…/manifesto/manifesto/…). Las canónicas

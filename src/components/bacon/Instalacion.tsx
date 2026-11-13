@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ACTOS, ESTADOS_APERTURA } from "@/content/bacon";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { ACTOS, APARICION, ESTADOS_APERTURA } from "@/content/bacon";
+import { guardarHuella } from "./huella";
 import { Arranque, marca, type Estado, type Motor } from "./materiaGL";
 
 type Preset = Estado;
@@ -12,6 +13,8 @@ type Preset = Estado;
  * lista · error · sin-gl.
  */
 type Fase = "inicio" | "preparando" | "manual" | "lista" | "error" | "sin-gl";
+/** La aparición: una secuencia breve la primera vez que la escena está lista y a la vista. */
+type Cine = "no" | "corriendo" | "hecha";
 
 /** La compilación empieza cuando la instalación está a menos de esta distancia de entrar en pantalla (en alturas de pantalla). */
 const ANTICIPO = "250% 0px 250% 0px";
@@ -22,6 +25,24 @@ const PRESETS: Record<string, Preset> = {
   ii: { luzX: -0.6, luzY: 0.3, radio: 1.25, intensidad: 1.5, ambiente: 0.12, apertura: 0.35, tension: 0.6, altar: 0, sombra: 0.9 },
   iii: { luzX: 0.12, luzY: -0.55, radio: 1.35, intensidad: 1.7, ambiente: 0.08, apertura: 0.6, tension: 0.95, altar: 1, sombra: 1 },
 };
+/** Antes de la aparición: la sala a oscuras (la forma ya está ahí, pero nada la ilumina). */
+const OSCURO: Preset = { luzX: 0.85, luzY: -0.9, radio: 0.5, intensidad: 0, ambiente: 0.012, apertura: 0, tension: 0.3, altar: 0, sombra: 0.75 };
+
+/**
+ * La aparición, momento a momento: oscuridad → tensión → aparición → revelación → materia abierta → sombra.
+ * Todo con los parámetros del motor (luz, alcance, apertura, tensión, luz cenital) y el encuadre del lienzo (escala y altura);
+ * el shader no cambia. Dura unos nueve segundos y se puede saltar en cualquier momento.
+ */
+type Momento = { ms: number; estado: Preset; enc: [number, number] };
+const SECUENCIA: Momento[] = [
+  { ms: 1000, estado: OSCURO, enc: [1.42, 5] },
+  { ms: 1600, estado: { ...OSCURO, luzX: 0.78, luzY: -0.72, radio: 0.72, intensidad: 0.55, ambiente: 0.03 }, enc: [1.32, 3.5] },
+  { ms: 1800, estado: { ...PRESETS.i, luzX: 0.04, luzY: 0.92, intensidad: 1.15 }, enc: [1.12, 0.5] },
+  { ms: 1400, estado: { ...PRESETS.ii, apertura: 0.12, luzX: -0.55, luzY: 0.38 }, enc: [1.0, 0] },
+  { ms: 1800, estado: { ...PRESETS.ii, apertura: 0.88, luzX: -0.42, luzY: 0.18, intensidad: 1.6 }, enc: [1.17, -1.5] },
+  { ms: 2000, estado: PRESETS.iii, enc: [1.0, 0] },
+];
+
 const LUZ_MAX = 0.95;
 const DURACION = 1900;
 
@@ -42,13 +63,19 @@ export function Instalacion() {
   const faseRef = useRef<Fase>("inicio");
   const [apertura, setApertura] = useState(PRESETS.ii.apertura);
   const [luzUi, setLuzUi] = useState({ x: PRESETS.i.luzX, y: PRESETS.i.luzY });
+  const [cine, setCine] = useState<Cine>("no");
+  const cineRef = useRef<Cine>("no");
+  const [momento, setMomento] = useState(-1);
+  const [encuadre, setEncuadre] = useState<{ s: number; y: number; ms: number }>({ s: 1, y: 0, ms: 0 });
+  const relojes = useRef<number[]>([]);
+  const aLaVista = useRef(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lienzoRef = useRef<HTMLDivElement>(null);
   const motor = useRef<Motor | null>(null);
-  const actual = useRef<Estado>({ ...PRESETS.i });
-  const objetivo = useRef<Estado>({ ...PRESETS.i });
-  const tween = useRef<{ desde: Estado; t0: number } | null>(null);
+  const actual = useRef<Estado>({ ...OSCURO });
+  const objetivo = useRef<Estado>({ ...OSCURO });
+  const tween = useRef<{ desde: Estado; t0: number; dur: number } | null>(null);
   const luzLibre = useRef(false);
   const raf = useRef(0);
   const rafT = useRef(0);
@@ -60,18 +87,19 @@ export function Instalacion() {
     motor.current?.dibujar(actual.current);
   }, []);
 
-  /** Cuando nada se mueve durante un instante: un único fotograma a resolución completa. */
+  /** Cuando nada se mueve durante un instante: un único fotograma a resolución completa (y su copia para el umbral). */
   const programarFinal = useCallback(() => {
     clearTimeout(asentar.current);
     asentar.current = window.setTimeout(() => {
       if (tween.current || !motor.current || !visible.current) return;
       motor.current.calidad("final");
       dibujar();
+      if (canvasRef.current && actual.current.intensidad > 0.5) guardarHuella(canvasRef.current);
     }, 180);
   }, [dibujar]);
 
   /**
-   * Bajo demanda: un solo fotograma, o los necesarios para terminar la transición entre actos.
+   * Bajo demanda: un solo fotograma, o los necesarios para terminar la transición entre estados.
    * Mientras algo se mueve, a media resolución; al detenerse, programarFinal() repinta a resolución completa.
    */
   const pedir = useCallback(() => {
@@ -86,7 +114,7 @@ export function Instalacion() {
       raf.current = 0;
       const tw = tween.current;
       if (tw) {
-        const k = reducido() ? 1 : limitar((ahora - tw.t0) / DURACION, 0, 1);
+        const k = reducido() ? 1 : limitar((ahora - tw.t0) / tw.dur, 0, 1);
         const e = ease(k);
         const a = actual.current, o = objetivo.current, d = tw.desde;
         (Object.keys(o) as (keyof Estado)[]).forEach((c) => {
@@ -103,8 +131,58 @@ export function Instalacion() {
     raf.current = requestAnimationFrame(paso);
   }, [dibujar, programarFinal]);
 
+  /** Lleva la escena a un estado en `dur` ms (la luz movida a mano se respeta salvo que se pida lo contrario). */
+  const llevar = useCallback((e: Estado, dur: number) => {
+    tween.current = { desde: { ...actual.current }, t0: performance.now(), dur };
+    objetivo.current = { ...e };
+    pedir();
+  }, [pedir]);
+
   const poner = useCallback((f: Fase) => { faseRef.current = f; setFase(f); }, []);
   const prepararRef = useRef<(manual: boolean) => void>(() => {});
+
+  const ponerCine = useCallback((c: Cine) => { cineRef.current = c; setCine(c); }, []);
+  const pararRelojes = () => { relojes.current.forEach(clearTimeout); relojes.current = []; };
+
+  /** La aparición. Cada momento lleva el motor a un estado y mueve el encuadre; al final, el Acto III queda en manos del visitante. */
+  const aparecer = useCallback(() => {
+    if (!motor.current) return;
+    pararRelojes();
+    ponerCine("corriendo");
+    luzLibre.current = false;
+    let t = 0;
+    // al volver a verla, primero se apaga la sala
+    if (actual.current.intensidad > 0.05) { llevar(OSCURO, 700); setEncuadre({ s: 1.42, y: 5, ms: 700 }); t = 750; }
+    SECUENCIA.forEach((m, i) => {
+      relojes.current.push(window.setTimeout(() => {
+        setMomento(i);
+        setEncuadre({ s: m.enc[0], y: m.enc[1], ms: m.ms + 400 });
+        llevar(m.estado, m.ms);
+      }, t));
+      t += m.ms;
+    });
+    relojes.current.push(window.setTimeout(() => {
+      setMomento(-1);
+      setEncuadre({ s: 1, y: 0, ms: 1400 });
+      setActo(2);
+      setApertura(PRESETS.iii.apertura);
+      ponerCine("hecha");
+    }, t + 300));
+  }, [llevar, ponerCine]);
+
+  /** El visitante toma el control: la secuencia se corta donde esté (y si la sala seguía a oscuras, se enciende el Acto I). */
+  const cortarCine = useCallback(() => {
+    if (cineRef.current === "hecha") return;
+    pararRelojes();
+    setMomento(-1);
+    setEncuadre({ s: 1, y: 0, ms: 900 });
+    ponerCine("hecha");
+    if (objetivo.current.intensidad < 0.5) {
+      setActo(0);
+      setApertura(0);
+      llevar({ ...PRESETS.i, apertura: 0 }, 900);
+    }
+  }, [llevar, ponerCine]);
 
   // Motor, tamaño y visibilidad
   useEffect(() => {
@@ -115,6 +193,12 @@ export function Instalacion() {
     const limpiezas: Array<() => void> = [];
     poner("inicio"); // un re-montaje (React en desarrollo) empieza de cero
     setMontado(true);
+    if (reducido()) {
+      // Sin aparición: la sala empieza directamente en el Acto I
+      actual.current = { ...PRESETS.i };
+      objetivo.current = { ...PRESETS.i };
+      cineRef.current = "hecha";
+    }
 
     /** Compila sin bloquear la página (si el navegador lo permite) y activa la escena cuando está lista. */
     const preparar = async (manual: boolean) => {
@@ -136,6 +220,7 @@ export function Instalacion() {
         requestAnimationFrame(() => requestAnimationFrame(() => marca("escena-presentada")));
         poner("lista");
         if (tween.current) pedir(); // el visitante ya cambió de acto mientras tanto
+        if (cineRef.current === "no" && aLaVista.current) aparecer();
       } catch {
         if (activo && !contextoPerdido) poner("error"); // si el contexto se perdió, al restaurarse se reintenta
       }
@@ -143,8 +228,7 @@ export function Instalacion() {
     prepararRef.current = preparar;
 
     // Cuándo empezar: con la instalación aún lejos no se hace nada; cuando está a unas pantallas, se prepara
-    // (la compilación en frío puede durar decenas de segundos, así que no se espera a que esté a la vista),
-    // y solo con la pestaña visible.
+    // (la compilación en frío puede durar segundos, así que no se espera a que esté a la vista), y solo con la pestaña visible.
     const disparar = () => {
       if (document.visibilityState !== "hidden") { preparar(false); return; }
       const v = () => {
@@ -169,6 +253,12 @@ export function Instalacion() {
       if (en.isIntersecting) pedir();
     });
     io.observe(canvas);
+    // La aparición empieza cuando la escena está casi entera a la vista
+    const vista = new IntersectionObserver(([en]) => {
+      aLaVista.current = en.intersectionRatio >= 0.55;
+      if (aLaVista.current && cineRef.current === "no" && faseRef.current === "lista") aparecer();
+    }, { threshold: [0, 0.55, 0.8] });
+    vista.observe(canvas);
     const perdido = (e: Event) => {
       e.preventDefault();
       contextoPerdido = true;
@@ -183,9 +273,12 @@ export function Instalacion() {
       activo = false;
       limpiezas.forEach((f) => f());
       clearTimeout(asentar.current);
+      relojes.current.forEach(clearTimeout);
+      relojes.current = [];
       cerca.disconnect();
       ro.disconnect();
       io.disconnect();
+      vista.disconnect();
       cancelAnimationFrame(raf.current);
       raf.current = 0;
       canvas.removeEventListener("webglcontextlost", perdido);
@@ -193,21 +286,21 @@ export function Instalacion() {
       arranque.current?.soltar();
       motor.current = null;
     };
-  }, [dibujar, pedir, poner]);
+  }, [dibujar, pedir, poner, aparecer, ponerCine]);
 
   const irAActo = useCallback((i: number) => {
     const id = ACTOS[i].id;
     const p = PRESETS[id];
     const ap = id === "i" ? 0 : p.apertura;
+    if (cineRef.current !== "hecha") { pararRelojes(); setMomento(-1); setEncuadre({ s: 1, y: 0, ms: 900 }); ponerCine("hecha"); }
     setActo(i);
     setApertura(ap);
     luzLibre.current = false;
-    tween.current = { desde: { ...actual.current }, t0: performance.now() };
-    objetivo.current = { ...p, apertura: ap };
-    pedir();
-  }, [pedir]);
+    llevar({ ...p, apertura: ap }, DURACION);
+  }, [llevar, ponerCine]);
 
   const moverLuz = useCallback((x: number, y: number) => {
+    cortarCine();
     const lx = limitar(x, -LUZ_MAX, LUZ_MAX);
     const ly = limitar(y, -LUZ_MAX, LUZ_MAX);
     luzLibre.current = true;
@@ -217,9 +310,10 @@ export function Instalacion() {
     objetivo.current.luzY = ly;
     setLuzUi({ x: lx, y: ly });
     pedir();
-  }, [pedir]);
+  }, [pedir, cortarCine]);
 
   const cambiarApertura = (v: number) => {
+    cortarCine();
     setApertura(v);
     actual.current.apertura = v;
     objetivo.current.apertura = v;
@@ -234,7 +328,7 @@ export function Instalacion() {
     moverLuz((e.clientX - r.left - r.width / 2) / unit, -(e.clientY - r.top - r.height / 2) / unit);
   };
   const alBajar = (e: React.PointerEvent) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || (e.target as HTMLElement).closest("button")) return;
     arrastre.current = true;
     e.currentTarget.setPointerCapture(e.pointerId);
     desdeEscena(e);
@@ -261,47 +355,20 @@ export function Instalacion() {
   const conApertura = acto > 0;
   /** La escena aún no está disponible (se prepara, espera al visitante o falló): los mandos solo guardan el ajuste. */
   const esperando = fase !== "lista" && fase !== "sin-gl";
+  const estiloEncuadre = { "--enc-s": encuadre.s, "--enc-y": `${encuadre.y}%`, "--enc-t": `${encuadre.ms}ms` } as CSSProperties;
 
   return (
-    <section className={`bc-inst${montado ? " is-js" : ""}${esperando ? " is-espera" : ""}`} aria-labelledby="bc-inst-t" data-acto={a.id}>
-      <div className="bc-inst__cab">
-        <p className="bc-kicker">Una interpretación de MANIFESTO · La materia del sacrificio</p>
-        <h2 id="bc-inst-t" className="bc-inst__h">Tres actos para una forma suspendida</h2>
-
-        <ol className="bc-actos" aria-label="Actos">
-          {ACTOS.map((x, i) => (
-            <li key={x.id}>
-              <button type="button" className="bc-acto-btn" aria-current={i === acto ? "step" : undefined} aria-label={`Acto ${x.numero}: ${x.titulo}`} onClick={() => irAActo(i)}>
-                <span className="bc-acto-btn__n">{x.numero}</span>
-                <span className="bc-acto-btn__c">{x.corto}</span>
-                <span className="bc-acto-btn__t">{x.titulo}</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <div className="bc-inst__acto">
-        <div className="bc-actos-textos">
-          {ACTOS.map((x, i) => (
-            <article key={x.id} className="bc-acto" data-activo={i === acto ? "" : undefined} aria-hidden={montado && i !== acto ? true : undefined}>
-              <h3 className="bc-acto__h"><span>Acto {x.numero}</span> {x.titulo}</h3>
-              <p className="bc-acto__linea" aria-live={i === acto ? "polite" : undefined}>{x.linea}</p>
-              <dl className="bc-acto__ayuda">
-                <div><dt>Qué ves</dt><dd>{x.ves}</dd></div>
-                <div><dt>Qué puedes hacer</dt><dd>{x.haz}</dd></div>
-                <div><dt>Por qué importa</dt><dd>{x.porque}</dd></div>
-              </dl>
-            </article>
-          ))}
-        </div>
-        <a className="bc-comprender-link" href="#comprender" onClick={() => { const d = document.getElementById("comprender"); if (d instanceof HTMLDetailsElement) d.open = true; }}>Comprender lo que estoy viendo ↓</a>
-      </div>
+    <section className={`bc-inst${montado ? " is-js" : ""}${esperando ? " is-espera" : ""}`} aria-labelledby="bc-inst-t" data-acto={a.id} data-cine={cine}>
+      <header className="bc-inst__cab">
+        <p className="bc-kicker">{APARICION.kicker}</p>
+        <h2 id="bc-inst-t" className="bc-inst__h">{APARICION.titulo}</h2>
+      </header>
 
       <div className="bc-inst__escena">
         <div
           ref={lienzoRef}
           className={`bc-lienzo${fase === "lista" ? " is-lista" : ""}`}
+          style={estiloEncuadre}
           role="group"
           aria-busy={fase === "preparando" ? true : undefined}
           tabIndex={0}
@@ -314,6 +381,12 @@ export function Instalacion() {
         >
           <canvas ref={canvasRef} className="bc-canvas" aria-hidden="true" />
           {fase === "error" || sinGL ? <div className="bc-sin-gl" role="img" aria-label="Alternativa estática: una forma oscura suspendida en un muro apenas iluminado." /> : null}
+          {fase === "lista" ? (
+            <>
+              <p className="bc-cine__momento" aria-hidden="true" key={momento}>{momento >= 0 ? APARICION.momentos[momento] : ""}</p>
+              {cine === "corriendo" ? <button type="button" className="bc-cine__saltar" onClick={cortarCine}>{APARICION.saltar}</button> : null}
+            </>
+          ) : null}
           {sinGL ? null : (
             <div className="bc-espera" data-fase={fase} aria-hidden={fase === "lista" ? true : undefined}>
               <div className="bc-espera__cuerpo">
@@ -343,6 +416,20 @@ export function Instalacion() {
           )}
           <span className="bc-sr" role="status">{fase === "lista" ? "La escena está lista." : fase === "error" ? "No se pudo preparar la escena." : ""}</span>
         </div>
+      </div>
+
+      <div className="bc-inst__panel">
+        <ol className="bc-actos" aria-label="Actos">
+          {ACTOS.map((x, i) => (
+            <li key={x.id}>
+              <button type="button" className="bc-acto-btn" aria-current={i === acto ? "step" : undefined} aria-label={`Acto ${x.numero}: ${x.titulo}`} onClick={() => irAActo(i)}>
+                <span className="bc-acto-btn__n">{x.numero}</span>
+                <span className="bc-acto-btn__c">{x.corto}</span>
+                <span className="bc-acto-btn__t">{x.titulo}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
         <p className="bc-pista"><span>Acto {a.numero}</span> {a.pista}</p>
 
         <div className="bc-mandos">
@@ -390,6 +477,25 @@ export function Instalacion() {
               Siguiente acto →
             </button>
           </div>
+          {fase === "lista" && cine === "hecha" && !reducido() ? (
+            <button type="button" className="bc-volver" onClick={aparecer}>↺ {APARICION.volver}</button>
+          ) : null}
+        </div>
+
+        <div className="bc-inst__acto">
+          {ACTOS.map((x, i) => (
+            <article key={x.id} className="bc-acto" data-activo={i === acto ? "" : undefined} aria-hidden={montado && i !== acto ? true : undefined}>
+              <p className="bc-acto__linea" aria-live={i === acto ? "polite" : undefined}><span>{x.titulo}</span> {x.linea}</p>
+              <details className="bc-acto__mas">
+                <summary>Qué ves · qué puedes hacer</summary>
+                <dl className="bc-acto__ayuda">
+                  <div><dt>Qué ves</dt><dd>{x.ves}</dd></div>
+                  <div><dt>Qué puedes hacer</dt><dd>{x.haz}</dd></div>
+                  <div><dt>Por qué importa</dt><dd>{x.porque}</dd></div>
+                </dl>
+              </details>
+            </article>
+          ))}
         </div>
       </div>
     </section>
