@@ -17,6 +17,7 @@ import { crearRuido, generarMuro, generarPlano, geometria, OBJETIVO, sueloY, typ
 /** Posición de partida de cada plano (en U): desordenados, sus sombras no dicen nada. */
 const INICIO = [-0.16, 0.14, -0.09];
 const RANGO = 0.26;
+const MUELLE_BASE: [number, number] = [90, 19];
 const ORDEN_DIBUJO = [2, 1, 0];
 const reducido = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 const limitar = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
@@ -51,6 +52,11 @@ export function Negativo() {
   const alineadoRef = useRef(false);
   const tecladoRef = useRef(false);
   const tocadoRef = useRef(false);
+  /** Muelle de cada plano hacia su destino (rigidez, amortiguación) y el instante en que empieza a moverse. */
+  const muelle = useRef<[number, number][]>([[90, 19], [90, 19], [90, 19]]);
+  const salida = useRef([0, 0, 0]);
+  /** true mientras la reunión automática sigue en curso (cualquier gesto del visitante la va soltando plano a plano). */
+  const reuniendo = useRef(false);
   const hover = useRef(-1);
   const empujado = useRef(false);
   const Iprev = useRef(0);
@@ -96,9 +102,19 @@ export function Negativo() {
     ctx.globalAlpha = 1;
     ctx.drawImage(M, 0, 0, W, H);
     // La lámpara sube y abre su cono al encontrarse la figura (antes de las sombras: no las aclara)
-    const gl = ctx.createRadialGradient(L[0], L[1], 0, L[0], L[1], (1.15 + 0.3 * k) * U);
-    gl.addColorStop(0, `rgba(255,176,96,${0.1 + 0.22 * k})`);
-    gl.addColorStop(0.55, `rgba(200,120,60,${0.04 + 0.1 * k})`);
+    // la lámpara reacciona a los planos: se atenúa un poco cuando uno pasa por delante y su centro cede con el balanceo
+    let tapa = 0, mece = 0;
+    for (let i = 0; i < 3; i++) {
+      const p = planos.current[i];
+      const cx = (p.mem[0] + p.mem[2]) / 2 + (x.current[i] - OBJETIVO[i]) * U;
+      tapa += suave(0.16 * U, 0, Math.abs(cx - L[0]));
+      mece += giro.current[i];
+    }
+    const atenua = 1 - 0.1 * Math.min(1, tapa);
+    const lx = L[0] + mece * 0.05 * U;
+    const gl = ctx.createRadialGradient(lx, L[1], 0, lx, L[1], (1.15 + 0.3 * k) * U);
+    gl.addColorStop(0, `rgba(255,176,96,${(0.1 + 0.22 * k) * atenua})`);
+    gl.addColorStop(0.55, `rgba(200,120,60,${(0.04 + 0.1 * k) * atenua})`);
     gl.addColorStop(1, "rgba(0,0,0,0)");
     ctx.globalCompositeOperation = "lighter";
     ctx.fillStyle = gl;
@@ -207,13 +223,17 @@ export function Negativo() {
       const d = destino.current[i];
       if (d !== null && arr.current?.i !== i) {
         if (quieto) { x.current[i] = d; v.current[i] = 0; destino.current[i] = null; }
+        else if (ahora < salida.current[i]) activo = true; // la resistencia inicial: el plano tarda un instante en ceder
         else {
-          const a = -90 * (x.current[i] - d) - 19 * v.current[i];
+          const [kk, cc] = muelle.current[i];
+          const a = -kk * (x.current[i] - d) - cc * v.current[i];
           v.current[i] += a * dt; x.current[i] += v.current[i] * dt;
+          if (reuniendo.current) vel.current[i] = 0.9 * v.current[i]; // al tirar de él, el plano cuelga y se inclina
           if (Math.abs(x.current[i] - d) < 1e-4 && Math.abs(v.current[i]) < 1e-3) { x.current[i] = d; v.current[i] = 0; destino.current[i] = null; }
           else activo = true;
         }
       }
+      if (destino.current[i] === null) muelle.current[i] = MUELLE_BASE;
       // Balanceo: el plano cuelga de un cable; al moverlo se inclina y luego oscila hasta quedarse quieto
       if (quieto) { giro.current[i] = 0; giroV.current[i] = 0; }
       else {
@@ -221,10 +241,11 @@ export function Negativo() {
         const objetivoGiro = limitar(-vel.current[i] * 0.05, -0.07, 0.07);
         const a = -58 * (giro.current[i] - objetivoGiro) - 7.5 * giroV.current[i];
         giroV.current[i] += a * dt; giro.current[i] += giroV.current[i] * dt;
-        if (Math.abs(giro.current[i]) > 2e-4 || Math.abs(giroV.current[i]) > 2e-3 || Math.abs(vel.current[i]) > 1e-3) activo = true;
+        if (Math.abs(giro.current[i]) > 5e-4 || Math.abs(giroV.current[i]) > 5e-3 || Math.abs(vel.current[i]) > 2e-3) activo = true;
         else { giro.current[i] = 0; giroV.current[i] = 0; }
       }
     }
+    if (reuniendo.current && destino.current.every((q) => q === null)) reuniendo.current = false;
     const It = objetivoI();
     if (quieto) I.current = It;
     else {
@@ -250,7 +271,7 @@ export function Negativo() {
 
   /** Al soltar: si un plano quedó muy cerca de su sitio, se asienta en él (sin decidir por el visitante si está lejos). */
   const asentar = useCallback((i: number) => {
-    if (Math.abs(x.current[i] - OBJETIVO[i]) < 0.04) destino.current[i] = OBJETIVO[i];
+    if (Math.abs(x.current[i] - OBJETIVO[i]) < 0.04) { muelle.current[i] = MUELLE_BASE; salida.current[i] = 0; destino.current[i] = OBJETIVO[i]; }
     pedir();
   }, [pedir]);
 
@@ -412,7 +433,32 @@ export function Negativo() {
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") asentar(selRef.current);
   };
   const separar = () => {
-    for (let i = 0; i < 3; i++) { destino.current[i] = INICIO[i]; v.current[i] = 0; }
+    reuniendo.current = false;
+    for (let i = 0; i < 3; i++) { muelle.current[i] = MUELLE_BASE; salida.current[i] = 0; destino.current[i] = INICIO[i]; v.current[i] = 0; }
+    pedir();
+  };
+  /**
+   * Reunir la figura: cada plano va hacia su posición objetivo (la misma que alinean a mano los visitantes, así que el encuentro
+   * lo dispara el sistema de siempre). Muelles algo distintos y un leve retraso escalonado: no se mueven a la vez, ceden uno tras otro.
+   */
+  const reunir = () => {
+    if (reuniendo.current || (alineadoRef.current && destino.current.every((q) => q === null))) return;
+    const ahora = performance.now();
+    const preset: [number, number, number][] = [[26, 9, 0], [21, 8.2, 120], [17, 7.4, 250]];
+    tocadoRef.current = true;
+    setTocado(true);
+    let alguno = false;
+    for (let i = 0; i < 3; i++) {
+      if (arr.current?.i === i) continue; // el plano que el visitante sostiene no se toca
+      const lejos = Math.abs(x.current[i] - OBJETIVO[i]) > 0.003;
+      if (!lejos) { x.current[i] = OBJETIVO[i]; continue; }
+      muelle.current[i] = [preset[i][0], preset[i][1]];
+      salida.current[i] = ahora + (Math.abs(x.current[i] - OBJETIVO[i]) > 0.02 ? preset[i][2] : 0);
+      destino.current[i] = OBJETIVO[i];
+      v.current[i] = 0;
+      alguno = true;
+    }
+    reuniendo.current = alguno;
     pedir();
   };
 
@@ -457,6 +503,7 @@ export function Negativo() {
             </button>
           ))}
         </div>
+        <button type="button" className="bc-neg__reunir" aria-disabled={alineado ? true : undefined} onClick={reunir}>{NEGATIVO.reunir}</button>
         <button type="button" className="bc-neg__separar" onClick={separar}>{NEGATIVO.separar}</button>
         <p id="bc-neg-ay" className="bc-neg__ay">{NEGATIVO.ayuda}</p>
       </div>

@@ -320,11 +320,16 @@ export async function generarMuro(g: Geometria, ruido: Ruido, respiro: () => Pro
   const f = 0.5;
   const w = Math.max(2, Math.ceil(g.W * f)), h = Math.max(2, Math.ceil(g.H * f));
   const c = lienzo(w, h);
-  const ctx = c.getContext("2d")!;
+  const ctx = c.getContext("2d", { willReadFrequently: true })!;
   const img = ctx.createImageData(w, h);
   const D = img.data;
   const kU = 1 / g.U;
   const ys = sueloY(g);
+  // Esquina de dos paredes: a la izquierda el muro gira hacia el fondo (solo se ve en pantallas anchas) y recibe la luz más rasante
+  const esq = g.cx - 0.74 * g.U;
+  const hay = esq > 6;
+  // Alto del yeso: relieve fino que la luz rasante de abajo hace visible (se calcula una fila por delante)
+  const rel = (lx: number, ly: number) => ruido(lx * kU * 26 + 91, ly * kU * 30 + 17) * 0.6 + ruido(lx * kU * 70 + 5, ly * kU * 70 + 61) * 0.4;
   for (let y = 0; y < h; y++) {
     const ly = y / f;
     const suelo = ly > ys;
@@ -333,24 +338,67 @@ export async function generarMuro(g: Geometria, ruido: Ruido, respiro: () => Pro
       const lx = x / f;
       const o = (y * w + x) * 4;
       if (suelo) {
-        // Suelo de piedra: un charco de luz alrededor de la lámpara
+        // Suelo de piedra: variación tonal por zonas y un charco de luz alrededor de la lámpara
         const n = ruido(lx * kU * 7 + 41, ly * kU * 22 + 3);
+        const zona = ruido(lx * kU * 2.2 + 70, ly * kU * 9 + 8);
         const d = Math.hypot((lx - g.L[0]) * 0.55, (ly - g.L[1]) * 1.6) * kU;
         const I = 1 / (1 + Math.pow(d / 0.32, 2.4));
-        const k = (0.75 + 0.35 * n) * (0.1 + 1.3 * I) * (1 - 0.25 * Math.exp(-(ly - ys) * kU * 40));
+        const k = (0.62 + 0.5 * n) * (0.7 + 0.6 * zona) * (0.1 + 1.3 * I) * (1 - 0.35 * Math.exp(-(ly - ys) * kU * 40));
         D[o] = 30 * k + 30 * I; D[o + 1] = 23 * k + 15 * I; D[o + 2] = 18 * k + 6 * I; D[o + 3] = 255;
         continue;
       }
+      const lado = hay && lx < esq;
+      // veladuras de yeso: manchas grandes y lentas, y regueros que bajan desde arriba
       const n = ruido(lx * kU * 12 + 3, ly * kU * 12 + 7);
+      const vela = ruido(lx * kU * 2.4 + 20, ly * kU * 2.1 + 44);
+      const humedad = Math.pow(ruido(lx * kU * 6 + 8, ly * kU * 0.8 + 3), 2.2) * Math.max(0, 1 - ly / (ys * 0.9));
       const veta = ruido(lx * kU * 50 + 13, ly * kU * 1.6 + 2);
       const d = Math.hypot(lx - g.L[0], ly - g.L[1]) * kU;
-      const I = 1 / (1 + Math.pow(d / 1.25, 2));
+      let I = 1 / (1 + Math.pow(d / 1.25, 2));
+      // luz rasante: el relieve se marca más cuanto más cerca del suelo y de la lámpara
+      const r = rel(lx, ly) - rel(lx, ly - 3);
+      const rasante = Math.max(0, 1 - (ys - ly) * kU * 0.9) * I;
       // el muro recibe la luz rasante de abajo; junto al suelo, una franja más oscura (el rincón)
       const rincon = (1 - 0.45 * Math.exp(-(ys - ly) * kU * 30)) * (1 - 0.42 * Math.exp(-(ys - ly) * kU * 4.5));
-      const k = (0.74 + 0.36 * n) * (0.9 + 0.14 * veta) * (0.14 + 1.5 * I) * rincon;
-      D[o] = 62 * k + 40 * I; D[o + 1] = 50 * k + 20 * I; D[o + 2] = 41 * k + 8 * I; D[o + 3] = 255;
+      // esquinas altas: la sala se cierra
+      const techo = 1 - 0.5 * Math.exp(-ly * kU * 2.6);
+      let tono = 1;
+      if (hay) {
+        const dc = (lx - esq) * kU;
+        if (lado) { tono = 0.62 - 0.18 * Math.min(1, -dc * 1.4); I *= 0.55; }
+        else tono = 1 - 0.38 * Math.exp(-dc * 5.5); // la arista oscurece el rincón del muro frontal
+        if (Math.abs(dc) < 0.006) tono *= 0.45; // la propia arista
+      }
+      const k = (0.62 + 0.4 * n) * (0.9 + 0.14 * veta) * (0.76 + 0.5 * vela) * (1 - 0.32 * humedad) * (0.12 + 1.4 * I) * rincon * techo * tono * (1 + 5.5 * r * rasante);
+      D[o] = 57 * k + 34 * I; D[o + 1] = 44 * k + 16 * I; D[o + 2] = 36 * k + 6 * I; D[o + 3] = 255;
     }
   }
   ctx.putImageData(img, 0, 0);
+  // Losas del suelo: juntas que convergen hacia el fondo y una pequeña diferencia de tono entre ellas
+  const rr = rng(1933);
+  ctx.save();
+  ctx.scale(f, f);
+  const H = g.H, ancho = g.W;
+  const filas = [0.045, 0.11, 0.2, 0.34, 0.56, 1.0].map((t) => ys + t * (H - ys));
+  for (let i = 0; i < filas.length - 1; i++) {
+    const y0 = filas[i], y1 = filas[i + 1];
+    const escala0 = 0.6 + 0.4 * (y0 - ys) / (H - ys), escala1 = 0.6 + 0.4 * (y1 - ys) / (H - ys);
+    const paso = 0.5 * g.U;
+    for (let k = -8; k <= 8; k++) {
+      const x0 = g.cx + (k + 0.37 * (i % 2)) * paso * escala0, x1 = g.cx + (k + 0.37 * (i % 2)) * paso * escala1;
+      const xs0 = g.cx + ((k + 0.37 * (i % 2)) + 1) * paso * escala0, xs1 = g.cx + ((k + 0.37 * (i % 2)) + 1) * paso * escala1;
+      if (xs0 < 0 || x0 > ancho) continue;
+      const tono = rr();
+      ctx.fillStyle = tono > 0.5 ? `rgba(255,214,160,${0.02 + 0.04 * (tono - 0.5)})` : `rgba(0,0,0,${0.04 + 0.1 * (0.5 - tono)})`;
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(xs0, y0); ctx.lineTo(xs1, y1); ctx.lineTo(x1, y1); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,0.3)"; ctx.lineWidth = 1.2 / f * 0.5;
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+    }
+    ctx.strokeStyle = "rgba(0,0,0,0.34)"; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(ancho, y0); ctx.stroke();
+    ctx.strokeStyle = "rgba(255,214,160,0.05)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, y0 + 1.6); ctx.lineTo(ancho, y0 + 1.6); ctx.stroke();
+  }
+  ctx.restore();
   return c;
 }

@@ -104,6 +104,7 @@ export const NEGATIVO = {
   ayuda: "Arrastra un plano a izquierda o derecha. Con teclado: elige plano (1, 2, 3 o ↑↓) y muévelo con ← →.",
   aria: "Tres planos suspendidos delante de un muro, iluminados desde abajo. Sus sombras se suman en el muro. Usa las flechas izquierda y derecha para mover el plano elegido; arriba y abajo para cambiar de plano.",
   planos: ["Delante", "En medio", "Al fondo"],
+  reunir: "Reunir la figura",
   separar: "Separar los planos",
   encuentro: "Ningún plano lo contiene. Solo su sombra lo reúne.",
   encuentroSr: "Las tres sombras coinciden: en el muro aparece una figura suspendida.",

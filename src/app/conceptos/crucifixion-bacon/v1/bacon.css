@@ -301,13 +301,15 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-neg__sin { position: absolute; inset: auto 1rem 1rem; margin: 0; text-align: center; color: var(--c-muted); }
 .bc-neg__mandos { padding-inline: var(--mf-gutter); display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; }
 .bc-neg__planos { display: flex; gap: 0.35rem; }
-.bc-neg__plano, .bc-neg__separar {
+.bc-neg__plano, .bc-neg__separar, .bc-neg__reunir {
   min-height: 2.75rem; padding: 0.4rem 0.8rem; font: inherit; font-size: 0.8125rem; cursor: pointer;
   background: transparent; color: var(--c-muted); border: 1px solid var(--c-line);
 }
+.bc-neg__reunir { color: var(--c-ink); border-color: var(--c-sangre); background: rgb(125 42 36 / 0.2); min-width: 2.75rem; }
+.bc-neg__reunir[aria-disabled="true"] { opacity: 0.45; cursor: default; }
 .bc-neg__plano[aria-pressed="true"] { color: var(--c-ink); border-color: var(--c-sangre); background: rgb(125 42 36 / 0.16); }
-.bc-neg__plano:focus-visible, .bc-neg__separar:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
-@media (hover: hover) { .bc-neg__plano:hover, .bc-neg__separar:hover { color: var(--c-ink); border-color: var(--c-muted); } }
+.bc-neg__plano:focus-visible, .bc-neg__separar:focus-visible, .bc-neg__reunir:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+@media (hover: hover) { .bc-neg__plano:hover, .bc-neg__separar:hover, .bc-neg__reunir:hover { color: var(--c-ink); border-color: var(--c-muted); } }
 .bc-neg__ay { margin: 0; flex-basis: 100%; font-size: 0.8125rem; line-height: 1.4; color: var(--c-muted); }
 @media (min-width: 56rem) {
   .bc-neg__escena { height: min(86svh, 56rem); max-height: none; margin-inline: var(--mf-gutter); border: 1px solid var(--c-line); }
@@ -376,3 +378,42 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-derechos { background: #090605; border-top: 1px solid var(--c-line); padding: 1.25rem var(--mf-gutter); }
 .bc-derechos p { margin: 0 auto; max-width: 54rem; font-size: 0.875rem; line-height: 1.6; color: var(--c-muted); overflow-wrap: anywhere; }
 .bc-derechos a { color: var(--c-accent); text-underline-offset: 0.2em; display: inline-block; min-height: 1.5rem; }
+
+/* ── V3.3 · Ambientación: el mismo muro de yeso en el umbral y el epílogo (una baldosa estática, sin animación) ── */
+.theme-bacon {
+  --yeso: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='a' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.016' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.62  0 0 0 0 0.5  0 0 0 0 0.38  0 0 0 1.5 -0.55'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23a)'/%3E%3C/svg%3E");
+  --yeso-fino: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='b' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.7  0 0 0 0 0.58  0 0 0 0 0.44  0 0 0 1.2 -0.5'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23b)'/%3E%3C/svg%3E");
+}
+.bc-paso-umbral__sala::before, .bc-epi__fijo::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: var(--yeso), var(--yeso-fino); background-size: 512px 512px, 256px 256px; mix-blend-mode: soft-light; opacity: 0.55;
+  -webkit-mask-image: linear-gradient(#000 0 78%, transparent 82%); mask-image: linear-gradient(#000 0 78%, transparent 82%);
+}
+/* el rincón y la luz rasante: la sala se cierra arriba y a los lados; junto al suelo, el yeso recibe luz */
+.bc-paso-umbral__sala::after, .bc-epi__fijo::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(rgb(0 0 0 / 0.55), transparent 26%),
+    radial-gradient(ellipse 90% 70% at 50% 100%, transparent 40%, rgb(0 0 0 / 0.42));
+}
+/* losas del suelo (juntas que convergen) */
+.bc-paso-umbral__suelo, .bc-epi__suelo {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(11vw - 1px), rgb(0 0 0 / 0.3) calc(11vw - 1px) 11vw),
+    linear-gradient(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.62));
+}
+.bc-paso-umbral__suelo::before, .bc-epi__suelo::before {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(rgb(0 0 0 / 0.34) 0 1px, transparent 1px 22%); opacity: 0.8;
+}
+.bc-paso-umbral__suelo, .bc-epi__suelo { position: absolute; overflow: hidden; }
+/* El epílogo: la luz del suelo acompaña la desaparición (se apaga con la figura) */
+.bc-epi__fijo { --luz: calc(1 - clamp(0, (var(--p) - 0.55) * 1.6, 0.7)); }
+.bc-epi__fijo::after { opacity: calc(0.85 + (1 - var(--luz)) * 0.4); }
+@media (prefers-reduced-motion: reduce) {
+  .bc-paso-umbral__sala::before, .bc-epi__fijo::before { opacity: 0.45; }
+}
+.bc-epi__texto, .bc-paso-umbral__lineas { z-index: 3; }
+.bc-paso-umbral__lineas { position: absolute; inset: 0; pointer-events: none; }
+.bc-paso-umbral__lineas p { z-index: 3; }
+@media (prefers-reduced-motion: reduce) { .bc-paso-umbral__lineas { position: absolute; inset: auto 0 12% 0; } }
