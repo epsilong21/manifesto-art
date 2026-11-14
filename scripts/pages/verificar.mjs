@@ -48,8 +48,10 @@ for (const r of ["", "conceptos/"]) {
 }
 
 // 2. Nada ajeno al sitio: ni originales (/obras), ni Dante, ni carpetas internas
-const PROHIBIDO = /(^bacon\/|barca-de-dante|prototipos|presentation-review|assets-source|qa-reports|\.map$|^obras\/)/;
+const PROHIBIDO = /(^bacon\/(?!crucifixion-1933-wikiart\.jpg$)|barca-de-dante|prototipos|presentation-review|assets-source|qa-reports|\.map$|^obras\/)/;
 for (const a of archivos) if (PROHIBIDO.test(a)) errores.push(`Archivo no permitido: ${a}`);
+// 2a. Bacon: solo la reproducción elegida de Crucifixion (sin licencia; ver CREDITOS.md), y debe estar: la página la usa
+if (!archivos.includes("bacon/crucifixion-1933-wikiart.jpg")) errores.push("Falta la reproducción de Crucifixion (bacon/crucifixion-1933-wikiart.jpg)");
 
 // 2b. La pintura de Dalí: variantes presentes si se pidió; la referencia, nunca al publicar
 if (publicacion && conReferencia && !REPRODUCCIONES.referencia.publicable) errores.push("La reproducción de referencia de Los elefantes no se puede publicar");

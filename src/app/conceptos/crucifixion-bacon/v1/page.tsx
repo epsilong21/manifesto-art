@@ -26,7 +26,10 @@ export default function BaconV1Page() {
         <section className="bc-hero" aria-labelledby="bc-titulo">
           <figure className="bc-hero__fig">
             <CuadroBacon className="bc-hero__img" />
-            <figcaption>Crucifixion · Francis Bacon, 1933 · óleo sobre lienzo, 62 × 48,5 cm</figcaption>
+            <figcaption>
+              Crucifixion · Francis Bacon, 1933 · óleo sobre lienzo, 62 × 48,5 cm<br />
+              © The Estate of Francis Bacon · Reproducción: <a href="https://www.wikiart.org/en/francis-bacon/crucifixion-1933" target="_blank" rel="noopener noreferrer">WikiArt</a> (sin licencia; ver al pie)
+            </figcaption>
           </figure>
           <div className="bc-hero__texto">
             <p className="bc-kicker">Francis Bacon · 1933 · óleo sobre lienzo</p>
@@ -71,7 +74,7 @@ export default function BaconV1Page() {
         </details>
       </main>
       <aside className="bc-derechos" aria-label="Derechos y contacto">
-        <p>Las obras de terceros pertenecen a sus titulares. Esta página no incluye la pintura original por falta de licencia, y este aviso no concede derechos de reproducción. Para solicitudes de derechos, correcciones o retiradas: <a href="mailto:manifesto.msto@gmail.com">manifesto.msto@gmail.com</a>. Más en el <a href="../../../aviso-legal/">aviso legal</a>.</p>
+        <p>Las obras de terceros pertenecen a sus titulares. La pintura original se muestra sin licencia ni autorización de The Estate of Francis Bacon ni de DACS, por decisión editorial de MANIFESTO, que asume el riesgo; la reproducción procede de la ficha de WikiArt, que no es una licencia. Este aviso no concede derechos de reproducción ni es una garantía frente a reclamaciones. Para solicitudes de derechos, correcciones o retiradas: <a href="mailto:manifesto.msto@gmail.com">manifesto.msto@gmail.com</a>. Más en el <a href="../../../aviso-legal/">aviso legal</a>.</p>
       </aside>
       <PieObra {...CREDITOS} />
     </div>

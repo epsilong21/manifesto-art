@@ -126,8 +126,12 @@ for (const archivo of OBRAS) {
   }
 }
 rmSync(join(out, "obras"), { recursive: true, force: true });
-// La reproducción de Crucifixion (Bacon) es solo de vista previa local y no tiene licencia: nunca sale en la exportación
-rmSync(join(out, "bacon"), { recursive: true, force: true });
+// Crucifixion (Bacon): solo sale la reproducción elegida (decisión editorial, 14/11/2026, sin licencia; ver CREDITOS.md).
+// Cualquier otro archivo de public/bacon/ (referencias locales, pruebas) se elimina de la exportación.
+const BACON_PUBLICA = "crucifixion-1933-wikiart.jpg";
+if (existsSync(join(out, "bacon"))) {
+  for (const n of readdirSync(join(out, "bacon"))) if (n !== BACON_PUBLICA) rmSync(join(out, "bacon", n), { recursive: true, force: true });
+}
 
 // Next 16.4 antepone basePath a las imágenes Open Graph por archivo aunque
 // metadataBase ya incluya esa ruta (…/manifesto/manifesto/…). Las canónicas

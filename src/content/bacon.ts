@@ -142,9 +142,10 @@ export const COMPRENDER = {
 
 export const CREDITOS = {
   imagen:
-    "Crucifixion (1933), Francis Bacon © The Estate of Francis Bacon. All rights reserved. Licencias de reproducción: DACS. La reproducción no se incluye: MANIFESTO no dispone de licencia ni autorización documentada, así que esta página usa un marcador de posición. Este aviso no concede derechos de reproducción ni constituye una excepción de copyright.",
+    "Crucifixion (1933), Francis Bacon © The Estate of Francis Bacon. All rights reserved. Licencias de reproducción: DACS. Reproducción tomada de la ficha pública de WikiArt (600 × 781 px), que la etiqueta «Fair Use»: eso no es una licencia y WikiArt no ha concedido ningún permiso. MANIFESTO no dispone de licencia ni autorización documentada de The Estate of Francis Bacon, de DACS ni del propietario de la obra: la muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y asume el riesgo de reclamación. Se retirará si lo pide su titular. Este aviso no concede derechos de reproducción, no constituye una excepción de copyright ni garantiza protección frente a reclamaciones.",
   nota: "Las obras de terceros pertenecen a sus titulares. Las dos instalaciones, el umbral y el epílogo son interpretaciones independientes y originales de MANIFESTO, inspiradas en la obra y no realizadas ni avaladas por Francis Bacon ni por The Estate of Francis Bacon. Solicitudes de derechos, correcciones y retiradas: manifesto.msto@gmail.com.",
   fuentes: [
+    { label: "WikiArt: Crucifixion, 1933 (fuente de la reproducción; sin licencia)", href: "https://www.wikiart.org/en/francis-bacon/crucifixion-1933" },
     { label: "The Estate of Francis Bacon: Crucifixion", href: "https://www.francis-bacon.com/artworks/paintings/crucifixion" },
     { label: "The Estate of Francis Bacon: derechos", href: "https://www.francis-bacon.com/rights" },
     { label: "DACS: Crucifixion, 1933", href: "https://www.dacs.org.uk/artwork/crucifixion-1933-3569" },
