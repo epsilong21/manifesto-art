@@ -60,6 +60,12 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-umbral span { font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-muted); }
 .bc-umbral strong { font-family: var(--f-display); font-weight: 500; font-style: italic; font-size: clamp(1.8rem, 1rem + 4vw, 3.4rem); color: var(--c-accent); text-wrap: balance; }
 
+/* ── Puente: por qué existe la figura (antes de la Instalación I) ── */
+.bc-puente { background: #040302; padding: clamp(2.25rem, 6vw, 4rem) max(var(--mf-gutter), calc((100% - 54rem) / 2)) 0; display: grid; gap: 0.9rem; justify-items: start; }
+.bc-puente__h { margin: 0; font-size: clamp(1.9rem, 1.1rem + 3vw, 3rem); line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }
+.bc-puente__p { margin: 0; max-width: 36rem; font-family: var(--f-display); font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem); line-height: 1.42; color: var(--c-muted); text-wrap: pretty; }
+.bc-puente__p:first-of-type { color: var(--c-ink); }
+
 /* ── Instalación I · La materia del sacrificio ── */
 .bc-inst { background: #040302; padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(2rem, 4vw, 3rem); display: grid; gap: 1rem; }
 .bc-inst__cab { padding-inline: var(--mf-gutter); display: grid; gap: 0.45rem; }
@@ -151,11 +157,20 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-inst__panel { padding-inline: var(--mf-gutter); display: grid; gap: 0.9rem; transition: opacity 0.8s ease; }
 .bc-inst[data-cine="corriendo"] .bc-inst__panel { opacity: 0.4; }
 .bc-inst[data-cine="corriendo"] .bc-inst__panel:focus-within { opacity: 1; }
-.bc-mandos { display: grid; grid-template-columns: auto 1fr; gap: 0.9rem 1.25rem; align-items: start; }
+.bc-mandos { display: grid; grid-template-columns: 1fr; gap: 1rem 1.25rem; align-items: start; }
 .bc-mando { display: grid; gap: 0.4rem; min-width: 0; }
 .bc-mando__k { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-muted); }
 .bc-mando__ay { font-size: 0.8125rem; color: var(--c-muted); line-height: 1.35; }
-.bc-mando--ap { align-self: stretch; align-content: start; }
+.bc-mando--luz { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "pad k" "pad eco" "pad ay"; column-gap: 1.25rem; align-content: start; }
+.bc-mando--luz .bc-mando__k { grid-area: k; }
+.bc-mando--luz .bc-mando__eco { grid-area: eco; }
+.bc-mando--luz .bc-pad { grid-area: pad; }
+.bc-mando--luz .bc-mando__ay { grid-area: ay; }
+.bc-mando--ap { align-content: start; }
+/* La frase de cada mando: un eco breve, no un rótulo. Aparece al terminar la aparición (el espacio queda reservado). */
+.bc-mando__eco { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 1.1rem; line-height: 1.3; color: var(--c-ink); transition: opacity 1s ease 0.3s; }
+.bc-mando__guia { transition: opacity 1s ease 0.5s; }
+.bc-inst[data-cine="corriendo"] .bc-mando__eco, .bc-inst[data-cine="corriendo"] .bc-mando__guia { opacity: 0; }
 .bc-mando.is-off { opacity: 0.55; }
 .bc-pad {
   position: relative; width: 6.5rem; height: 6.5rem; touch-action: none; cursor: crosshair;
@@ -185,10 +200,11 @@ html:has(.theme-bacon) { background: #090605; }
 }
 .bc-volver:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
 
+@media (prefers-reduced-motion: reduce) { .bc-mando__eco, .bc-mando__guia { transition: none; } }
 @media (min-width: 56rem) {
   .bc-lienzo { height: min(86svh, 56rem); margin-inline: var(--mf-gutter); border: 1px solid var(--c-line); }
   .bc-inst__panel {
-    grid-template-columns: minmax(0, 1fr) minmax(22rem, 30rem); grid-template-areas: "actos mandos" "pista mandos" "acto mandos";
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 30rem); grid-template-rows: auto auto auto 1fr; grid-template-areas: "actos mandos" "pista mandos" "acto mandos" "libre mandos";
     column-gap: clamp(2rem, 4vw, 4rem); align-items: start;
   }
   .bc-actos { grid-area: actos; }
@@ -261,11 +277,16 @@ html:has(.theme-bacon) { background: #090605; }
   opacity: clamp(0, calc((var(--p) - 0.64) * 3), 1);
 }
 .bc-paso-umbral__lineas p {
-  --c: calc(0.2 + var(--i) * 0.29);
-  position: absolute; left: var(--mf-gutter); right: var(--mf-gutter); top: 74%; margin: 0; text-align: center;
+  grid-area: 1 / 1; align-self: end; margin: 0; text-align: center;
   font-family: var(--f-display); font-style: italic; font-size: clamp(1.45rem, 1rem + 2.2vw, 2.6rem); line-height: 1.15; color: var(--c-ink); text-wrap: balance;
   text-shadow: 0 0 1.2rem #000;
-  opacity: calc(clamp(0, (var(--p) - var(--c) + 0.16) * 6, 1) * clamp(0, (var(--c) + 0.16 - var(--p)) * 6, 1));
+  /* Entra en [c − 0,07, c], se queda h y sale en [c + h, c + h + 0,07] */
+  opacity: calc(clamp(0, (var(--p) - var(--c) + 0.07) * 14, 1) * clamp(0, (var(--c) + var(--h) + 0.07 - var(--p)) * 14, 1));
+}
+.bc-paso-umbral__lineas p[data-largo] {
+  max-width: 34rem; justify-self: center; font-size: clamp(1.2rem, 0.95rem + 1.7vw, 2.1rem); line-height: 1.22;
+  /* un velo oscuro suave: los canales de las membranas no cruzan el texto */
+  padding: 0.7rem 1.1rem; background: radial-gradient(ellipse closest-side, rgb(4 3 2 / 0.82) 55%, rgb(4 3 2 / 0));
 }
 
 /* ── Instalación II · El negativo del cuerpo ── */
@@ -341,9 +362,9 @@ html:has(.theme-bacon) { background: #090605; }
 
 @media (prefers-reduced-motion: reduce) {
   .bc-paso-umbral { height: auto; }
-  .bc-paso-umbral__fijo { position: relative; height: 80svh; }
+  .bc-paso-umbral__fijo { position: relative; height: max(80svh, 30rem); }
   .bc-paso-umbral__lineas { position: absolute; inset: auto 0 12% 0; display: grid; gap: 0.4rem; }
-  .bc-paso-umbral__lineas p { position: static; opacity: 1; }
+  .bc-paso-umbral__lineas p { grid-area: auto; opacity: 1; }
   .bc-epi { height: auto; }
   .bc-epi__fijo { position: relative; height: 100svh; }
   .bc-epi__texto { opacity: 1; }
@@ -409,9 +430,9 @@ html:has(.theme-bacon) { background: #090605; }
   .bc-paso-umbral__sala::before, .bc-epi__fijo::before { opacity: 0.45; }
 }
 .bc-epi__texto, .bc-paso-umbral__lineas { z-index: 3; }
-.bc-paso-umbral__lineas { position: absolute; inset: 0; pointer-events: none; }
+.bc-paso-umbral__lineas { position: absolute; inset: 0; pointer-events: none; display: grid; align-content: end; padding: 0 var(--mf-gutter) 21svh; }
 .bc-paso-umbral__lineas p { z-index: 3; }
-@media (prefers-reduced-motion: reduce) { .bc-paso-umbral__lineas { position: absolute; inset: auto 0 12% 0; } }
+@media (prefers-reduced-motion: reduce) { .bc-paso-umbral__lineas { position: absolute; inset: auto 0 8% 0; padding-bottom: 0; } }
 
 /* Grano de la página, solo en Bacon: la intensidad va DENTRO de la baldosa (alfa 0,0385 = 0,55 × 0,07, el mismo grano de globals.css)
    y la capa fija queda a opacidad 1. Si un compositor falla con una opacidad baja sobre una capa fija, lo peor que puede mostrar

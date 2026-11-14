@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import { ACTOS, APARICION, ESTADOS_APERTURA } from "@/content/bacon";
+import { ACTOS, APARICION, ESTADOS_APERTURA, MANDOS } from "@/content/bacon";
 import { guardarHuella } from "./huella";
 import { Arranque, marca, type Estado, type Motor } from "./materiaGL";
 
@@ -435,6 +435,7 @@ export function Instalacion() {
         <div className="bc-mandos">
           <div className="bc-mando bc-mando--luz">
             <span className="bc-mando__k" id="bc-luz-k">Luz</span>
+            <p className="bc-mando__eco">{MANDOS.luz.frase}</p>
             <div
               ref={padRef}
               className="bc-pad"
@@ -451,11 +452,13 @@ export function Instalacion() {
                 style={{ left: `${(luzUi.x / LUZ_MAX / 2 + 0.5) * 100}%`, top: `${(-luzUi.y / LUZ_MAX / 2 + 0.5) * 100}%` }}
               />
             </div>
-            <span id="bc-luz-ay" className="bc-mando__ay">Arrastra, o usa las flechas</span>
+            <span id="bc-luz-ay" className="bc-mando__ay"><span className="bc-mando__guia">{MANDOS.luz.guia} </span>Arrastra, o usa las flechas.</span>
           </div>
 
           <label className={`bc-mando bc-mando--ap${conApertura ? "" : " is-off"}`}>
-            <span className="bc-mando__k">Apertura</span>
+            <span className="bc-mando__k" id="bc-ap-k">Apertura</span>
+            <span className="bc-mando__eco">{MANDOS.apertura.frase}</span>
+            <span id="bc-ap-ay" className="bc-mando__ay bc-mando__guia">{MANDOS.apertura.guia}</span>
             <input
               type="range"
               min={0}
@@ -464,6 +467,8 @@ export function Instalacion() {
               value={apertura}
               disabled={!conApertura}
               onChange={(e) => cambiarApertura(Number(e.target.value))}
+              aria-labelledby="bc-ap-k"
+              aria-describedby="bc-ap-ay"
               aria-valuetext={estadoApertura(apertura)}
             />
             <span className="bc-mando__ay" aria-live="polite">{conApertura ? estadoApertura(apertura) : "Disponible desde el Acto II"}</span>

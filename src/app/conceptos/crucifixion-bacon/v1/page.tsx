@@ -6,7 +6,7 @@ import { Instalacion } from "@/components/bacon/Instalacion";
 import { Negativo } from "@/components/bacon/Negativo";
 import { Umbral } from "@/components/bacon/Umbral";
 import { PieObra } from "@/components/sprint/PieObra";
-import { COMPRENDER, CREDITOS, DOCUMENTADO, FICHA, INTERPRETACION_DOC } from "@/content/bacon";
+import { COMPRENDER, CREDITOS, DOCUMENTADO, FICHA, INTERPRETACION_DOC, PUENTE } from "@/content/bacon";
 import { cormorant } from "@/lib/fonts/cormorant";
 import "../../sprint.css";
 import "./bacon.css";
@@ -55,6 +55,11 @@ export default function BaconV1Page() {
           <span>A partir de aquí, una interpretación original de MANIFESTO</span>
           <strong>Inspirada en Bacon; no realizada ni avalada por él ni por su sucesión</strong>
         </div>
+
+        <section className="bc-puente" aria-labelledby="bc-puente-t">
+          <h2 id="bc-puente-t" className="bc-puente__h">{PUENTE.titulo}</h2>
+          {PUENTE.parrafos.map((t) => <p key={t} className="bc-puente__p">{t}</p>)}
+        </section>
 
         <Instalacion />
         <Umbral />

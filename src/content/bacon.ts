@@ -44,7 +44,7 @@ export const ACTOS: Acto[] = [
     numero: "I",
     titulo: "La aparición de la forma",
     corto: "Aparición",
-    pista: "Desplaza la luz para revelar lo que permanece oculto.",
+    pista: "Lo que no se ilumina, no existe.",
     linea: "Algo cuelga en la oscuridad. Todavía no se sabe qué.",
     ves: "Una masa que cuelga de un solo punto. La luz apenas roza sus bordes y sus pliegues.",
     haz: "Mueve la luz. Cada posición descubre otro volumen y desplaza su sombra en el muro.",
@@ -55,7 +55,7 @@ export const ACTOS: Acto[] = [
     numero: "II",
     titulo: "La materia se abre",
     corto: "Apertura",
-    pista: "Abre la materia y observa sus capas interiores.",
+    pista: "Un adentro que la superficie no muestra.",
     linea: "La luz se ensancha y la forma enseña que tiene un adentro.",
     ves: "Una materia retorcida que una cuerda tira de lado, otra parte que cede por su peso y una grieta que se abre en bolsas desiguales, con capas por dentro.",
     haz: "Abre o cierra la materia con el control «Apertura». Sin dejar de mover la luz.",
@@ -90,9 +90,30 @@ export const APARICION = {
   momentos: ["Oscuridad.", "Algo cuelga.", "La luz lo encuentra.", "Tiene un adentro.", "La materia se abre.", "Queda la sombra."],
 };
 
+/** Puente editorial antes de la Instalación I: por qué existe la figura y de quién es. */
+export const PUENTE = {
+  titulo: "El cuerpo como territorio",
+  parrafos: [
+    "En esta interpretación, la crucifixión deja de ser únicamente una imagen de sacrificio para convertirse en una pregunta sobre la fragilidad del cuerpo.",
+    "La figura que encontrarás no reproduce la pintura de Bacon: toma de ella solo un cuerpo que cuelga. Es una creación original de MANIFESTO: materia suspendida entre la tensión, la herida y la posibilidad de desaparecer.",
+  ],
+};
+
+/** Qué significan los dos mandos (visibles al terminar la aparición). */
+export const MANDOS = {
+  luz: { frase: "La luz revela lo que la oscuridad protege.", guia: "Desplaza la iluminación y descubre cómo cambia la forma." },
+  apertura: { frase: "La superficie no cuenta toda la historia.", guia: "Explora la apertura para observar el vacío que atraviesa la materia." },
+};
+
 /** Umbral entre las dos instalaciones: el cuerpo se retira y deja su lugar. */
 export const UMBRAL = {
-  lineas: ["El cuerpo se retira.", "Queda el lugar que ocupaba.", "Y su sombra, repartida."],
+  lineas: [
+    "El cuerpo se retira.",
+    "Queda el lugar que ocupaba.",
+    "Y su sombra, repartida.",
+    "Cuando el cuerpo deja de ser una forma completa, ¿qué permanece de él?",
+    "En la siguiente sala, la figura ya no existe en una sola pieza. Solo puede encontrarse reuniendo sus sombras.",
+  ],
 };
 
 /** Instalación II. */
@@ -131,11 +152,11 @@ export const COMPRENDER = {
     },
     {
       k: "Construcción de MANIFESTO",
-      t: "Las dos instalaciones son nuestras. La primera es una masa modelada en volumen y calculada en tiempo real, con una lámpara que puedes mover y una materia que se abre. La segunda son tres membranas cuyas sombras solo forman una figura en una posición concreta. Ninguna copia el cuadro ni lo traduce a 3D. No hay cruz: si aparece una, es solo sombra.",
+      t: "Las dos instalaciones son nuestras. La primera es una masa modelada en volumen y calculada en tiempo real, con una lámpara que puedes mover y una materia que se abre. La segunda son tres membranas cuyas sombras solo forman una figura en una posición concreta. No hay cruz: si aparece una, es solo sombra.",
     },
     {
-      k: "El gesto principal",
-      t: "Mover la luz es decidir qué parte del cuerpo existe; abrir la materia es decidir cuánto se deja ver de su interior. Tercer gesto: no ver el altar. El sacrificio está en lo que no se ilumina.",
+      k: "El tercer gesto",
+      t: "No ver el altar. El sacrificio está en lo que no se ilumina.",
     },
   ],
 };

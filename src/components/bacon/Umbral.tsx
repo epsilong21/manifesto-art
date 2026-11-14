@@ -11,6 +11,13 @@ import { UMBRAL } from "@/content/bacon";
 import { alCambiarHuella, huella } from "./huella";
 import { useProgreso } from "./progreso";
 
+/**
+ * Cuándo aparece cada línea (progreso 0–1 del umbral): [c, h]. Entra en [c − R, c], se queda h y sale en [c + h, c + h + R].
+ * Las tres primeras son el ritmo original; la pregunta se queda un poco más y la última queda hasta el final de la sección,
+ * para que el puente hacia la Instalación II se pueda leer sin añadir desplazamiento.
+ */
+const TIEMPOS: [number, number][] = [[0.11, 0.02], [0.25, 0.02], [0.39, 0.02], [0.56, 0.09], [0.8, 9]];
+
 export function Umbral() {
   const ref = useRef<HTMLElement>(null);
   const forma = useRef<HTMLCanvasElement>(null);
@@ -48,7 +55,7 @@ export function Umbral() {
           <span className="bc-paso-umbral__hilos"><i /><i /><i /></span>
         </div>
         <div className="bc-paso-umbral__lineas">
-          {UMBRAL.lineas.map((l, i) => <p key={l} style={{ "--i": i } as React.CSSProperties}>{l}</p>)}
+          {UMBRAL.lineas.map((l, i) => <p key={l} data-largo={l.length > 40 ? "" : undefined} style={{ "--c": TIEMPOS[i][0], "--h": TIEMPOS[i][1] } as React.CSSProperties}>{l}</p>)}
         </div>
       </div>
     </section>
