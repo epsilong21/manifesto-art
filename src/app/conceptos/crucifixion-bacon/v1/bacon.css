@@ -417,3 +417,11 @@ html:has(.theme-bacon) { background: #090605; }
 .bc-paso-umbral__lineas { position: absolute; inset: 0; pointer-events: none; }
 .bc-paso-umbral__lineas p { z-index: 3; }
 @media (prefers-reduced-motion: reduce) { .bc-paso-umbral__lineas { position: absolute; inset: auto 0 12% 0; } }
+
+/* Grano de la página, solo en Bacon: la intensidad va DENTRO de la baldosa (alfa 0,0385 = 0,55 × 0,07, el mismo grano de globals.css)
+   y la capa fija queda a opacidad 1. Si un compositor falla con una opacidad baja sobre una capa fija, lo peor que puede mostrar
+   es este mismo grano tenue y nunca un patrón blanco intenso. Un único selector sustituye al grano global solo en esta ruta. */
+body:has(.theme-bacon)::after {
+  opacity: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .0385 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
