@@ -63,8 +63,7 @@ html:has(.theme-bacon) { background: #090605; }
 /* ── Puente: por qué existe la figura (antes de la Instalación I) ── */
 .bc-puente { background: #040302; padding: clamp(2.25rem, 6vw, 4rem) max(var(--mf-gutter), calc((100% - 54rem) / 2)) 0; display: grid; gap: 0.9rem; justify-items: start; }
 .bc-puente__h { margin: 0; font-size: clamp(1.9rem, 1.1rem + 3vw, 3rem); line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }
-.bc-puente__p { margin: 0; max-width: 36rem; font-family: var(--f-display); font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem); line-height: 1.42; color: var(--c-muted); text-wrap: pretty; }
-.bc-puente__p:first-of-type { color: var(--c-ink); }
+.bc-puente__p { margin: 0; max-width: 36rem; font-family: var(--f-display); font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem); line-height: 1.42; color: var(--c-ink); text-wrap: pretty; }
 
 /* ── Instalación I · La materia del sacrificio ── */
 .bc-inst { background: #040302; padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(2rem, 4vw, 3rem); display: grid; gap: 1rem; }
