@@ -1,0 +1,1259 @@
+/* ─── Cristo coronado de espinas — Guido Reni ───
+   Paleta: marfil cálido, tinta profunda, ámbar.
+   Identidad: museo contemporáneo, editorial, respiro.
+   ───────────────────────────────────────────── */
+
+.theme-corona {
+  --c-fondo: #f3ede4;
+  --c-ink: #1e1a16;
+  --c-muted: #7d7368;
+  --c-accent: #96722e;
+  --c-linea: rgba(30, 26, 22, 0.1);
+  --co-gutter: clamp(1.25rem, 5vw, 4rem);
+  --f-display: var(--font-lora), "Georgia", serif;
+
+  background: var(--c-fondo);
+  color: var(--c-ink);
+}
+
+/* ── Tipografía base ──────────────────────── */
+
+.theme-corona h1,
+.theme-corona h2,
+.theme-corona h3 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+/* ── Kicker (acto) ────────────────────────── */
+
+.co-kicker {
+  font-family: var(--f-display);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  margin: 0 0 0.5rem;
+}
+
+.co-kicker--dark {
+  color: #c4934a;
+}
+
+/* ── Acto I: Hero ─────────────────────────── */
+
+.co-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(5rem, 12vh, 8rem) var(--co-gutter) clamp(3rem, 6vh, 5rem);
+  text-align: center;
+}
+
+.co-hero__pintura {
+  position: relative;
+  max-width: min(85vw, 36rem);
+  margin: 0 auto 2.5rem;
+}
+
+.co-hero__pintura::after {
+  content: "";
+  position: absolute;
+  inset: -40% -30%;
+  background: radial-gradient(
+    ellipse 70% 60% at 45% 40%,
+    rgba(150, 114, 46, 0.07) 0%,
+    rgba(150, 114, 46, 0.03) 40%,
+    transparent 72%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.co-hero__pintura img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+  box-shadow:
+    0 8px 40px rgba(30, 26, 22, 0.12),
+    0 2px 8px rgba(30, 26, 22, 0.08);
+}
+
+.co-hero__copy {
+  max-width: 36rem;
+}
+
+.co-titulo {
+  margin: 0 0 1.25rem;
+}
+
+.co-titulo__obra {
+  font-family: var(--f-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--c-ink);
+}
+
+.co-ficha {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+.co-ficha > div {
+  margin: 0;
+}
+
+.co-ficha__autor {
+  font-family: var(--f-display);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--c-ink);
+}
+
+.co-ficha__dato {
+  font-size: 0.875rem;
+  color: var(--c-muted);
+  line-height: 1.5;
+}
+
+/* ── Documentado ──────────────────────────── */
+
+.co-documental {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: clamp(3rem, 8vh, 6rem) var(--co-gutter);
+}
+
+.co-documental__cab {
+  margin-bottom: 2rem;
+}
+
+.co-documental__h {
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+  margin: 0.5rem 0 0;
+  color: var(--c-ink);
+}
+
+.co-documental__texto {
+  columns: 1;
+  column-gap: 2.5rem;
+  font-size: clamp(0.9375rem, 1vw + 0.5rem, 1.0625rem);
+  line-height: 1.6;
+  color: var(--c-ink);
+}
+
+.co-documental__texto p {
+  margin: 0 0 1em;
+  break-inside: avoid;
+}
+
+@media (min-width: 48rem) {
+  .co-documental__texto {
+    columns: 2;
+  }
+}
+
+/* ── Acto II: Explorador ──────────────────── */
+
+.co-explorador {
+  --c-fondo: #12100c;
+  --c-ink: #f3ede4;
+  --c-muted: #a89d8e;
+  --c-accent: #c4934a;
+  --c-linea: rgba(196, 147, 74, 0.15);
+
+  position: relative;
+  background: var(--c-fondo);
+  color: var(--c-ink);
+  padding: 0 var(--co-gutter);
+}
+
+.co-explorador::before,
+.co-explorador::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: clamp(3rem, 6svh, 5rem);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.co-explorador::before {
+  top: 0;
+  background: linear-gradient(180deg, #f3ede4, transparent);
+}
+
+.co-explorador::after {
+  bottom: 0;
+  background: linear-gradient(0deg, #f3ede4, transparent);
+}
+
+/* Intro */
+.co-explorador__intro {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: clamp(5rem, 14svh, 9rem) 0 clamp(2.5rem, 5svh, 4rem);
+}
+
+.co-explorador__intro::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--c-accent);
+  opacity: 0.3;
+  margin: clamp(1.5rem, 3svh, 2.5rem) auto 0;
+}
+
+.co-explorador__h {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  margin: 0.5rem 0 0;
+}
+
+.co-explorador__sub {
+  font-size: clamp(0.9375rem, 1vw + 0.5rem, 1.0625rem);
+  color: var(--c-muted);
+  margin: 0.75rem 0 0;
+  line-height: 1.5;
+}
+
+/* Scene: painting viewport + controls */
+.co-explorador__escena {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  max-width: 68rem;
+  margin: 0 auto;
+  padding-bottom: clamp(5rem, 10svh, 8rem);
+}
+
+.co-explorador__lupa {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 2826 / 3553;
+  width: min(100%, calc((100svh - 4rem) * 0.7954));
+  margin-inline: auto;
+  border-radius: 2px;
+  background: #0a0908;
+}
+
+/* Marcadores sobre el conjunto */
+.co-explorador__marca {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.co-explorador__marca span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 232, 205, 0.85);
+  background: rgba(16, 13, 10, 0.55);
+  color: #f5e8cd;
+  font-family: var(--f-display);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 0 5px rgba(245, 232, 205, 0.12);
+  transition: transform 0.3s, background 0.3s;
+  animation: co-marca-pulso 3s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.6s);
+}
+
+@keyframes co-marca-pulso {
+  0%, 100% { box-shadow: 0 0 0 5px rgba(245, 232, 205, 0.12); }
+  50% { box-shadow: 0 0 0 8px rgba(196, 147, 74, 0.2); }
+}
+
+@media (hover: hover) {
+  .co-explorador__marca:hover span {
+    transform: scale(1.18);
+    background: rgba(150, 114, 46, 0.85);
+  }
+}
+
+/* Minimapa: dónde está el detalle dentro del conjunto */
+.co-explorador__mini {
+  position: absolute;
+  top: 0.625rem;
+  left: 0.625rem;
+  width: max(22%, 44px);
+  padding: 0;
+  appearance: none;
+  background: #0a0908;
+  border: 1px solid rgba(245, 232, 205, 0.7);
+  border-radius: 2px;
+  cursor: pointer;
+  line-height: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  animation: co-fadein 0.6s ease-out both;
+}
+
+.co-explorador__mini:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.co-explorador__mini img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0.8;
+}
+
+.co-explorador__mini-v {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1.5px solid #f5e8cd;
+  background: rgba(245, 232, 205, 0.14);
+  transition:
+    left 1.4s cubic-bezier(0.4, 0, 0.1, 1),
+    top 1.4s cubic-bezier(0.4, 0, 0.1, 1),
+    width 1.4s cubic-bezier(0.4, 0, 0.1, 1),
+    height 1.4s cubic-bezier(0.4, 0, 0.1, 1);
+}
+
+.co-explorador__volver {
+  display: block;
+  appearance: none;
+  background: none;
+  border: none;
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 0;
+  min-height: 44px;
+  color: var(--c-accent);
+  font-family: var(--f-display);
+  font-size: 0.875rem;
+  font-style: italic;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.co-explorador__volver:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.co-explorador__pintura {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 1.4s cubic-bezier(0.4, 0, 0.1, 1);
+  will-change: transform;
+}
+
+/* Panel: nav + text */
+.co-explorador__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.co-explorador__nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--c-linea);
+}
+
+@media (min-width: 30rem) {
+  .co-explorador__btn-t {
+    display: inline;
+  }
+}
+
+.co-explorador__btn {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  color: var(--c-muted);
+  font-family: var(--f-display);
+  font-size: 0.875rem;
+  transition: color 0.3s, border-color 0.3s;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+}
+
+.co-explorador__btn[data-active] {
+  color: var(--c-accent);
+  border-bottom-color: var(--c-accent);
+}
+
+.co-explorador__btn:hover,
+.co-explorador__btn:focus-visible {
+  color: var(--c-ink);
+}
+
+.co-explorador__btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: -2px;
+  border-radius: 2px;
+}
+
+.co-explorador__num {
+  font-family: var(--f-display);
+  font-size: 0.75rem;
+  color: var(--c-accent);
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.co-explorador__btn[data-active] .co-explorador__num {
+  opacity: 1;
+}
+
+.co-explorador__btn-t {
+  display: none;
+}
+
+/* Text region */
+.co-explorador__lectura {
+  min-height: 10rem;
+}
+
+.co-explorador__texto {
+  animation: co-fadein 0.6s ease-out both;
+}
+
+.co-explorador__invita {
+  font-family: var(--f-display);
+  font-size: clamp(0.9375rem, 1vw + 0.5rem, 1.0625rem);
+  font-style: italic;
+  color: var(--c-muted);
+  margin: 0;
+  line-height: 1.6;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--c-linea);
+}
+
+.co-explorador__dt {
+  font-family: var(--f-display);
+  font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+  font-weight: 400;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.co-explorador__dd {
+  font-size: clamp(0.9375rem, 0.9vw + 0.5rem, 1rem);
+  line-height: 1.6;
+  color: var(--c-muted);
+  margin: 0 0 1rem;
+}
+
+.co-explorador__tipo {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: var(--c-accent);
+  border: 1px solid var(--c-linea);
+  border-radius: 2px;
+  padding: 0.125rem 0.4rem;
+  opacity: 0.6;
+}
+
+@keyframes co-fadein {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reveal animation (solo si hay JS: sin JS el contenido es visible) */
+@media (scripting: enabled) {
+  .co-explorador [data-reveal] {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 0.8s ease,
+      transform 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .co-explorador [data-reveal][data-visible] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Landscape phones */
+@media (max-height: 500px) and (orientation: landscape) {
+  .co-explorador__escena {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .co-explorador__lupa {
+    width: min(100%, calc((100svh - 3rem) * 0.7954));
+    margin-inline: 0;
+  }
+  .co-explorador__nav {
+    flex-direction: column;
+    border-bottom: none;
+    border-left: 1px solid var(--c-linea);
+  }
+  .co-explorador__btn {
+    border-bottom: none;
+    border-left: 2px solid transparent;
+    margin-bottom: 0;
+    margin-left: -1px;
+    justify-content: flex-start;
+  }
+  .co-explorador__btn[data-active] {
+    border-left-color: var(--c-accent);
+    border-bottom-color: transparent;
+  }
+  .co-explorador__btn-t {
+    display: inline;
+  }
+}
+
+/* Desktop */
+@media (min-width: 64rem) {
+  .co-explorador__escena {
+    grid-template-columns: 1.15fr 1fr;
+    align-items: center;
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+  .co-explorador__lupa {
+    width: min(100%, calc((100svh - 14rem) * 0.7954));
+    margin-inline: 0 auto;
+  }
+  .co-explorador__panel {
+    padding-top: 0;
+  }
+  .co-explorador__nav {
+    flex-direction: column;
+    border-bottom: none;
+    border-left: 1px solid var(--c-linea);
+  }
+  .co-explorador__btn {
+    border-bottom: none;
+    border-left: 2px solid transparent;
+    margin-bottom: 0;
+    margin-left: -1px;
+    padding: 0.75rem 1.25rem;
+    justify-content: flex-start;
+  }
+  .co-explorador__btn[data-active] {
+    border-left-color: var(--c-accent);
+    border-bottom-color: transparent;
+  }
+  .co-explorador__btn-t {
+    display: inline;
+  }
+  .co-explorador__lectura {
+    min-height: 14rem;
+  }
+  .co-explorador__invita {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .co-explorador [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .co-explorador__pintura,
+  .co-explorador__mini-v,
+  .co-explorador__marca span {
+    transition: none;
+    animation: none;
+  }
+  .co-explorador__texto,
+  .co-explorador__mini {
+    animation: none;
+  }
+}
+
+/* ── Puente narrativo ─────────────────────── */
+
+.co-puente {
+  position: relative;
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 6vh, 4.5rem) var(--co-gutter) clamp(3rem, 8vh, 6rem);
+  text-align: center;
+  border-top: 1px solid var(--c-linea);
+}
+
+.co-puente__antes {
+  font-family: var(--f-display);
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+  font-style: italic;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--c-ink);
+  margin: 0 0 1.5rem;
+}
+
+.co-puente__despues {
+  font-size: clamp(0.875rem, 1vw + 0.5rem, 1rem);
+  line-height: 1.6;
+  color: var(--c-muted);
+  margin: 0;
+}
+
+/* ── Acto III: Corona — escenario escultórico ── */
+
+.co-corona {
+  --c-fondo: #12100c;
+  --c-ink: #e2d8c8;
+  --c-muted: #9a8d7a;
+  --c-accent: #c4934a;
+  --c-linea: rgba(196, 147, 74, 0.15);
+  --co-presion: 0;
+
+  position: relative;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 45%, rgba(196, 147, 74, 0.04) 0%, transparent 65%),
+    linear-gradient(180deg, #f3ede4 0%, #d4cbbf 3%, #6b5d4e 7%, #2a2318 12%, var(--c-fondo) 24%);
+  color: var(--c-ink);
+  padding: clamp(3rem, 8vh, 5.5rem) var(--co-gutter) clamp(2rem, 5vh, 3.5rem);
+  overflow: hidden;
+}
+
+.co-corona::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  box-shadow:
+    inset 0 0 clamp(4rem, 12vw, 10rem) clamp(1rem, 4vw, 3rem) rgba(10, 8, 6, 0.85);
+  opacity: var(--co-vignette-o, 0.15);
+  transition: opacity 0.4s ease-out;
+}
+
+.co-corona__cab {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.co-corona__h {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin: 0.5rem 0 0;
+  color: var(--c-ink);
+}
+
+.co-corona__tipo {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: var(--c-muted);
+  border: none;
+  border-radius: 2px;
+  padding: 0;
+  margin-top: 0.5rem;
+  opacity: 0.5;
+  letter-spacing: 0.03em;
+}
+
+.co-corona__escenario {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto clamp(1.25rem, 3vh, 2rem);
+}
+
+.co-corona__escenario::before {
+  content: "";
+  position: absolute;
+  inset: -20% -15%;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 55% 50% at 50% 50%,
+    rgba(196, 147, 74, 0.07) 0%,
+    transparent 70%
+  );
+  opacity: var(--co-glow-o, 0.3);
+  transition: opacity 0.4s ease-out;
+}
+
+.co-corona__lienzo {
+  position: relative;
+  width: max(min(80vw, 20rem), min(95vw, 54rem, calc((100svh - 24rem) * 1.333)));
+  aspect-ratio: 4 / 3;
+  margin: 0 auto;
+  cursor: ns-resize;
+  touch-action: none;
+  outline: none;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.co-corona__lienzo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 clamp(3rem, 8vw, 7rem) clamp(1rem, 3vw, 3rem) rgba(10, 8, 6, 0.7);
+  border-radius: inherit;
+}
+
+.co-corona__lienzo:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.co-corona__lienzo canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 48%, #000 40%, transparent 95%);
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 48%, #000 40%, transparent 95%);
+}
+
+.co-corona__pista {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: co-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes co-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.co-corona__respuesta {
+  position: relative;
+  z-index: 1;
+  max-width: 28rem;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: clamp(0.5rem, 1.5vh, 1rem);
+}
+
+.co-corona__pie {
+  font-family: var(--f-display);
+  font-size: clamp(0.875rem, 1vw + 0.5rem, 1rem);
+  font-style: italic;
+  line-height: 1.55;
+  color: var(--c-muted);
+  margin: 0 0 1.25rem;
+  min-height: 3em;
+}
+
+.co-corona__control {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 14rem;
+  margin: 0 auto;
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+
+.co-corona__control:hover,
+.co-corona__control:focus-within {
+  opacity: 0.9;
+}
+
+.co-corona__label {
+  font-size: 0.75rem;
+  color: var(--c-muted);
+  flex-shrink: 0;
+}
+
+.co-corona__slider {
+  flex: 1;
+  height: 2px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--c-linea);
+  border: none;
+  border-radius: 1px;
+  outline: none;
+}
+
+.co-corona__slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  cursor: pointer;
+}
+
+.co-corona__slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  border: none;
+  cursor: pointer;
+}
+
+.co-corona__slider:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 4px;
+}
+
+.co-fallback {
+  position: relative;
+  z-index: 1;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--c-muted);
+}
+
+/* ── Acto IV: Cierre ──────────────────────── */
+
+.co-cierre {
+  padding: clamp(5rem, 14vh, 10rem) var(--co-gutter) clamp(4rem, 10vh, 7rem);
+  background: linear-gradient(
+    180deg,
+    #0a0908 0%,
+    #12100c 6%,
+    #1a1712 14%,
+    #25211b 24%,
+    #3a3329 36%,
+    #6b5f4e 50%,
+    #a99a84 62%,
+    var(--c-fondo) 78%
+  );
+  text-align: center;
+}
+
+@property --luz {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 160%;
+}
+
+@property --luz-x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --luz-y {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 48%;
+}
+
+.co-cierre__monumento {
+  position: relative;
+  width: min(85vw, 28rem);
+  margin: 0 auto clamp(3rem, 7vh, 5rem);
+}
+
+.co-cierre__monumento::after {
+  content: "";
+  position: absolute;
+  inset: -40% -30%;
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 45%,
+    rgba(150, 114, 46, 0.07) 0%,
+    rgba(150, 114, 46, 0.03) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.co-cierre__monumento img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 65% 55% at var(--luz-x) var(--luz-y),
+    #000 calc(var(--luz) - 18%),
+    transparent var(--luz)
+  );
+  mask-image: radial-gradient(
+    ellipse 65% 55% at var(--luz-x) var(--luz-y),
+    #000 calc(var(--luz) - 18%),
+    transparent var(--luz)
+  );
+}
+
+/* Atención secuencial: rostro → corona → manos/caña → conjunto completo.
+   Conecta el cierre con los tres descubrimientos del Acto II. */
+@keyframes co-atencion {
+  0%   { --luz: 0%;   --luz-x: 48%; --luz-y: 35%; }
+  22%  { --luz: 32%;  --luz-x: 48%; --luz-y: 35%; }
+  38%  { --luz: 44%;  --luz-x: 46%; --luz-y: 23%; }
+  56%  { --luz: 58%;  --luz-x: 52%; --luz-y: 65%; }
+  75%  { --luz: 100%; --luz-x: 50%; --luz-y: 48%; }
+  100% { --luz: 160%; --luz-x: 50%; --luz-y: 48%; }
+}
+
+@keyframes co-resplandor {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (scripting: enabled) {
+  .co-cierre__monumento img {
+    --luz: 0%;
+    --luz-x: 48%;
+    --luz-y: 35%;
+  }
+
+  .co-cierre__monumento::after {
+    opacity: 0;
+  }
+
+  .co-cierre__monumento[data-visible] img {
+    animation: co-atencion 5.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s both;
+  }
+
+  .co-cierre__monumento[data-visible]::after {
+    animation: co-resplandor 4s ease-out 1.5s both;
+  }
+
+  .co-cierre__epilogo > * {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition:
+      opacity 1.2s ease,
+      transform 1.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .co-cierre__epilogo[data-visible] > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  .co-cierre__epilogo[data-visible] > :nth-child(2) { transition-delay: 0.3s; }
+  .co-cierre__epilogo[data-visible] > :nth-child(3) { transition-delay: 0.8s; }
+  .co-cierre__epilogo[data-visible] > :nth-child(4) { transition-delay: 2s; }
+}
+
+.co-cierre__epilogo {
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.co-cierre__remate {
+  position: relative;
+  margin: clamp(2rem, 5vh, 3.5rem) auto 0;
+  padding-top: clamp(1.75rem, 4vh, 2.5rem);
+  max-width: 30rem;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  line-height: 1.25;
+  color: var(--c-ink);
+  letter-spacing: -0.01em;
+}
+
+.co-cierre__remate::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--c-accent);
+  transform: translateX(-50%);
+  opacity: 0.6;
+}
+
+.co-cierre__h {
+  font-family: var(--f-display);
+  font-size: clamp(1.375rem, 3vw, 1.75rem);
+  font-style: italic;
+  margin: 0.5rem 0 1.5rem;
+  color: var(--c-ink);
+}
+
+.co-cierre__texto {
+  font-size: clamp(0.9375rem, 1vw + 0.5rem, 1.0625rem);
+  line-height: 1.65;
+  color: var(--c-muted);
+  margin: 0;
+  max-width: 32rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 64rem) {
+  .co-cierre__monumento {
+    width: min(38vw, 36rem, calc((100svh - 9rem) * 0.7954));
+    margin-bottom: clamp(3.5rem, 7vh, 5rem);
+  }
+
+  .co-cierre__epilogo {
+    max-width: 36rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .co-cierre__monumento img,
+  .co-cierre__monumento::after,
+  .co-cierre__epilogo > * {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    --luz: 160%;
+    --luz-x: 50%;
+    --luz-y: 48%;
+  }
+}
+
+/* ── Comprender ───────────────────────────── */
+
+.co-comprender {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: clamp(3.5rem, 8vh, 6rem) var(--co-gutter) clamp(2.5rem, 6vh, 4.5rem);
+  border-top: 1px solid var(--c-linea);
+}
+
+.co-comprender__h {
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+  margin: 0 0 2rem;
+  color: var(--c-ink);
+}
+
+.co-comprender__lista {
+  margin: 0;
+}
+
+.co-comprender__item {
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--c-linea);
+}
+
+.co-comprender__q {
+  font-family: var(--f-display);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-ink);
+  margin: 0 0 0.5rem;
+}
+
+.co-comprender__a {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--c-muted);
+  margin: 0;
+}
+
+/* ── Footer ───────────────────────────────── */
+
+.co-footer {
+  border-top: 1px solid var(--c-linea);
+  padding: clamp(2rem, 5vh, 4rem) var(--co-gutter);
+}
+
+.co-footer__inner {
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.co-creditos__h {
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  margin: 0 0 1rem;
+}
+
+.co-creditos__img,
+.co-creditos__nota {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--c-muted);
+  margin: 0 0 0.5rem;
+}
+
+.co-creditos__fuentes {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.co-creditos__fuentes a {
+  font-size: 0.8125rem;
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.co-creditos__fuentes a:hover {
+  color: var(--c-ink);
+}
+
+.co-footer__nav {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--c-linea);
+}
+
+.co-footer__link {
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  text-decoration: none;
+}
+
+.co-footer__link:hover {
+  color: var(--c-ink);
+}
+
+/* ── Utilidades ───────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Reduced motion ───────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .co-corona__pista {
+    animation: none;
+    opacity: 0.7;
+  }
+
+  .co-corona::after,
+  .co-corona__escenario::before,
+  .co-corona__control {
+    transition: none;
+  }
+}
+
+/* ── Responsive: 320px ────────────────────── */
+
+@media (max-width: 23.9375rem) {
+  .co-hero__pintura {
+    max-width: 95vw;
+  }
+}
+
+/* ── Responsive: >1440px ──────────────────── */
+
+@media (min-width: 90rem) {
+  .co-hero__pintura {
+    max-width: 32rem;
+  }
+
+}
+
+/* ── Responsive: >1920px ──────────────────── */
+
+@media (min-width: 120rem) {
+  .theme-corona {
+    font-size: 1.0625rem;
+  }
+}
+
+/* ── Pulido editorial de escritorio (≥64rem) ──
+   Solo reparte mejor el espacio: móvil y tablet no cambian. */
+@media (min-width: 64rem) {
+  /* Acto I: pintura y ficha lado a lado, el conjunto cabe en una pantalla */
+  .co-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: clamp(3rem, 6vw, 6rem);
+    max-width: 78rem;
+    margin: 0 auto;
+    padding: clamp(5rem, 9vh, 6.5rem) var(--co-gutter) clamp(2.5rem, 5vh, 4rem);
+    text-align: left;
+  }
+
+  .co-hero__pintura {
+    margin: 0 0 0 auto;
+    max-width: min(30rem, calc((100svh - 11rem) * 0.795));
+  }
+
+  .co-hero__copy {
+    max-width: 26rem;
+  }
+
+  .co-ficha {
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  /* Documentado: encabezado a la izquierda, texto a la derecha */
+  .co-documental {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr);
+    column-gap: clamp(2rem, 5vw, 5rem);
+    max-width: 78rem;
+    padding-block: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  .co-documental__cab {
+    margin-bottom: 0;
+  }
+
+  .co-puente {
+    padding-block: clamp(2rem, 5vh, 3.5rem);
+  }
+
+  /* Acto III: escenario expandido */
+  .co-corona {
+    padding-block: clamp(3rem, 7vh, 5rem);
+  }
+
+  .co-comprender {
+    max-width: 78rem;
+    padding-block: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  .co-comprender__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 2.5rem;
+  }
+}

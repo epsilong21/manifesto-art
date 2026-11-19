@@ -58,6 +58,16 @@ El aviso legal del sitio (`/aviso-legal/`, «Aviso legal y derechos de reproducc
 - **Condiciones del archivo:** la marca de Commons no equivale a una autorización del Museo del Prado; las condiciones de reutilización de sus imágenes están pendientes de confirmar.
 - **Capas de MANIFESTO:** los sectores, los medallones y el ojo son zonas dibujadas sobre la imagen, medidas sobre esta reproducción, y no la alteran.
 
+### Cristo coronado de espinas · Guido Reni, hacia 1636–1637 · Gemäldegalerie Alte Meister, Dresde (Gal.-Nr. 329)
+
+- **Pintura:** de dominio público (Reni murió en 1642). La fecha varía según las fuentes (1636, 1636–37, 1640); la página indica hacia 1636–1637. Existen otras versiones (Fitzwilliam Museum, 1639, entre ellas); se usa la de Dresde.
+- **Reproducción:** fotografía de Dguendel (27/01/2024), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dresden,_Gem%C3%A4ldegalerie_Alte_Meister,_Guido_Reni,_Christus_mit_der_Dornenkrone.jpg), licencia CC BY 4.0; la atribución figura en la página.
+- **Archivos en el repositorio:** `public/corona/corona-600.webp`, `corona-1200.webp` y `corona-2100.webp`, redimensionados y convertidos a WebP.
+- **Condiciones del archivo:** la política de reproducción de imágenes de la Gemäldegalerie Alte Meister está pendiente de confirmar.
+- **Capas de MANIFESTO:** la corona tridimensional del Acto III y los encuadres del explorador son creaciones propias y no alteran la pintura.
+- **Fuentes:** [ficha de la colección digital de SKD](https://skd-online-collection.skd.museum/Details/Index/378309) y [Guido Reni en Wikipedia](https://en.wikipedia.org/wiki/Guido_Reni).
+- **Publicación:** vista previa por enlace directo, sin entrada en el catálogo ni en el mapa del sitio.
+
 ## Obras protegidas reproducidas sin licencia
 
 ### Los elefantes · Salvador Dalí, 1948
