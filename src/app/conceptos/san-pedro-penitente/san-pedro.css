@@ -1,0 +1,292 @@
+/* ───────────────────────────────────────────────────────────────
+   San Pedro penitente — «El peso de la negación»  ·  prefijo sp-
+   Mobile-first: la pintura va arriba y el texto abajo; a partir de
+   proporción apaisada (6:5) el texto pasa a la izquierda.
+   Los textos tienen su propio color y fondo: nunca dependen del canvas.
+   ─────────────────────────────────────────────────────────────── */
+
+.theme-san-pedro {
+  --c-bg: #050505;
+  --c-ink: #e4dac6;
+  --c-muted: #b3a690;
+  --c-accent: #d9ad5e;
+  --c-int: #a9bdd4;
+  --c-line: rgba(217, 173, 94, 0.28);
+  --sp-gutter: clamp(1rem, 4vw, 3rem);
+  background: var(--c-bg);
+  color: var(--c-ink);
+  min-height: 100svh;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+html.sp-bloqueado { overflow: hidden; }
+
+/* ── Capas ─────────────────────────────────────────────────── */
+.sp-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: var(--c-bg);
+  pointer-events: none;
+}
+.sp-cab {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 10;
+}
+.sp-vel {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 8;
+  /* vertical: cubre cabecera + franja del botón del visor */
+  height: calc(env(safe-area-inset-top, 0px) + 7.75rem);
+  background: linear-gradient(var(--c-bg) 88%, transparent);
+  pointer-events: none;
+}
+.sp-pista { position: relative; z-index: 1; }
+.sp-footer { position: relative; z-index: 2; background: var(--c-bg); }
+/* cierre: la pintura y el texto se funden con el pie en vez de cortarse en seco */
+.theme-san-pedro .sp-footer { border-top: 0; }
+.sp-footer::before {
+  content: "";
+  position: absolute;
+  inset: -5rem 0 auto 0;
+  height: 5rem;
+  background: linear-gradient(transparent, var(--c-bg));
+  pointer-events: none;
+}
+
+/* ── Tramos (beats) ────────────────────────────────────────── */
+.sp-beat {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 100svh;
+  padding: 0 var(--sp-gutter) 5svh;
+}
+.sp-beat--hero { min-height: 170svh; align-items: flex-start; padding-bottom: 0; }
+.sp-beat--hero .sp-bloque { margin-top: 60svh; }
+.sp-beat--silencio { min-height: 115svh; }
+.sp-beat--contemplar { min-height: 70svh; padding: 0; }
+.sp-beat--fin { align-items: flex-start; padding-top: 62svh; padding-bottom: max(5.5rem, 8svh); min-height: 0; }
+
+.sp-bloque {
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 1.1rem 1.1rem 1.25rem;
+  background: rgba(5, 5, 5, 0.9);
+  border-top: 1px solid var(--c-line);
+  display: grid;
+  gap: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.sp-beat--hero .sp-bloque { background: transparent; border-top: 0; padding-inline: 0; }
+.sp-bloque--silencio { background: transparent; border-top: 0; }
+
+/* ── Tipografía ────────────────────────────────────────────── */
+.sp-ojo {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.sp-titulo {
+  margin: 0;
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(2.3rem, 1.5rem + 4.4vw, 4.6rem);
+  line-height: 1.02;
+  color: #f4ead6;
+  text-wrap: balance;
+}
+.sp-autor { margin: 0; font-size: 0.95rem; color: var(--c-muted); }
+.sp-baja { margin: 0.6rem 0 0; font-size: 0.8rem; color: var(--c-muted); letter-spacing: 0.06em; }
+.sp-h2 {
+  margin: 0;
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(1.7rem, 1.2rem + 2vw, 2.6rem);
+  line-height: 1.1;
+  color: #f4ead6;
+}
+.sp-p {
+  margin: 0;
+  font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.06rem);
+  line-height: 1.65;
+  color: var(--c-ink);
+}
+.sp-nota { margin: 0; font-size: 0.85rem; color: var(--c-muted); }
+
+.sp-cita {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.sp-cita p {
+  margin: 0;
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.6rem, 1.15rem + 2.1vw, 2.5rem);
+  line-height: 1.18;
+  color: #f4ead6;
+  text-wrap: balance;
+}
+.sp-cita cite { font-style: normal; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-accent); }
+.sp-cita--gallo { margin-top: 0.4rem; padding-top: 0.9rem; border-top: 1px solid var(--c-line); }
+.sp-cita--gallo p, .sp-cita--suave p { font-size: clamp(1.15rem, 1rem + 0.9vw, 1.5rem); color: var(--c-ink); }
+
+.sp-silencio {
+  margin: 0;
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.7rem, 1.2rem + 2.4vw, 2.8rem);
+  line-height: 1.15;
+  color: #e9dcc2;
+  text-wrap: balance;
+}
+
+/* ── Etiquetas: documentado / interpretación ───────────────── */
+.sp-tag {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+.sp-tag--doc { color: var(--c-accent); border-color: var(--c-line); }
+.sp-tag--int { color: var(--c-int); border-color: rgba(169, 189, 212, 0.4); border-style: dashed; }
+
+.sp-grupo { display: grid; gap: 0.8rem; }
+.sp-grupo + .sp-grupo { padding-top: 1.8rem; border-top: 1px solid rgba(217, 173, 94, 0.14); }
+.sp-grupo:last-child .sp-p { color: #d3dbe6; }
+
+.sp-ficha { margin: 0.3rem 0 0; display: grid; gap: 0.35rem; font-size: 0.85rem; color: var(--c-muted); }
+.sp-ficha dt { margin-top: 0.4rem; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent); }
+.sp-ficha dd { margin: 0; }
+
+/* ── Botones ───────────────────────────────────────────────── */
+.sp-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--c-ink);
+  background: rgba(5, 5, 5, 0.72);
+  border: 1px solid var(--c-line);
+  cursor: pointer;
+}
+.sp-btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+@media (hover: hover) {
+  .sp-btn:hover { border-color: var(--c-accent); color: #fff; }
+}
+.sp-visor-zona {
+  position: fixed;
+  z-index: 9;
+  top: calc(env(safe-area-inset-top, 0px) + 4.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.sp-btn--visor { background: rgba(5, 5, 5, 0.92); white-space: nowrap; }
+/* al llegar al pie, el botón deja de intervenir */
+.sp-visor-zona { transition: opacity 0.3s ease; }
+.sp-visor-zona[data-oculto="1"] { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* ── Visor de la pintura completa ──────────────────────────── */
+.sp-visor {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--c-ink);
+  background: rgba(3, 3, 3, 0.97);
+}
+.sp-visor[open] { display: grid; place-items: center; }
+.sp-visor::backdrop { background: #000; }
+.sp-visor__in { display: grid; justify-items: center; gap: 0.8rem; padding: 1rem; max-width: 100vw; }
+.sp-visor__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(92vw, 100%);
+  max-height: 76svh;
+  aspect-ratio: 1576 / 2000;
+  object-fit: contain;
+}
+.sp-visor__pie { margin: 0; max-width: 40rem; text-align: center; font-size: 0.8rem; color: var(--c-muted); }
+.sp-visor form { margin: 0; }
+
+/* ── Aparición de textos (sin JS quedan visibles) ──────────── */
+.sp-js .sp-rev { opacity: 0; transform: translateY(14px); transition: opacity 0.9s ease, transform 0.9s ease; }
+.sp-js .sp-rev.is-in { opacity: 1; transform: none; }
+
+/* ── Apaisado: texto a la izquierda, pintura a la derecha ──── */
+@media (min-aspect-ratio: 6/5) {
+  .sp-vel { height: calc(env(safe-area-inset-top, 0px) + 4.75rem); background: linear-gradient(var(--c-bg) 80%, transparent); }
+  .sp-beat { align-items: center; padding-top: 4.75rem; padding-bottom: 1rem; }
+  .sp-beat--hero { align-items: flex-start; padding-bottom: 0; }
+  .sp-beat--contemplar { min-height: 85svh; padding: 0; }
+  .sp-beat--hero .sp-bloque { margin-top: 30svh; }
+  .sp-beat--fin { align-items: center; padding: 5.5rem var(--sp-gutter) 5.5rem; min-height: 100svh; }
+  .sp-beat--fin .sp-p { font-size: 0.95rem; line-height: 1.55; }
+  .sp-ficha { grid-template-columns: 6.6rem 1fr; column-gap: 0.8rem; }
+  .sp-ficha dt { margin-top: 0; padding-top: 0.2rem; }
+  .sp-ficha dd { padding-bottom: 0.45rem; }
+  .sp-bloque {
+    margin: 0;
+    max-width: min(30rem, 42vw);
+    background: transparent;
+    border-top: 0;
+    padding: 0;
+  }
+  .sp-bloque:not(.sp-bloque--silencio):not(.sp-bloque--hero) { padding-left: 1.1rem; border-left: 1px solid var(--c-line); }
+  .sp-beat--hero .sp-bloque { border-left: 0; padding-left: 0; }
+  .sp-bloque--silencio { padding-left: 1.1rem; border-left: 1px solid transparent; }
+  /* bajo la pintura, centrado en su columna (67 % del ancho) */
+  .sp-visor-zona { top: auto; bottom: 0.9rem; left: 67%; }
+}
+@media (max-height: 460px) {
+  .sp-p { font-size: 0.9rem; line-height: 1.5; }
+  .sp-cita p { font-size: 1.4rem; }
+  .sp-bloque { gap: 0.6rem; }
+}
+
+/* ── Alternativa sin WebGL / sin JS ────────────────────────── */
+.sp-fallback { padding-top: 5rem; }
+.sp-fallback .sp-beat, .sp-fallback .sp-beat--hero, .sp-fallback .sp-beat--fin { min-height: 0; padding: 2.5rem var(--sp-gutter); }
+.sp-fallback .sp-beat--hero .sp-bloque { margin-top: 0; }
+.sp-fallback .sp-beat--contemplar { display: none; }
+.sp-fallback .sp-bloque { margin: 0 auto; max-width: 36rem; background: transparent; border: 0; padding: 0; }
+.sp-fallback .sp-baja { display: none; }
+.sp-fb-fig { margin: 0 auto; padding: 0 var(--sp-gutter); max-width: 34rem; }
+.sp-fb-fig img { display: block; width: 100%; height: auto; aspect-ratio: 1576 / 2000; }
+
+/* ── Movimiento reducido ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .sp-js .sp-rev { opacity: 1; transform: none; transition: none; }
+}

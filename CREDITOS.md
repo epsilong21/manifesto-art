@@ -107,6 +107,14 @@ Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fun
 - **Sin licencia:** **no hay autorización de VEGAP ni de la Fundació Gala-Salvador Dalí**, ni de Glasgow Life para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y así se indica en la página. Se retirará si lo pide su titular.
 - **Capas de MANIFESTO:** el modelo de las dos miradas, la franja de luz y las guías de triángulo, círculo y ejes se dibujan o se calculan aparte y no alteran el archivo.
 
+### San Pedro penitente · Taller de Jusepe de Ribera, siglo XVII
+
+- **Reproducción:** [«The penitent Saint Peter.jpg»](https://commons.wikimedia.org/wiki/File:The_penitent_Saint_Peter.jpg) (Wikimedia Commons, 1576 × 2000 px), clasificada allí como dominio público. Su crédito remite a Sotheby's, Nueva York, 5 de junio de 2014, lote 31. Christie's vendió la misma obra en la venta 23048, lote 203 (17 de abril de 2024), como taller de Ribera.
+- **Archivo en el repositorio:** `public/san-pedro/san-pedro-600.webp`, `san-pedro-1200.webp` y `san-pedro-1576.webp`, redimensionados y convertidos a WebP, sin ampliar ni retocar. El sitio no sirve la imagen por encima de 1576 px.
+- **Sin verificación independiente:** Commons clasifica la imagen como dominio público, pero MANIFESTO **no ha verificado de forma independiente** el estatus en cada jurisdicción. El archivo local es una captura PNG decodificada, no el JPG original de Commons: el SHA-1 registrado en Commons no puede comprobarse.
+- **Pendiente:** revisar el estatus de la obra y de la fotografía según el país de uso (incluida Colombia) y las posibles condiciones de Christie's y Sotheby's sobre sus fotografías. **No existe autorización comercial documentada.**
+- **Capas de MANIFESTO:** los haces de luz, las negaciones, la brasa y los tratamientos de luz y sombra son creaciones artísticas de MANIFESTO generadas con WebGL2 y no alteran el archivo.
+
 ## Creaciones de MANIFESTO
 
 El código, el diseño, los shaders, las composiciones gráficas (incluidos «El desierto imposible» y la composición de *Los elefantes*) y la textura mineral (generada por `scripts/textura-mineral.mjs`) son creaciones de MANIFESTO.
@@ -124,6 +132,8 @@ En las páginas 06–09 (*La ascensión al Empíreo*, *El descendimiento de la c
 En *Crucifixion* (Bacon), las dos instalaciones («La materia del sacrificio», calculada en tiempo real con WebGL2, y «El negativo del cuerpo», dibujada en Canvas 2D), el umbral, el epílogo y las tres lecturas son creaciones originales de MANIFESTO, generadas con código. Se inspiran en la obra, pero no la reproducen ni la imitan, y no han sido realizadas ni avaladas por Francis Bacon ni por The Estate of Francis Bacon.
 
 En *Cristo de San Juan de la Cruz* (Dalí), el modelo de las dos miradas, la franja de luz entre la sombra y la bahía, la regla de luminosidad y las guías de triángulo, círculo y ejes son creaciones de MANIFESTO, generadas con código y dibujadas aparte, sin alterar el archivo.
+
+En *San Pedro penitente* (taller de Ribera), los cuatro actos, los tres haces de luz que las negaciones apagan, la brasa, el silencio luminoso, la escala narrativa y los tratamientos de luz y sombra son creaciones de MANIFESTO, generadas en tiempo real con WebGL2 y dibujadas sobre la reproducción sin alterar el archivo. Las citas bíblicas proceden de la Reina-Valera Antigua (dominio público).
 
 ## Tipografías
 
@@ -170,3 +180,9 @@ Fuentes añadidas en *Glenn* (Basquiat):
 - **basquiat.com**, [notas de la cronología del Whitney Museum (1992)](https://www.basquiat.com/chronology): cronología del contexto, entre otras las exposiciones en la Mary Boone Gallery de 1984 y 1985 y la portada «New Art, New Money» de febrero de 1985.
 - **Sotheby's**, [*Tenor* (1985), nota de catálogo (2014)](https://www.sothebys.com/en/auctions/ecatalogue/2014/contemporary-art-evening-auction-l14020/lot.29.html): en la serie de mediados de los ochenta, Basquiat fotocopiaba dibujos suyos anteriores para el fondo.
 - **Gagosian Shop** y **Musart**, descripciones del plato *Glenn* editado con el Estate ([Gagosian](https://www.gagosianshop.com/products/jean-michel-basquiat-glenn-plate), [Musart](https://musart.com/en/jean-michel-basquiat-limoges-porcelain-plate-small-glenn-1984-musbow-cajmb20)): fuentes comerciales, usadas solo para describir lo que se ve (Observación) y para la relación probable del título con O'Brien (Interpretación).
+
+Fuentes añadidas en *San Pedro penitente* (taller de Ribera):
+
+- **Christie's**, [venta 23048, lote 203 (17 de abril de 2024)](https://www.christies.com/en/lot/lot-6474861): catalogación como taller de Ribera, descripción de la obra (lágrimas, rostro vuelto al cielo), técnica, medidas y procedencia.
+- **Wikimedia Commons**, [«The penitent Saint Peter.jpg»](https://commons.wikimedia.org/wiki/File:The_penitent_Saint_Peter.jpg): reproducción usada, clasificada como dominio público, crédito a Sotheby's.
+- **Biblia, Reina-Valera Antigua** (dominio público), consultada a través de [Bible Gateway](https://www.biblegateway.com/): Mateo 16:18, Mateo 26:69–75, Marcos 14:66–72, Lucas 22:54–62 y Juan 18:15–27.
