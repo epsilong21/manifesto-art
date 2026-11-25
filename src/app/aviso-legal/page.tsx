@@ -4,6 +4,7 @@ import { ConceptHeader, WhatsAppFlotante, SiteFooter } from "@/components/concep
 import { ACTUALIZACION, CONTACTO_LEGAL, CREDITOS_URL, DATOS_PENDIENTES, RESPONSABLE, SECCIONES_AVISO, TELEFONO_HREF } from "@/content/aviso-legal";
 import { BASQUIAT, DERECHOS_BASQUIAT, OBRA_BASQUIAT } from "@/content/basquiat";
 import { DERECHOS_DALI, ELEFANTES, OBRA_ELEFANTES } from "@/content/elefantes";
+import { OBRA as MADONA } from "@/prototipos/madonna-presencia/reproduccion";
 import { DERECHOS_GLENN, GLENN, OBRA_GLENN } from "@/content/glenn";
 import { MEDUSA } from "@/content/medusa";
 import { NOCHE } from "@/content/noche";
@@ -127,6 +128,17 @@ export default function AvisoLegalPage() {
       derechos: `Obra © Salvador Dalí, Fundació Gala-Salvador Dalí / VEGAP. Protegida hasta el ${DERECHOS_DALI.hasta}.`,
       situacion:
         "No hay autorización de VEGAP ni de la Fundació Gala-Salvador Dalí, ni de Glasgow Life para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y se retirará si lo pide el titular de los derechos. Este aviso no concede ni sustituye ninguna autorización.",
+    },
+    {
+      slug: "la-madona-de-portlligat",
+      titulo: MADONA.titulo,
+      autor: MADONA.artista,
+      fecha: MADONA.fecha,
+      coleccion: `${MADONA.coleccion} (${MADONA.credito}, cat. ${MADONA.catalogo})`,
+      imagen: "La pintura no se muestra en esta edición. La página presenta una lámina rotulada como no disponible y enlaza las fichas oficiales del catálogo razonado y del museo.",
+      derechos: `${MADONA.derechos}. Protegida hasta el ${DERECHOS_DALI.hasta}.`,
+      situacion:
+        "No hay autorización de VEGAP ni de la Fundació Gala-Salvador Dalí para reproducir la imagen. La instalación tridimensional de MANIFESTO que sigue a la ficha es una interpretación propia, claramente diferenciada de la pintura, y no sustituye ni reproduce su composición. Este aviso no concede ni sustituye ninguna autorización.",
     },
   ];
 

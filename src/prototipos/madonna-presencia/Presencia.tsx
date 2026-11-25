@@ -18,12 +18,15 @@
  * La instalación, la transición de entrada, el regreso A1 y el sistema de reproducción no cambian.
  */
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import { Instalacion, VISTA_INST0, ENCUADRE0, type InstalacionApi, type VistaInst, type Encuadre } from "./Instalacion";
 import type { Cavidad } from "../madonna-retablo/retabloGL";
 import { ESTACIONES } from "../madonna-retablo/composicion";
 import { FICHAS, OBRA, resolverReproduccion, candidata, type Reproduccion } from "./reproduccion";
 import { REGISTRO, TIEMPOS, VARIANTE0, DUR_VUELTA, registrar, clavesRegreso, clavesVuelta, type Variante } from "./correspondencia";
 import { cormorant } from "@/lib/fonts/cormorant";
+import { DERECHOS_DALI } from "@/content/elefantes";
+import { CONTACTO_LEGAL } from "@/content/aviso-legal";
 
 type Fase = "encuentro" | "entrando" | "instalacion" | "volviendo" | "regreso";
 /** De dónde se entra en la instalación: la sala del encuentro, el regreso (reanudar en el encuadre) o el regreso (reiniciar). */
@@ -426,7 +429,12 @@ export function Presencia() {
               </p>
               {cand.estado === "sin" && (
                 <p className="pr-derechos">
-                  {OBRA.derechos}. Sin reproducción: la obra está protegida (VEGAP) y no consta autorización para mostrarla.
+                  {OBRA.derechos}. Protegida por derechos de autor hasta el {DERECHOS_DALI.hasta} ({DERECHOS_DALI.gestion});
+                  reproducirla requiere su autorización, que no consta en esta edición. Esta página es un proyecto editorial
+                  de divulgación e interpretación: la pintura original y la instalación de MANIFESTO que sigue son cosas
+                  distintas y se presentan por separado. MANIFESTO no está afiliado a la Fundació Gala-Salvador Dalí ni a
+                  VEGAP. Consultas o reclamaciones de derechos:{" "}
+                  <a href={`mailto:${CONTACTO_LEGAL.correo}`}>{CONTACTO_LEGAL.correo}</a> · <Link href="/aviso-legal">Aviso legal</Link>.
                 </p>
               )}
             </div>
@@ -607,8 +615,10 @@ export function Presencia() {
                     <p className="pr-derechos">{OBRA.derechos}. {repro.credito}</p>
                   ) : (
                     <p className="pr-pista">
-                      En esta edición la reproducción no está disponible (obra protegida; no consta autorización): la ficha
-                      oficial permite verla. Esta versión no tiene el mismo efecto que una edición con la pintura.
+                      En esta edición la reproducción no está disponible (obra protegida hasta el {DERECHOS_DALI.hasta},{" "}
+                      {DERECHOS_DALI.gestion}; no consta autorización): la ficha oficial permite verla. MANIFESTO no está
+                      afiliado a su titular. Esta versión no tiene el mismo efecto que una edición con la pintura. Consultas
+                      o reclamaciones de derechos: <Link href="/aviso-legal">aviso legal</Link>.
                     </p>
                   )}
                 </section>
