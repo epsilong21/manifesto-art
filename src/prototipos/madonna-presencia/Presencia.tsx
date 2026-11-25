@@ -427,7 +427,7 @@ export function Presencia() {
                 <a href={FICHAS.catalogo.url} target="_blank" rel="noopener noreferrer">{FICHAS.catalogo.nombre}</a>
                 <a href={FICHAS.museo.url} target="_blank" rel="noopener noreferrer">{FICHAS.museo.nombre}</a>
               </p>
-              {cand.estado === "sin" && (
+              {cand.estado === "sin" ? (
                 <p className="pr-derechos">
                   {OBRA.derechos}. Protegida por derechos de autor hasta el {DERECHOS_DALI.hasta} ({DERECHOS_DALI.gestion});
                   reproducirla requiere su autorización, que no consta en esta edición. Esta página es un proyecto editorial
@@ -436,7 +436,17 @@ export function Presencia() {
                   VEGAP. Consultas o reclamaciones de derechos:{" "}
                   <a href={`mailto:${CONTACTO_LEGAL.correo}`}>{CONTACTO_LEGAL.correo}</a> · <Link href="/aviso-legal">Aviso legal</Link>.
                 </p>
-              )}
+              ) : cand.estado === "integra" && cand.origen === "editorial-sin-licencia" ? (
+                <p className="pr-derechos">
+                  {OBRA.derechos}. Protegida por derechos de autor hasta el {DERECHOS_DALI.hasta} ({DERECHOS_DALI.gestion}).
+                  No hay autorización de VEGAP ni de la Fundació Gala-Salvador Dalí: esta reproducción se publica por
+                  decisión editorial de MANIFESTO S.A.S., con finalidad divulgativa, y se retirará si lo pide el titular
+                  de los derechos. Este aviso no concede ni sustituye ninguna autorización. La pintura original y la
+                  instalación de MANIFESTO que sigue son cosas distintas y se presentan por separado. MANIFESTO no está
+                  afiliado a la Fundació Gala-Salvador Dalí ni a VEGAP. Consultas o reclamaciones de derechos:{" "}
+                  <a href={`mailto:${CONTACTO_LEGAL.correo}`}>{CONTACTO_LEGAL.correo}</a> · <Link href="/aviso-legal">Aviso legal</Link>.
+                </p>
+              ) : null}
             </div>
           </div>
         </div>

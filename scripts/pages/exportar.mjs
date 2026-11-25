@@ -97,6 +97,22 @@ if (glenn.elegida) {
   }
 }
 console.log(`Glenn: ${glenn.elegida ? `con la pintura, reproducción «${glenn.elegida.clave}»` : "sin la pintura (esquema)"}`);
+
+// La Madona de Portlligat: reproducción editorial SIN licencia (decisión del responsable, 25/11/2026; ver
+// src/prototipos/madonna-presencia/reproduccion.ts, PUBLICACION_EDITORIAL_SIN_LICENCIA). Un solo archivo, sin
+// alternativa con licencia todavía: si no está en public/obras, la página usa su lámina vacía.
+const MADONA_ARCHIVO = "madona-portlligat-1949-referencia.jpg";
+const MADONA_PROPORCION = 295 / 380;
+const madona = existsSync(join(raiz, "public/obras", MADONA_ARCHIVO));
+if (madona) {
+  const { width, height } = await sharp(join(raiz, "public/obras", MADONA_ARCHIVO)).metadata();
+  if (Math.abs(width / height / MADONA_PROPORCION - 1) > 0.01) {
+    console.error(`✗ ${MADONA_ARCHIVO} mide ${width} × ${height}: no tiene la proporción esperada (295 × 380).`);
+    process.exit(1);
+  }
+}
+console.log(`La Madona de Portlligat: ${madona ? "con la pintura (reproducción editorial sin licencia)" : "sin la pintura (lámina vacía)"}`);
+
 const env = {
   ...process.env,
   MANIFESTO_DESTINO: "pages",
@@ -106,7 +122,7 @@ const env = {
   NEXT_PUBLIC_SITE_URL: dominio ? `https://${dominio}` : (process.env.NEXT_PUBLIC_SITE_URL ?? `https://epsilong21.github.io${base}`),
 };
 
-const OBRAS = ["medusa.jpg", "medusa-stuck.jpg", "noche-estrellada.jpg", ...(elegida ? [elegida.archivo] : []), ...(basquiat.elegida ? [basquiat.elegida.archivo] : []), ...(glenn.elegida ? [glenn.elegida.archivo] : [])];
+const OBRAS = ["medusa.jpg", "medusa-stuck.jpg", "noche-estrellada.jpg", ...(elegida ? [elegida.archivo] : []), ...(basquiat.elegida ? [basquiat.elegida.archivo] : []), ...(glenn.elegida ? [glenn.elegida.archivo] : []), ...(madona ? [MADONA_ARCHIVO] : [])];
 const ANCHOS = JSON.parse(readFileSync(join(raiz, "src/lib/imagenAnchos.json"), "utf8"));
 
 rmSync(out, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
@@ -176,6 +192,7 @@ const marcas = [
   ...(elegida ? [`--elefantes=${elegida.archivo.replace(/\.\w+$/, "")}`] : []),
   ...(basquiat.elegida ? [`--basquiat=${basquiat.elegida.archivo.replace(/\.\w+$/, "")}`] : []),
   ...(glenn.elegida ? [`--glenn=${glenn.elegida.archivo.replace(/\.\w+$/, "")}`] : []),
+  ...(madona ? ["--madona"] : []),
   ...(publicacion ? ["--publicacion"] : []),
 ];
 const verificacion = spawnSync(process.execPath, [join(raiz, "scripts/pages/verificar.mjs"), out, base, ...marcas], { stdio: "inherit" });
@@ -198,6 +215,12 @@ if (glenn.elegida?.clave === "referencia") {
     REPRODUCCIONES_GLENN.referencia.publicable
       ? "\n⚠ out/ contiene la reproducción de REFERENCIA de Glenn (Basquiat), SIN LICENCIA, publicable por decisión editorial de MANIFESTO S.A.S. (ver glenn-reproducciones.json)."
       : "\n⚠ out/ contiene la reproducción de REFERENCIA de Glenn (sin licencia): solo para revisión local. NO publicar.",
+  );
+}
+if (madona) {
+  console.warn(
+    "\n⚠ out/ contiene la reproducción de La Madona de Portlligat, SIN LICENCIA de VEGAP ni de la Fundació Gala-Salvador " +
+    "Dalí, publicada por decisión editorial de MANIFESTO S.A.S. (25/11/2026; ver CREDITOS.md y /aviso-legal).",
   );
 }
 process.exit(verificacion.status ?? 1);

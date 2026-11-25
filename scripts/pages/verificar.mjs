@@ -1,11 +1,14 @@
 // Verifica una exportación estática antes de publicarla.
-// Uso: node scripts/pages/verificar.mjs <out> [basePath] [--elefantes=<nombre>] [--basquiat=<nombre>] [--glenn=<nombre>] [--publicacion]
+// Uso: node scripts/pages/verificar.mjs <out> [basePath] [--elefantes=<nombre>] [--basquiat=<nombre>] [--glenn=<nombre>] [--madona] [--publicacion]
 // Con --elefantes, la exportación debe incluir las variantes de esa reproducción
 // de la pintura de Dalí; sin él, no puede quedar ningún rastro de ninguna.
 // La reproducción de referencia (sin licencia) solo se admite sin --publicacion,
 // y con cualquier otra no puede quedar ningún rastro de ella.
 // --basquiat funciona igual para Untitled (Basquiat) y --glenn, para Glenn (Basquiat):
 // su referencia solo se admite con --publicacion si su entrada dice `publicable: true`.
+// --madona: la reproducción editorial SIN licencia de La Madona de Portlligat (decisión del
+// responsable del proyecto, 25/11/2026) se admite en cualquier build, publicación incluida;
+// sin la marca, no puede quedar ningún rastro de ella (incluida la referencia local de revisión).
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { REPRODUCCIONES as REPRODUCCIONES_BASQUIAT } from "../basquiat/reproduccion.mjs";
@@ -16,6 +19,7 @@ const args = process.argv.slice(2);
 const elefantes = args.find((a) => a.startsWith("--elefantes="))?.slice("--elefantes=".length);
 const basquiat = args.find((a) => a.startsWith("--basquiat="))?.slice("--basquiat=".length);
 const glenn = args.find((a) => a.startsWith("--glenn="))?.slice("--glenn=".length);
+const madona = args.includes("--madona");
 const publicacion = args.includes("--publicacion");
 const conReferencia = elefantes === "los-elefantes-referencia";
 const basquiatReferencia = basquiat === "basquiat-untitled-referencia";
@@ -95,12 +99,20 @@ if (!glenn) {
   for (const [a, t] of textos) if (/\/obras\/glenn|img\/glenn/.test(t)) errores.push(`${a} referencia una reproducción de Glenn`);
 }
 
-// 2e. La reproducción local de La Madona de Portlligat nunca se publica (AUTORIZACION = null)
-for (const a of archivos) if (/madona-portlligat-1949-referencia/.test(a)) errores.push(`Archivo no permitido: ${a}`);
-for (const [a, t] of textos) {
-  if (!/madona-portlligat-1949-referencia/.test(t)) continue;
-  if (/\.js$/.test(a)) continue;
-  errores.push(`${a} contiene datos de la reproducción local de La Madona`);
+// 2e. La Madona de Portlligat: sin --madona, ningún rastro (ni la referencia local de revisión,
+// que nunca se publica porque AUTORIZACION sigue en null). Con --madona, deben estar las variantes
+// WebP generadas al exportar (nunca el .jpg de /obras: ver PROHIBIDO arriba).
+if (madona) {
+  if (!archivos.some((a) => /^img\/madona-portlligat-1949-referencia-\d+\.webp$/.test(a))) {
+    errores.push("Faltan las variantes de la reproducción de La Madona de Portlligat");
+  }
+} else {
+  for (const a of archivos) if (/madona-portlligat-1949-referencia/.test(a)) errores.push(`Archivo no permitido: ${a}`);
+  for (const [a, t] of textos) {
+    if (!/madona-portlligat-1949-referencia/.test(t)) continue;
+    if (/\.js$/.test(a)) continue;
+    errores.push(`${a} contiene datos de la reproducción local de La Madona`);
+  }
 }
 
 // 3. Ninguna página enlaza la reproducción de Dalí ni a Dante
