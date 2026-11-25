@@ -117,6 +117,15 @@ Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fun
 - **Sin licencia:** **no hay autorización de VEGAP ni de la Fundació Gala-Salvador Dalí**, ni de Glasgow Life para la imagen. Se muestra por decisión editorial de MANIFESTO S.A.S., con finalidad educativa, y así se indica en la página. Se retirará si lo pide su titular.
 - **Capas de MANIFESTO:** el modelo de las dos miradas, la franja de luz y las guías de triángulo, círculo y ejes se dibujan o se calculan aparte y no alteran el archivo.
 
+### La Madona de Portlligat (primera versión) · Salvador Dalí, 1949 · Haggerty Museum of Art, Marquette University, Milwaukee
+
+Protegida por derechos de autor hasta el 1 de enero de 2060. Los gestiona la Fundació Gala-Salvador Dalí a través de VEGAP.
+
+- **Reproducción:** no incluida. La experiencia funciona sin la pintura, mostrando una ficha documental y una alternativa informativa. La referencia local de desarrollo (`madona-portlligat-1949-referencia.jpg`) nunca se versiona ni se publica.
+- **Sin licencia:** **no hay autorización de la Fundació Gala-Salvador Dalí, de VEGAP ni del Haggerty Museum of Art.** La pintura no se muestra en la versión pública. Si se obtiene una autorización, el sistema de reproducción (`reproduccion.ts`) activará la imagen y los créditos correspondientes.
+- **Datos de la obra:** ficha del [catálogo razonado en línea de la Fundació Gala-Salvador Dalí, P 643](https://catalogues.salvador-dali.org/catalogues/es/heritageobject/333-bc25/) y ficha del [Haggerty Museum of Art](https://haggerty.zetcom.net/en/collection/item/943/). Donación de Mr. y Mrs. Ira Haupt.
+- **Capas de MANIFESTO:** la instalación tridimensional (retablo SDF con raymarching en WebGL2), las tres estaciones, la arquitectura integral, el paisaje mediterráneo, el HUD cinematográfico, las transiciones y la sala de contemplación son creaciones de MANIFESTO, generadas en tiempo real con código. La geometría de la composición se derivó de las proporciones de la pintura (ver `composicion.ts`), pero no reproduce ni imita la pintura.
+
 ### San Pedro penitente · Taller de Jusepe de Ribera, siglo XVII
 
 - **Reproducción:** [«The penitent Saint Peter.jpg»](https://commons.wikimedia.org/wiki/File:The_penitent_Saint_Peter.jpg) (Wikimedia Commons, 1576 × 2000 px), clasificada allí como dominio público. Su crédito remite a Sotheby's, Nueva York, 5 de junio de 2014, lote 31. Christie's vendió la misma obra en la venta 23048, lote 203 (17 de abril de 2024), como taller de Ribera.
@@ -145,9 +154,11 @@ En *Cristo de San Juan de la Cruz* (Dalí), el modelo de las dos miradas, la fra
 
 En *San Pedro penitente* (taller de Ribera), los cuatro actos, los tres haces de luz que las negaciones apagan, la brasa, el silencio luminoso, la escala narrativa y los tratamientos de luz y sombra son creaciones de MANIFESTO, generadas en tiempo real con WebGL2 y dibujadas sobre la reproducción sin alterar el archivo. Las citas bíblicas proceden de la Reina-Valera Antigua (dominio público).
 
+En *La Madona de Portlligat* (Dalí, 1949), la instalación tridimensional (retablo SDF con raymarching en WebGL2), las tres estaciones, la arquitectura integral con las cuatro cavidades diferenciadas, el paisaje mediterráneo de Port Lligat, el HUD cinematográfico, el sistema de correspondencia geométrica (registro A1), las transiciones (R1 «la respiración») y la sala de contemplación V2.7.1 son creaciones de MANIFESTO, generadas en tiempo real con código. La composición geométrica se derivó de las proporciones y el eje de simetría de la pintura; no reproduce ni imita la pintura.
+
 ## Tipografías
 
-Archivo, Gloock, Instrument Serif, Big Shoulders, Bricolage Grotesque, IBM Plex Mono y Bodoni Moda, de Google Fonts, con licencia SIL Open Font License. Se autoalojan al compilar.
+Archivo, Gloock, Instrument Serif, Big Shoulders, Bricolage Grotesque, IBM Plex Mono, Bodoni Moda, Cormorant Garamond y Lora, de Google Fonts, con licencia SIL Open Font License. Se autoalojan al compilar.
 
 ## Fuentes de los textos
 

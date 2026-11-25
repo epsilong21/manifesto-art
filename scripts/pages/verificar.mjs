@@ -38,6 +38,9 @@ for (const r of RUTAS) if (!existsSync(join(out, r, "index.html"))) errores.push
 // 1b. Las páginas 06–10: desde V5.1 también las enlazan la entrada y el catálogo (comprobación de abajo).
 const RUTAS_SPRINT = ["conceptos/ascension-al-empireo/", "conceptos/el-descendimiento-de-la-cruz/", "conceptos/la-loca-meg/", "conceptos/los-siete-pecados-capitales/", "conceptos/cristo-de-san-juan-de-la-cruz/"];
 for (const r of RUTAS_SPRINT) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
+// 1c. Obras fuera del catálogo pero con ruta pública
+const RUTAS_EXTRAS = ["conceptos/la-madona-de-portlligat/"];
+for (const r of RUTAS_EXTRAS) if (!existsSync(join(out, r, "index.html"))) errores.push(`Falta la ruta /${r}`);
 if (!existsSync(join(out, "404.html"))) errores.push("Falta 404.html");
 // La entrada y el catálogo enlazan las diez obras, el aviso legal y la política de datos
 for (const r of ["", "conceptos/"]) {
@@ -90,6 +93,14 @@ if (!glennReferencia) {
 if (!glenn) {
   for (const a of archivos) if (/^img\/glenn/.test(a)) errores.push(`Archivo no permitido: ${a}`);
   for (const [a, t] of textos) if (/\/obras\/glenn|img\/glenn/.test(t)) errores.push(`${a} referencia una reproducción de Glenn`);
+}
+
+// 2e. La reproducción local de La Madona de Portlligat nunca se publica (AUTORIZACION = null)
+for (const a of archivos) if (/madona-portlligat-1949-referencia/.test(a)) errores.push(`Archivo no permitido: ${a}`);
+for (const [a, t] of textos) {
+  if (!/madona-portlligat-1949-referencia/.test(t)) continue;
+  if (/\.js$/.test(a)) continue;
+  errores.push(`${a} contiene datos de la reproducción local de La Madona`);
 }
 
 // 3. Ninguna página enlaza la reproducción de Dalí ni a Dante

@@ -1,0 +1,1512 @@
+/* ─────────────────────────────────────────────────────────────
+   La Madona de Portlligat · V2.3 «La presencia en la ausencia» (prototipo)
+   Sala (pintura) + instalación (3D) + transiciones. Mobile-first.
+   La lámina nunca se anima, recorta ni deforma: solo su opacidad entera.
+   ───────────────────────────────────────────────────────────── */
+
+.pr {
+  --pr-noche: #04060d;
+  --pr-frio: #eef2fb;
+  --pr-frio2: #b4bfd4;
+  --pr-ambar: #e0a458;
+  --pr-linea: rgb(238 242 251 / 0.22);
+  --pr-vela: rgb(4 6 13 / 0.62);
+  --pr-gutter: clamp(1rem, 4vw, 2.5rem);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--pr-noche);
+  color: var(--pr-frio);
+  font-family: "Instrument Serif", Georgia, serif;
+}
+
+/* ═══ Sala (el encuentro) ═══
+   Una sala de contemplación: la pintura domina, el resto es atmósfera y silencio. Tres composiciones, de menor a mayor:
+   vertical (columna única; la acción siempre en la primera pantalla), horizontal (pintura | texto) y sala ancha, que
+   repite la rejilla del regreso (título | pintura | invitación): se vuelve a la misma habitación. */
+.pr {
+  --pr-display: var(--font-cormorant), "Instrument Serif", Georgia, serif;
+}
+.pr-sala {
+  /* Alto de la pintura en vertical: lo que queda tras la cabecera, el título y la invitación (nunca por encima de su resolución nativa) */
+  --pr-alto: min(max(15rem, calc(100svh - 19.5rem)), 986px);
+  position: relative;
+  box-sizing: border-box;
+  display: none;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: max(1rem, env(safe-area-inset-top)) max(var(--pr-gutter), env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(var(--pr-gutter), env(safe-area-inset-left));
+}
+/* La sala solo existe en el layout mientras se ve: en la instalación y en el regreso no ocupa sitio (así la página no gana un
+   desplazamiento vertical invisible bajo la capa fija, que en móvil colapsaría la barra del navegador y movería la pintura).
+   Aislamiento, recorte y capas de la atmósfera también son solo de esas fases. */
+.pr[data-fase="encuentro"] .pr-sala,
+.pr[data-fase="entrando"][data-desde="sala"] .pr-sala {
+  display: flex;
+  isolation: isolate;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+/* La atmósfera: la oscuridad del encuentro ya anuncia el paisaje abierto de la instalación (cielo ultramar arriba, mar lila abajo
+   y, detrás de la pintura, un resplandor cálido muy contenido). Solo gradientes: sin imágenes, partículas ni WebGL. */
+.pr[data-fase="encuentro"] .pr-sala::before,
+.pr[data-fase="entrando"][data-desde="sala"] .pr-sala::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 42% at 50% 104%, rgb(104 112 196 / 0.2), transparent 72%),
+    radial-gradient(ellipse 85% 52% at 50% -8%, rgb(31 76 184 / 0.26), transparent 72%),
+    radial-gradient(ellipse 46% 56% at 50% 50%, rgb(224 164 88 / 0.07), transparent 76%),
+    var(--pr-noche);
+}
+.pr-sala__cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
+}
+.pr-ante {
+  margin: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pr-ambar);
+  font-family: system-ui, sans-serif;
+}
+.pr-centro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding-block: 0.7rem 0;
+  min-width: 0;
+}
+
+/* La ficha y la lámina son hijas de `figure`/`figcaption`, pero se colocan como elementos de la sala */
+.pr-lamina-fig,
+.pr-ficha {
+  display: contents;
+}
+.pr-aviso {
+  margin: 0;
+  max-width: 34rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--pr-ambar);
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--pr-ambar);
+  font-family: system-ui, sans-serif;
+}
+.pr-lamina {
+  position: relative;
+  order: 0;
+  display: block;
+  max-width: 100%;
+  /* Sombra del contenedor (nunca filtros sobre los píxeles de la lámina): la pintura cuelga de la pared, no flota */
+  box-shadow: 0 2.4rem 5.5rem -1.8rem rgb(0 0 0 / 0.7), 0 0 0 1px rgb(238 242 251 / 0.05);
+}
+/* El horizonte de la pintura continúa en la sala: una banda cálida y plana, como el sol bajo el horizonte de la instalación */
+.pr[data-fase="encuentro"] .pr-lamina::before,
+.pr[data-fase="entrando"][data-desde="sala"] .pr-lamina::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -70vw;
+  right: -70vw;
+  top: 28%;
+  height: 34%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 9% at 50% 50%, rgb(244 168 102 / 0.17), transparent 100%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgb(176 196 240 / 0.12), transparent 100%);
+}
+.pr-lamina__img {
+  display: block;
+  width: auto;
+  /* `height: auto` + `max-height` solo limita por arriba: con un archivo de baja resolución (p. ej. la referencia local
+     de revisión) la lámina se queda en su tamaño nativo en vez de ocupar el alto disponible. `height` fijo a `--pr-alto`
+     la escala (arriba o abajo) a ese alto siempre; si excede el ancho de su columna, `max-width` + `object-fit: contain`
+     la reducen sin deformarla ni recortarla. */
+  height: calc(var(--pr-alto) * 0.78);
+  max-width: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+.pr-lamina__vacia {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: min(calc(var(--pr-alto) * 0.7789), calc(100vw - 2 * var(--pr-gutter)));
+  aspect-ratio: 768 / 986;
+  padding: 1.25rem;
+  border: 1px solid var(--pr-linea);
+  /* Opaco: el horizonte de la sala pasa por detrás de la pintura, nunca a través de su ausencia */
+  background: #090c14;
+  text-align: center;
+}
+.pr-lamina__vacia-t {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+}
+.pr-lamina__vacia-s {
+  margin: 0;
+  max-width: 17rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--pr-frio2);
+  font-family: system-ui, sans-serif;
+}
+
+/* Identificación: el título es lo primero que se lee tras la pintura; el resto, en voz baja */
+.pr-ficha__cabeza {
+  order: 1;
+  max-width: 34rem;
+  text-align: center;
+}
+.pr-ficha__titulo {
+  margin: 0;
+  font-family: var(--pr-display);
+  font-size: clamp(1.9rem, 1.2rem + 3.2vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+.pr-ficha__titulo cite {
+  font-style: normal;
+}
+.pr-ficha__ed {
+  display: block;
+  margin-top: 0.3em;
+  font-size: 0.5em;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: var(--pr-frio2);
+}
+.pr-ficha__linea {
+  margin: 0.55rem 0 0;
+  font-family: var(--pr-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+  color: var(--pr-frio2);
+}
+.pr-ficha__datos {
+  order: 3;
+  max-width: 34rem;
+  text-align: center;
+}
+.pr-ficha__datos p {
+  margin: 0.15rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--pr-frio2);
+  font-family: system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.pr-texto {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  max-width: 34rem;
+  text-align: center;
+}
+/* Vertical: la invitación antes que el resto, siempre a la vista; en las composiciones anchas se lee primero el contexto */
+.pr-invita {
+  order: -2;
+}
+.pr-interp {
+  order: -1;
+  max-width: 26rem;
+}
+/* La invitación: un umbral. El nombre invita; la línea inferior dice qué es (interactivo, en 3D) */
+.pr-btn--umbral {
+  flex-direction: column;
+  gap: 0.15rem;
+  min-height: 56px;
+  padding: 0.45rem 1.9rem;
+  background: rgb(224 164 88 / 0.12);
+}
+.pr-umbral__t {
+  font-family: var(--pr-display);
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+.pr-umbral__s {
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pr-frio2);
+}
+@media (hover: hover) {
+  .pr-btn--umbral:not(:disabled):hover {
+    background: rgb(224 164 88 / 0.22);
+  }
+}
+.pr-doc {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--pr-frio);
+  font-family: system-ui, sans-serif;
+}
+.pr-rotulo {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--pr-linea);
+  border-radius: 999px;
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pr-frio2);
+}
+.pr-rotulo--int {
+  border-color: var(--pr-ambar);
+  color: var(--pr-ambar);
+}
+.pr-pista {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--pr-frio2);
+  font-family: system-ui, sans-serif;
+}
+.pr-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.pr-fichas {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2rem 1rem;
+  font-size: 0.6875rem;
+  font-family: system-ui, sans-serif;
+}
+.pr-fichas a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--pr-frio2);
+  text-underline-offset: 3px;
+}
+.pr-derechos {
+  margin: 0;
+  font-size: 0.625rem;
+  line-height: 1.5;
+  color: rgb(180 191 212 / 0.75);
+  font-family: system-ui, sans-serif;
+}
+
+/* ═══ Botones ═══ */
+.pr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.25rem 0.9rem;
+  border: 1px solid var(--pr-linea);
+  border-radius: 999px;
+  background: var(--pr-vela);
+  backdrop-filter: blur(6px);
+  color: var(--pr-frio);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.15;
+  font-family: system-ui, sans-serif;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.25s, border-color 0.25s;
+}
+.pr-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.pr-btn--principal {
+  border-color: var(--pr-ambar);
+  background: rgb(224 164 88 / 0.14);
+  padding-inline: 1.4rem;
+}
+.pr-btn--sec {
+  flex: 0 0 auto;
+  padding-inline: 0.8rem;
+  font-size: 0.75rem;
+}
+.pr-btn--flecha {
+  padding: 0;
+  font-size: 1.25rem;
+}
+.pr-btn__num {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--pr-ambar);
+}
+.pr-btn[aria-pressed="true"] {
+  border-color: var(--pr-ambar);
+  background: rgb(224 164 88 / 0.16);
+}
+.pr-btn:focus-visible,
+.pr-fichas a:focus-visible,
+.pr-deslizador input:focus-visible {
+  outline: 2px solid var(--pr-frio);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .pr-btn:not(:disabled):hover {
+    border-color: var(--pr-ambar);
+  }
+}
+
+/* ═══ Instalación (capa fija sobre la sala) ═══ */
+.pr-inst {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--pr-noche);
+  visibility: hidden;
+  opacity: 1;
+}
+.pr-inst__capa,
+.pr-inst__escena {
+  position: absolute;
+  inset: 0;
+}
+.pr-inst__lienzo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+}
+.pr-inst__lienzo:active {
+  cursor: grabbing;
+}
+.pr-inst__lienzo:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--pr-frio);
+}
+.pr-inst__alternativa {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  pointer-events: none;
+  background: #5d86e0;
+}
+.pr-inst__escena[data-gl="no"] .pr-inst__alternativa {
+  display: flex;
+}
+.pr-inst__escena[data-gl="no"] .pr-inst__lienzo {
+  opacity: 0;
+}
+.pr-inst__alternativa svg {
+  width: auto;
+  height: min(70%, 60rem);
+  max-width: 100%;
+}
+.pr-inst__alt-txt {
+  margin: 0;
+  max-width: 90%;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: var(--pr-vela);
+  font-size: 0.8125rem;
+  text-align: center;
+  color: var(--pr-frio);
+  font-family: system-ui, sans-serif;
+}
+
+/* Velos: el espacio alrededor se oscurece y el centro es lo último que se apaga */
+.pr-vela {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.pr-vela--borde {
+  background: radial-gradient(ellipse 34% 44% at 50% 52%, transparent 0%, rgb(4 6 13 / 0.25) 38%, rgb(4 6 13 / 0.94) 100%);
+}
+.pr-vela--total {
+  background: var(--pr-noche);
+}
+
+/* ── HUD de la instalación (V2.6B.2) ──
+   Permanente y mínimo: título y «Salir» arriba; abajo una sola barra (‹ · indicador de tres tramos · › · Opciones).
+   Todo lo demás vive en el panel «Opciones», que se abre bajo demanda. El lenguaje editorial es el de la sala (Cormorant);
+   los botones conservan la letra de sistema de la sala (sublíneas y acciones). */
+.pr-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  font-family: var(--pr-display);
+}
+.pr-hud > * {
+  pointer-events: auto;
+}
+.pr-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.pr-hud__cabeza {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: min(22rem, 62%);
+  padding: max(0.6rem, env(safe-area-inset-top)) 0.5rem 1.2rem max(var(--pr-gutter), env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 44px;
+  gap: 0.1rem;
+  text-shadow: 0 1px 10px rgb(4 6 13 / 0.55);
+  pointer-events: none;
+  isolation: isolate;
+}
+/* El respaldo del título es una neblina oscura que desborda la caja del texto: así llega entera hasta el final de cada línea */
+.pr-hud__cabeza::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  width: 150%;
+  height: 190%;
+  pointer-events: none;
+  background: radial-gradient(ellipse 100% 100% at 0 0, rgb(4 6 13 / 0.84), rgb(4 6 13 / 0.78) 62%, rgb(4 6 13 / 0.3) 84%, transparent 100%);
+}
+.pr-hud__cabeza .pr-ante {
+  display: none;
+}
+.pr-hud__titulo {
+  margin: 0;
+  font-size: clamp(1.3rem, 1.1rem + 1vw, 1.9rem);
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+.pr-hud__arriba {
+  position: absolute;
+  top: max(0.6rem, env(safe-area-inset-top));
+  right: max(0.6rem, env(safe-area-inset-right));
+  display: flex;
+  gap: 0.4rem;
+}
+.pr-btn--salir {
+  letter-spacing: 0.06em;
+  background: rgb(4 6 13 / 0.74);
+}
+
+/* El mando: la barra de recorrido y, encima, las opciones (cuando se abren) */
+.pr-mando {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  --pr-mando-pt: 1.2rem;
+  padding: var(--pr-mando-pt) max(var(--pr-gutter), env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(var(--pr-gutter), env(safe-area-inset-left));
+  background: linear-gradient(0deg, rgb(4 6 13 / 0.55), rgb(4 6 13 / 0.2) 60%, transparent);
+}
+/* La barra es una cápsula oscura: el texto y los iconos nunca dependen de lo claro que esté el cielo o el mar detrás */
+.pr-recorre {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid rgb(238 242 251 / 0.14);
+  border-radius: 999px;
+  background: rgb(4 6 13 / 0.78);
+  backdrop-filter: blur(10px);
+}
+.pr-recorre .pr-btn {
+  background: transparent;
+  backdrop-filter: none;
+  border-color: rgb(238 242 251 / 0.16);
+}
+.pr-btn--opciones {
+  padding: 0;
+  gap: 0.45rem;
+}
+.pr-opc__ico {
+  fill: currentColor;
+  flex: 0 0 auto;
+}
+.pr-opc__t {
+  display: none;
+}
+/* El indicador: dónde se está sin cifras. Nombre de la posición y tres tramos (la actual en ámbar, las ya recorridas más claras) */
+.pr-indica {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  text-align: center;
+  text-shadow: 0 1px 10px rgb(4 6 13 / 0.7);
+}
+.pr-indica__nombre {
+  margin: 0;
+  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+.pr-indica__num {
+  margin-right: 0.4em;
+  color: var(--pr-ambar);
+  font-style: italic;
+}
+.pr-indica__tramos {
+  display: flex;
+  gap: 0.35rem;
+}
+.pr-indica__tramos i {
+  display: block;
+  width: 1.7rem;
+  height: 2px;
+  border-radius: 2px;
+  background: rgb(238 242 251 / 0.3);
+  transition: background-color 0.6s ease, box-shadow 0.6s ease, transform 0.6s ease;
+}
+.pr-indica__tramos i[data-estado="pasada"] {
+  background: rgb(238 242 251 / 0.72);
+}
+.pr-indica__tramos i[data-estado="actual"] {
+  background: var(--pr-ambar);
+  box-shadow: 0 0 8px rgb(224 164 88 / 0.65);
+  transform: scaleY(1.6);
+}
+
+/* La indicación de cómo avanzar: una frase, solo en la primera posición, sin interrumpir */
+.pr-hud__pista {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - var(--pr-mando-pt) + 0.45rem);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--pr-gutter));
+  margin: 0;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: rgb(4 6 13 / 0.8);
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--pr-frio);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.pr[data-fase="instalacion"][data-est="0"] .pr-hud__pista {
+  opacity: 1;
+  transition-delay: 1s;
+}
+.pr[data-opciones="si"] .pr-hud__pista {
+  display: none;
+}
+
+/* Opciones bajo demanda: estaciones, recorrido, pausa, exploración libre y reinicio */
+@keyframes pr-opciones-abre {
+  from { opacity: 0; transform: translateY(0.5rem); }
+}
+.pr-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  border: 1px solid var(--pr-linea);
+  border-radius: 1rem;
+  background: rgb(4 6 13 / 0.88);
+  backdrop-filter: blur(10px);
+  animation: pr-opciones-abre 0.25s ease both;
+}
+.pr-opciones[hidden] {
+  display: none;
+}
+.pr-opciones__est,
+.pr-opciones__acc {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+.pr-opciones .pr-btn {
+  border-radius: 0.75rem;
+  padding-inline: 0.3rem;
+}
+.pr-opciones__est .pr-btn {
+  flex-direction: column;
+  gap: 0;
+}
+.pr-est__n,
+.pr-est__t {
+  font-family: var(--pr-display);
+}
+.pr-est__n {
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1;
+  color: var(--pr-ambar);
+}
+.pr-est__t {
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+.pr-deslizador {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  min-width: 0;
+  padding-inline: 0.4rem;
+}
+.pr-etiqueta {
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pr-frio2);
+  font-family: system-ui, sans-serif;
+}
+.pr-deslizador input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  accent-color: var(--pr-ambar);
+  cursor: pointer;
+}
+.pr-opciones .pr-btn--sec {
+  font-size: 0.6875rem;
+}
+
+/* La revelación: silencio, una frase, una acción */
+.pr-revela {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 3rem var(--pr-gutter) max(1.4rem, env(safe-area-inset-bottom));
+  background: linear-gradient(0deg, rgb(4 6 13 / 0.78), rgb(4 6 13 / 0.4) 60%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.pr-revela__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.pr-revela__linea {
+  margin: 0;
+  font-size: clamp(1.3rem, 1.1rem + 0.9vw, 1.7rem);
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 14px rgb(4 6 13 / 0.7);
+}
+
+/* ═══ Omitir transición / estado ═══ */
+.pr-omitir {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: max(1.2rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  animation: pr-aparece 0.4s ease 0.4s both;
+}
+.pr-omitir[hidden] {
+  display: none;
+}
+@keyframes pr-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.pr-estado {
+  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════
+   Transiciones por fase: encuentro → entrando → instalacion → volviendo → regreso.
+   Las secuencias con retardo son ANIMACIONES (no transiciones): al cambiar de fase (omitir) se cancelan al instante;
+   una transición con el mismo valor final seguiría su curso y dejaría la capa oculta. Cada fase fija además su estado
+   final de forma estática, de modo que el paso de una a otra no produce saltos.
+   ═══════════════════════════════════════════ */
+@keyframes pr-sale { from { opacity: 1; } to { opacity: 0; } }
+@keyframes pr-entra { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pr-capa-aparece { 0%, 99.9% { visibility: hidden; } 100% { visibility: visible; } }
+
+/* — La sala (encuentro): solo visible en el encuentro y mientras se entra desde ella — */
+.pr-sala {
+  visibility: hidden;
+}
+.pr[data-fase="encuentro"] .pr-sala,
+.pr[data-fase="entrando"][data-desde="sala"] .pr-sala {
+  visibility: visible;
+}
+.pr-cromo {
+  opacity: 1;
+}
+.pr[data-fase="entrando"] .pr-cromo {
+  animation: pr-sale 0.45s ease both;
+}
+.pr[data-fase="instalacion"] .pr-cromo {
+  opacity: 0;
+}
+.pr-lamina {
+  opacity: 1;
+}
+.pr[data-fase="entrando"] .pr-lamina {
+  animation: pr-sale 0.7s ease 0.45s both;
+}
+.pr[data-fase="instalacion"] .pr-lamina {
+  opacity: 0;
+}
+/* La atmósfera de la sala se apaga con la pintura, antes de que la capa de la instalación (1,1 s) la cubra */
+.pr[data-fase="entrando"][data-desde="sala"] .pr-sala::before {
+  animation: pr-sale 0.7s ease 0.4s both;
+}
+
+/* — Aparición de la sala (primera visita) —
+   1 · se establece la atmósfera · 2 · aparece la pintura (solo su opacidad) · 3 · entra la identificación ·
+   4 · se revela la invitación · 5 · el resto, en voz baja. Nada bloquea la interacción: cualquier gesto la asienta al instante
+   (`data-llegada="asentada"`) y con movimiento reducido todas las duraciones valen 0. */
+@keyframes pr-llega { from { opacity: 0; } }
+@keyframes pr-llega-sube { from { opacity: 0; transform: translateY(0.7rem); } }
+.pr[data-llegada="en-curso"] .pr-sala::before {
+  animation: pr-llega 1.4s ease both;
+}
+.pr[data-llegada="en-curso"] .pr-sala__cab {
+  animation: pr-llega 1s ease 0.4s both;
+}
+.pr[data-llegada="en-curso"] .pr-sala .pr-lamina {
+  animation: pr-llega 1.5s ease 0.45s both;
+}
+.pr[data-llegada="en-curso"] .pr-ficha__cabeza {
+  animation: pr-llega-sube 1.1s cubic-bezier(0.22, 0.61, 0.36, 1) 1.3s both;
+}
+.pr[data-llegada="en-curso"] .pr-ficha__datos {
+  animation: pr-llega 1s ease 1.7s both;
+}
+.pr[data-llegada="en-curso"] .pr-sala .pr-doc {
+  animation: pr-llega-sube 1s cubic-bezier(0.22, 0.61, 0.36, 1) 1.8s both;
+}
+.pr[data-llegada="en-curso"] .pr-invita {
+  animation: pr-llega-sube 1s cubic-bezier(0.22, 0.61, 0.36, 1) 2.1s both;
+}
+.pr[data-llegada="en-curso"] .pr-interp,
+.pr[data-llegada="en-curso"] .pr-fuentes {
+  animation: pr-llega 1s ease 2.4s both;
+}
+
+/* — Capa de la instalación — */
+.pr[data-fase="entrando"][data-desde="sala"] .pr-inst,
+.pr[data-fase="entrando"][data-desde="reinicia"] .pr-inst {
+  animation: pr-capa-aparece 1.1s linear both;
+}
+.pr[data-fase="entrando"][data-desde="reanuda"] .pr-inst,
+.pr[data-fase="instalacion"] .pr-inst,
+.pr[data-fase="volviendo"] .pr-inst {
+  visibility: visible;
+}
+
+/* — Velos de la entrada desde la sala (V2.3). En el regreso con encuadre (V2.4) la escena 3D se ve limpia — */
+.pr-vela--total,
+.pr-vela--borde {
+  opacity: 1;
+}
+.pr[data-fase="entrando"][data-desde="sala"] .pr-vela--total,
+.pr[data-fase="entrando"][data-desde="reinicia"] .pr-vela--total {
+  animation: pr-sale 1s ease 1.15s both;
+}
+.pr[data-fase="entrando"][data-desde="sala"] .pr-vela--borde,
+.pr[data-fase="entrando"][data-desde="reinicia"] .pr-vela--borde {
+  animation: pr-sale 1.8s ease 1.3s both;
+}
+.pr[data-fase="entrando"][data-desde="reanuda"] .pr-vela--total,
+.pr[data-fase="entrando"][data-desde="reanuda"] .pr-vela--borde,
+.pr[data-fase="instalacion"] .pr-vela--total,
+.pr[data-fase="volviendo"] .pr-vela--total,
+.pr[data-fase="volviendo"] .pr-vela--borde {
+  opacity: 0;
+}
+.pr[data-fase="instalacion"] .pr-vela--borde {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+/* En la revelación el encuadre se cierra suavemente sobre el centro vacío */
+.pr[data-fase="instalacion"][data-alineado="si"] .pr-vela--borde {
+  opacity: 0.6;
+  transition: opacity 2.4s ease 0.4s;
+}
+
+/* — HUD — */
+.pr-hud {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.pr[data-fase="instalacion"] .pr-hud {
+  opacity: 1;
+  transition: opacity 0.8s ease 0.2s;
+}
+
+/* — El regreso (V2.4 / V2.7.1): lámina íntegra, sala de contemplación final —
+   .pr-ventana oscurece todo lo que queda FUERA del rectángulo de la lámina (sombra de caja inversa): nunca se dibuja
+   nada encima de sus píxeles. El pseudoelemento ::before de .pr-regreso construye la escenografía ambiental. */
+.pr-regreso {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  visibility: hidden;
+  pointer-events: none;
+}
+.pr[data-fase="regreso"] .pr-regreso::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 48%, rgb(224 164 88 / 0.06), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 50%, rgb(31 76 184 / 0.09), transparent 75%),
+    radial-gradient(ellipse 50% 45% at 50% 100%, rgb(104 112 196 / 0.12), transparent 70%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 55%, rgb(2 3 8 / 0.5) 100%),
+    var(--pr-noche);
+}
+.pr-ventana {
+  position: absolute;
+  pointer-events: none;
+  box-shadow: 0 0 0 200vmax var(--pr-noche);
+}
+.pr-regreso__rejilla {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  box-sizing: border-box;
+  padding: max(0.8rem, env(safe-area-inset-top)) max(var(--pr-gutter), env(safe-area-inset-right)) max(0.8rem, env(safe-area-inset-bottom)) max(var(--pr-gutter), env(safe-area-inset-left));
+  gap: 0.75rem;
+  pointer-events: none;
+}
+.pr-regreso__arriba,
+.pr-regreso__abajo {
+  pointer-events: auto;
+}
+.pr-regreso__ranura {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+}
+.pr-placa {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+.pr-placa__marco {
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 986px;
+  object-fit: contain;
+  user-select: none;
+  filter: drop-shadow(0 1.5rem 4rem rgb(0 0 0 / 0.6)) drop-shadow(0 0 1.5rem rgb(224 164 88 / 0.08));
+}
+.pr-regreso__arriba {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem 0.8rem;
+  text-align: center;
+}
+.pr-regreso__titulo {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  font-family: var(--pr-display);
+}
+.pr-regreso__titulo cite {
+  font-style: normal;
+  font-size: clamp(1.4rem, 1rem + 1.6vw, 2.2rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  color: var(--pr-frio);
+}
+.pr-regreso__edicion {
+  font-size: clamp(0.75rem, 0.6rem + 0.5vw, 0.9375rem);
+  font-style: italic;
+  color: var(--pr-frio2);
+  letter-spacing: 0.02em;
+}
+.pr-regreso__autor {
+  font-size: clamp(0.8125rem, 0.65rem + 0.5vw, 1rem);
+  color: var(--pr-frio2);
+  letter-spacing: 0.02em;
+}
+.pr-regreso__autor::before {
+  content: none;
+}
+.pr-regreso__cierre {
+  margin: 0;
+  font-family: var(--pr-display);
+  font-size: clamp(0.875rem, 0.7rem + 0.5vw, 1.1rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--pr-frio2);
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+.pr-regreso__abajo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 40rem;
+  margin-inline: auto;
+  text-align: center;
+}
+.pr-acciones--quietas {
+  gap: 0.4rem;
+}
+.pr-btn--quieto {
+  background: transparent;
+  backdrop-filter: none;
+  border-color: rgb(238 242 251 / 0.16);
+  color: var(--pr-frio2);
+  font-size: 0.75rem;
+}
+.pr-btn--quieto-principal {
+  color: var(--pr-frio);
+  border-color: rgb(224 164 88 / 0.55);
+}
+@media (hover: hover) {
+  .pr-btn--quieto:not(:disabled):hover {
+    color: var(--pr-frio);
+    border-color: var(--pr-ambar);
+  }
+}
+
+.pr-aviso--corto {
+  font-size: 0.625rem;
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+}
+.pr-solo-ancho {
+  display: none;
+}
+.pr-mas {
+  width: 100%;
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: var(--pr-frio2);
+}
+.pr-mas__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-height: 38svh;
+  overflow-y: auto;
+  padding: 0.3rem 0.2rem 0.6rem;
+  text-align: left;
+  overscroll-behavior: contain;
+}
+.pr-mas__bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+.pr-mas__bloque .pr-rotulo {
+  margin: 0;
+  font-weight: 400;
+}
+.pr-mas__bloque .pr-fichas {
+  justify-content: flex-start;
+}
+.pr-doc--datos {
+  font-size: 0.75rem;
+  color: var(--pr-frio2);
+}
+.pr-mas summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.pr-mas summary:focus-visible {
+  outline: 2px solid var(--pr-frio);
+  outline-offset: 3px;
+}
+@media (min-width: 40rem) {
+  .pr-solo-ancho {
+    display: inline;
+  }
+}
+
+/* Estado del regreso: todo visible */
+.pr[data-fase="regreso"] .pr-regreso,
+.pr[data-fase="volviendo"] .pr-regreso {
+  visibility: visible;
+}
+
+/* El regreso (V2.5). Los tiempos vienen de `TIEMPOS` (correspondencia.ts) como variables --pr-t-* en milisegundos sin unidad.
+   Común a las tres variantes: la cámara se aleja hasta el encuadre registrado mientras el entorno se oscurece alrededor
+   de la lámina (.pr-ventana); un instante quieto; la lámina sustituye a la escena; la lámina queda sola; llegan los rótulos. */
+.pr[data-fase="volviendo"] .pr-ventana {
+  animation: pr-entra calc(var(--pr-t-camara) * 1ms) ease both;
+}
+.pr[data-fase="volviendo"] .pr-placa {
+  animation: pr-entra calc(var(--pr-t-sust-dur) * 1ms) linear calc(var(--pr-t-sust) * 1ms) both;
+}
+.pr[data-fase="volviendo"] .pr-barra {
+  animation: pr-entra calc(var(--pr-t-barras-dur) * 1ms) ease calc(var(--pr-t-barras) * 1ms) both;
+}
+/* A1 y A2: la lámina aparece opaca (duración 0: corte, nunca translúcida). El contenedor escénico sale con ella (A1: en el
+   mismo instante, un solo fotograma) o antes, con un fundido breve (A2: queda un instante oscuro entre ambos). */
+.pr[data-fase="volviendo"]:not([data-alt="a"]) .pr-inst {
+  animation: pr-sale calc(var(--pr-t-fundido-dur) * 1ms) ease calc(var(--pr-t-fundido) * 1ms) both;
+}
+/* r1 · «la respiración»: igual que A1 pero con 200 ms de fundido del contenedor escénico
+   justo antes de que aparezca la lámina. La regla genérica :not([data-alt="a"]) ya lo cubre. */
+
+/* r2 · «continuidad espacial»: el 3D ajusta su exposición y saturación para parecerse a la pintura antes del corte.
+   Una sola animación combinada (pr-iguala) maneja filter + opacity en tres fases:
+     0–50 %  ajuste de color (brillo, saturación, sepia) mientras la cámara llega
+     50–70 % la escena mantiene el aspecto ajustado (pausa visual)
+     70–100 % la escena se atenúa hasta desaparecer; la lámina aparece al final */
+@keyframes pr-iguala {
+  0%   { filter: brightness(1) saturate(1) sepia(0); opacity: 1; }
+  50%  { filter: brightness(0.82) saturate(0.7) sepia(0.15); opacity: 1; }
+  70%  { filter: brightness(0.82) saturate(0.7) sepia(0.15); opacity: 1; }
+  100% { filter: brightness(0.82) saturate(0.7) sepia(0.15); opacity: 0; }
+}
+.pr[data-fase="volviendo"][data-alt="r2"] .pr-inst {
+  animation: pr-iguala 1000ms ease 500ms both;
+}
+
+/* a · V2.4 original (solo referencia): la escena permanece debajo mientras la lámina se funde translúcida */
+.pr[data-fase="volviendo"][data-alt="a"] .pr-placa {
+  animation-timing-function: ease;
+}
+/* Revisión (?detener=ventana): se queda en el encuadre registrado, sin lámina, para compararlo con ella */
+.pr[data-fase="volviendo"][data-detener="si"] .pr-placa,
+.pr[data-fase="volviendo"][data-detener="si"] .pr-barra {
+  animation: none;
+  opacity: 0;
+}
+.pr[data-fase="volviendo"][data-detener="si"] .pr-inst {
+  animation: none;
+}
+
+/* Vuelta a la instalación desde la lámina */
+.pr[data-fase="entrando"][data-desde="reanuda"] .pr-regreso,
+.pr[data-fase="entrando"][data-desde="reinicia"] .pr-regreso {
+  visibility: visible;
+}
+.pr[data-fase="entrando"][data-desde="reanuda"] .pr-barra {
+  animation: pr-sale 0.4s ease both;
+}
+.pr[data-fase="entrando"][data-desde="reanuda"] .pr-placa {
+  animation: pr-sale 0.6s ease 0.1s both;
+}
+.pr[data-fase="entrando"][data-desde="reanuda"] .pr-ventana {
+  animation: pr-sale 1.1s ease 0.7s both;
+}
+.pr[data-fase="entrando"][data-desde="reinicia"] .pr-barra {
+  animation: pr-sale 0.45s ease both;
+}
+.pr[data-fase="entrando"][data-desde="reinicia"] .pr-placa,
+.pr[data-fase="entrando"][data-desde="reinicia"] .pr-ventana {
+  animation: pr-sale 0.7s ease 0.45s both;
+}
+
+/* La revelación (silencio): la cabecera y el mando se retiran; tras una pausa llegan una frase y dos acciones */
+.pr-hud__cabeza,
+.pr-hud__arriba,
+.pr-mando {
+  transition: opacity 0.7s ease;
+}
+.pr[data-alineado="si"] .pr-hud__cabeza {
+  opacity: 0;
+  transition: opacity 1.2s ease 0.6s;
+}
+.pr[data-alineado="si"] .pr-hud__arriba:not(:has(:focus-visible)),
+.pr[data-alineado="si"] .pr-mando:not(:has(:focus-visible)) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.9s ease 0.4s;
+}
+.pr[data-alineado="si"] .pr-revela {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 1.6s ease 2s;
+}
+.pr[data-alineado="si"] .pr-hud__pista {
+  opacity: 0;
+}
+
+/* ═══ Pantallas anchas ═══ */
+@media (min-width: 40rem) {
+  .pr-ante {
+    font-size: 0.6875rem;
+  }
+  .pr-hud__cabeza .pr-ante {
+    display: block;
+  }
+  .pr-mando {
+    background: linear-gradient(0deg, rgb(4 6 13 / 0.4), transparent);
+  }
+  .pr-recorre,
+  .pr-opciones {
+    width: min(36rem, 100%);
+    margin-inline: auto;
+  }
+  .pr-recorre {
+    grid-template-columns: 44px minmax(0, 1fr) 44px auto;
+  }
+  .pr-btn--opciones {
+    padding-inline: 0.9rem 1.1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+  }
+  .pr-opc__t {
+    display: inline;
+  }
+}
+
+/* Móvil en horizontal (poca altura): el panel se reparte en dos columnas para no robar escena */
+@media (min-width: 40rem) and (max-height: 30rem) {
+  .pr-acciones,
+  .pr-fichas {
+    justify-content: flex-start;
+  }
+  .pr-recorre,
+  .pr-opciones {
+    width: min(34rem, 100%);
+  }
+  .pr-mando {
+    --pr-mando-pt: 0.5rem;
+    padding-bottom: max(0.4rem, env(safe-area-inset-bottom));
+  }
+  .pr-opciones {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .pr-opciones__est {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .pr-opciones__acc {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .pr-deslizador {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .pr-hud__cabeza {
+    padding-bottom: 0.6rem;
+  }
+  .pr-hud__pista {
+    font-size: 0.95rem;
+  }
+  .pr-revela {
+    padding-top: 1.5rem;
+    gap: 0.5rem;
+  }
+}
+
+/* Salas grandes: el texto crece con la pantalla */
+@media (min-width: 90rem) and (min-height: 60rem) {
+  .pr-doc {
+    font-size: 0.9375rem;
+  }
+  .pr-ficha__datos p,
+  .pr-pista,
+  .pr-fichas {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Pantallas bajas en vertical (320×568…): el título y la invitación se compactan para que la pintura conserve su presencia */
+@media (max-width: 40rem) and (max-height: 40rem) {
+  .pr-sala {
+    --pr-alto: min(max(15rem, calc(100svh - 17.5rem)), 986px);
+  }
+  .pr-ficha__titulo {
+    font-size: 1.65rem;
+  }
+  .pr-ficha__linea {
+    margin-top: 0.35rem;
+    font-size: 1.05rem;
+  }
+  .pr-centro {
+    gap: 0.65rem;
+  }
+}
+
+/* Sala horizontal (móvil apaisado, tableta, ventanas bajas): la pintura a toda la altura útil | título, invitación y datos */
+@media (orientation: landscape) and (min-width: 40rem) {
+  .pr-sala {
+    --pr-pad-v: clamp(1.25rem, 5.5svh, 3.75rem);
+    /* Margen superior: nunca menor que la cabecera (MANIFESTO y, en revisión local, la etiqueta) */
+    --pr-pad-t: max(var(--pr-pad-v), 2.2rem);
+    --pr-alto: min(calc(100svh - var(--pr-pad-t) - var(--pr-pad-v)), 986px);
+    padding-block: max(var(--pr-pad-t), env(safe-area-inset-top)) max(var(--pr-pad-v), env(safe-area-inset-bottom));
+  }
+  .pr-sala__cab {
+    position: absolute;
+    z-index: 1;
+    top: max(0.55rem, env(safe-area-inset-top));
+    left: max(var(--pr-gutter), env(safe-area-inset-left));
+    right: max(var(--pr-gutter), env(safe-area-inset-right));
+  }
+  .pr-centro {
+    display: grid;
+    grid-template-columns: auto minmax(0, 28rem);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    justify-content: center;
+    align-content: stretch;
+    column-gap: clamp(1.5rem, 4vw, 3.5rem);
+    row-gap: 0.9rem;
+    padding-block: 0;
+  }
+  .pr-lamina {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: start;
+  }
+  .pr-ficha__cabeza {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    text-align: left;
+    max-width: none;
+  }
+  .pr-ficha__titulo {
+    font-size: clamp(1.7rem, 0.9rem + 2.2vw, 2.7rem);
+  }
+  .pr-texto {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    align-items: flex-start;
+    text-align: left;
+    max-width: none;
+  }
+  .pr-ficha__datos {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: end;
+    text-align: left;
+    max-width: none;
+  }
+  .pr-texto .pr-fichas {
+    justify-content: flex-start;
+  }
+}
+
+/* Sala ancha: la misma rejilla que el regreso (título | pintura | invitación). La pintura ocupa exactamente el mismo
+   rectángulo que al volver: título arriba a la izquierda, datos abajo, invitación abajo a la derecha */
+@media (orientation: landscape) and (min-width: 70rem) and (min-height: 40rem) {
+  .pr-sala {
+    --pr-pad-t: var(--pr-pad-v);
+  }
+  .pr-centro {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: clamp(1.5rem, 3.4vw, 4rem);
+    justify-content: stretch;
+  }
+  .pr-lamina {
+    grid-column: 2;
+  }
+  .pr-ficha__cabeza {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+    text-align: right;
+    max-width: 26rem;
+  }
+  .pr-ficha__titulo {
+    font-size: clamp(2.2rem, 0.9rem + 2.5vw, 3.7rem);
+  }
+  .pr-ficha__datos {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: end;
+    text-align: right;
+    max-width: 24rem;
+  }
+  .pr-texto {
+    grid-column: 3;
+    grid-row: 1 / -1;
+    align-self: end;
+    justify-self: start;
+    max-width: 24rem;
+  }
+  .pr-invita,
+  .pr-interp {
+    order: 0;
+  }
+}
+
+/* Regreso en paisaje (móvil horizontal y escritorio): título | lámina a toda la altura útil | acciones.
+   Las columnas laterales se alinean al fondo de la lámina, como cartelas de museo. */
+@media (orientation: landscape) and (min-width: 40rem) and (max-height: 30rem), (orientation: landscape) and (min-width: 52rem) {
+  .pr-regreso__rejilla {
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+  }
+  .pr-regreso__arriba {
+    order: 1;
+    align-self: end;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+  .pr-regreso__titulo {
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+  .pr-regreso__titulo cite {
+    font-size: clamp(1.6rem, 1rem + 1.8vw, 2.8rem);
+    text-align: right;
+  }
+  .pr-regreso__ranura {
+    order: 2;
+    height: 100%;
+  }
+  .pr-placa {
+    width: auto;
+  }
+  .pr-regreso__abajo {
+    order: 3;
+    align-self: end;
+    align-items: flex-start;
+    text-align: left;
+    margin-inline: 0;
+    max-width: 24rem;
+  }
+  .pr-regreso__cierre {
+    text-align: left;
+  }
+  .pr-regreso__abajo .pr-acciones {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .pr-mas summary {
+    justify-content: flex-start;
+  }
+  .pr-mas__cuerpo {
+    max-height: 60svh;
+  }
+  .pr-omitir {
+    left: auto;
+    right: max(var(--pr-gutter), env(safe-area-inset-right));
+    transform: none;
+  }
+}
+/* Escritorio: espacio museográfico alrededor de la lámina */
+@media (orientation: landscape) and (min-width: 52rem) and (min-height: 30rem) {
+  .pr-regreso__rejilla {
+    padding-block: max(clamp(1.25rem, 5svh, 3.5rem), env(safe-area-inset-top));
+  }
+}
+
+/* Móvil muy estrecho */
+@media (max-width: 26rem) {
+  .pr-opciones .pr-btn--sec {
+    padding-inline: 0.3rem;
+  }
+  .pr-hud__arriba .pr-btn--sec {
+    padding-inline: 0.75rem;
+  }
+}
+
+/* ═══ Corte instantáneo (omitir) y reduced motion: sin transiciones, estados estáticos diferenciados ═══ */
+.pr[data-corte="si"] *,
+.pr[data-corte="si"] *::before,
+.pr[data-corte="si"] *::after {
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pr *,
+  .pr *::before,
+  .pr *::after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

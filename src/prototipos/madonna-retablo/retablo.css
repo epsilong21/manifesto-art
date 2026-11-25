@@ -1,0 +1,374 @@
+/* ─────────────────────────────────────────────────────────────
+   «El retablo que espera» · V2.1 (prototipo)
+   Interpretación original de MANIFESTO. Mobile-first.
+   ───────────────────────────────────────────────────────────── */
+
+.rt {
+  --rt-noche: #04060d;
+  --rt-frio: #eef2fb;
+  --rt-frio2: #b4bfd4;
+  --rt-ambar: #e0a458;
+  --rt-linea: rgb(238 242 251 / 0.22);
+  --rt-vela: rgb(4 6 13 / 0.62);
+  --rt-gutter: clamp(1rem, 4vw, 2.5rem);
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--rt-noche);
+  color: var(--rt-frio);
+  font-family: "Instrument Serif", Georgia, serif;
+}
+
+/* ── Lienzo ── */
+.rt-lienzo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+}
+.rt-lienzo:active {
+  cursor: grabbing;
+}
+.rt-lienzo:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--rt-frio);
+}
+
+/* ── Alternativa sin WebGL ── */
+.rt-alternativa {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  pointer-events: none;
+  background: #5d86e0;
+}
+.rt[data-gl="no"] .rt-alternativa {
+  display: flex;
+}
+.rt[data-gl="no"] .rt-lienzo {
+  opacity: 0;
+}
+.rt-alternativa svg {
+  width: auto;
+  height: min(78%, 60rem);
+  max-width: 100%;
+}
+.rt-alternativa__txt {
+  margin: 0;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: var(--rt-vela);
+  font-size: 0.875rem;
+  color: var(--rt-frio);
+  font-family: system-ui, sans-serif;
+}
+
+/* ── HUD ── */
+.rt-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.rt-hud > * {
+  pointer-events: auto;
+}
+
+/* Cabecera discreta: no ocupa la composición */
+.rt-cabeza {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: min(26rem, 78%);
+  padding: max(var(--rt-gutter), env(safe-area-inset-top)) var(--rt-gutter) 1.4rem max(var(--rt-gutter), env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: radial-gradient(130% 150% at 0 0, rgb(4 6 13 / 0.6), rgb(4 6 13 / 0.32) 45%, transparent 75%);
+  text-shadow: 0 1px 10px rgb(4 6 13 / 0.55);
+  pointer-events: none;
+}
+.rt-ante {
+  margin: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rt-ambar);
+  font-family: system-ui, sans-serif;
+}
+.rt-titulo {
+  margin: 0;
+  font-size: clamp(1.25rem, 1rem + 1.4vw, 1.9rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+.rt-sub {
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--rt-frio2);
+  font-family: system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}
+.rt-estado {
+  margin: 0;
+  /* Región viva para lectores de pantalla; visualmente oculta: la imagen habla por sí sola */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── Mando ── */
+.rt-mando {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.6rem max(var(--rt-gutter), env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(var(--rt-gutter), env(safe-area-inset-left));
+  background: linear-gradient(0deg, rgb(4 6 13 / 0.7), rgb(4 6 13 / 0.38) 55%, transparent);
+}
+/* En la vista alineada el mando se aparta para no tapar la base del pedestal; vuelve con cualquier gesto o con el foco */
+.rt-mando {
+  transition: opacity 0.7s ease;
+}
+.rt[data-oculto="si"] .rt-mando:not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
+}
+.rt-estaciones {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.rt-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.rt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--rt-linea);
+  border-radius: 999px;
+  background: var(--rt-vela);
+  backdrop-filter: blur(6px);
+  color: var(--rt-frio);
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1.15;
+  font-family: system-ui, sans-serif;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.25s, border-color 0.25s;
+}
+.rt-btn__num {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--rt-ambar);
+}
+.rt-btn[aria-pressed="true"] {
+  border-color: var(--rt-ambar);
+  background: rgb(224 164 88 / 0.16);
+}
+.rt-btn:focus-visible,
+.rt-deslizador input:focus-visible {
+  outline: 2px solid var(--rt-frio);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .rt-btn:hover {
+    border-color: var(--rt-ambar);
+  }
+}
+.rt-btn--sec {
+  flex: 0 0 auto;
+  padding-inline: 1rem;
+}
+
+.rt-deslizador {
+  flex: 1 1 10rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  min-width: 0;
+}
+.rt-etiqueta {
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rt-frio2);
+  font-family: system-ui, sans-serif;
+}
+.rt-deslizador input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  accent-color: var(--rt-ambar);
+  cursor: pointer;
+}
+
+/* Diagnóstico de render (solo con ?qa=1) */
+.rt-fps {
+  position: absolute;
+  right: var(--rt-gutter);
+  top: max(var(--rt-gutter), env(safe-area-inset-top));
+  font-size: 0.6875rem;
+  font-family: ui-monospace, monospace;
+  color: rgb(238 242 251 / 0.8);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--rt-vela);
+  pointer-events: none;
+}
+
+/* ── Pantallas anchas: etiquetas en una línea, mando acotado y centrado ── */
+@media (min-width: 40rem) {
+  .rt-mando {
+    left: 50%;
+    right: auto;
+    width: min(46rem, 100%);
+    transform: translateX(-50%);
+    background: linear-gradient(0deg, rgb(4 6 13 / 0.62), transparent);
+  }
+  .rt-btn {
+    font-size: 0.8125rem;
+    padding-inline: 1rem;
+  }
+}
+
+/* Escritorio ancho: el mando pasa a una sola fila y deja libre la base de la composición (pedestal, volúmenes inferiores) */
+@media (min-width: 70rem) {
+  .rt-mando {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.9rem;
+    width: min(70rem, 100%);
+    padding-top: 1rem;
+  }
+  .rt-estaciones {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.4rem;
+  }
+  .rt-btn {
+    white-space: nowrap;
+  }
+  .rt-fila {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+  }
+  .rt-deslizador {
+    flex: 1 1 8rem;
+  }
+}
+
+/* Móvil en horizontal: el mando también va en una sola fila para no tapar la base de la composición */
+@media (min-width: 40rem) and (max-height: 30rem) {
+  .rt-mando {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    width: min(100%, 70rem);
+    padding-top: 0.6rem;
+    padding-bottom: max(0.4rem, env(safe-area-inset-bottom));
+  }
+  .rt-estaciones {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.3rem;
+  }
+  .rt-btn {
+    white-space: nowrap;
+    padding-inline: 0.7rem;
+    font-size: 0.75rem;
+  }
+  .rt-fila {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+  }
+  .rt-deslizador {
+    flex: 1 1 4rem;
+  }
+  .rt-etiqueta {
+    display: none;
+  }
+  .rt-btn--sec {
+    padding-inline: 0.7rem;
+  }
+}
+
+/* Móvil estrecho: etiquetas más cortas por el ancho */
+@media (max-width: 26rem) {
+  .rt-btn {
+    flex-direction: column;
+    gap: 0;
+    font-size: 0.6875rem;
+  }
+  .rt-etiqueta {
+    display: none;
+  }
+  /* V2.1: el deslizador y «Explorar libremente» comparten fila (a 320 px el botón pasaba a una tercera fila y tapaba la base) */
+  .rt-mando {
+    gap: 0.25rem;
+    padding-top: 1.1rem;
+  }
+  .rt-fila {
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+  }
+  .rt-deslizador {
+    flex: 1 1 4rem;
+  }
+  .rt-btn--sec {
+    padding-inline: 0.7rem;
+  }
+}
+
+/* Móvil en horizontal: la cabecera se compacta */
+@media (max-height: 30rem) {
+  .rt-sub {
+    display: none;
+  }
+  .rt-cabeza {
+    padding-bottom: 0.6rem;
+  }
+}
+
+/* ── Reduced motion: sin transiciones ── */
+@media (prefers-reduced-motion: reduce) {
+  .rt *,
+  .rt *::before,
+  .rt *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
